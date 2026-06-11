@@ -352,7 +352,7 @@ function Splash({ onStart }) {
             <CircleDollarSign size={26} strokeWidth={2.2} />
           </div>
         </div>
-        <h1 style={{ fontSize: 34, fontWeight: 800, letterSpacing: "-0.04em", margin: 0, lineHeight: 1.15 }}>
+        <h1 style={{ fontSize: 34, fontWeight: 800, letterSpacing: "-0.04em", margin: 0, lineHeight: 1.15, color: "#ffffff", textShadow: "0 2px 4px rgba(0,0,0,0.2)" }}>
           배당 눈덩이
         </h1>
         <p style={{ fontSize: 16, color: C.sub, margin: "12px 0 0", lineHeight: 1.55, maxWidth: 280, letterSpacing: "-0.01em" }}>
