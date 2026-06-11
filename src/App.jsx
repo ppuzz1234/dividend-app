@@ -214,36 +214,41 @@ export default function App() {
   const showHeader = !["splash", "simulate", "done"].includes(step);
 
   return (
-    <div style={{ fontFamily: FONT, width: "100%", display: "flex", justifyContent: "center", padding: "8px 0 24px" }}>
+    <div style={{ fontFamily: FONT, width: "100%", display: "flex", justifyContent: "center", padding: "24px 0" }}>
       <Style />
-      <div style={{ width: 426 * scale, height: 894 * scale }}>
-        <div style={{ transform: `scale(${scale})`, transformOrigin: "top left", width: 426, height: 894 }}>
+      {/* 1. 크기가 스케일링되는 최상위 컨테이너 크기 최적화 및 중앙 정렬 */}
+      <div style={{ width: 426 * scale, height: 894 * scale, display: "flex", justifyContent: "center", alignItems: "center" }}>
+        <div style={{ transform: `scale(${scale})`, transformOrigin: "center center", width: 426, height: 894 }}>
+          
           {/* ----------------------------- 기기 프레임 ----------------------------- */}
+          {/* 2. 상하좌우 대칭을 위해 padding을 12px에서 14px 균등 배치 및 그림자 위치 조정 */}
           <div style={{
-            width: 426, height: 894, borderRadius: 68, padding: 12,
-            background: "linear-gradient(180deg,#3a3d3b,#2c2f2d)",
-            boxShadow: "0 40px 80px -28px rgba(0,0,0,.85), inset 0 0 0 1px rgba(255,255,255,.06)",
+            width: 426, height: 894, borderRadius: 56, padding: 14,
+            background: "#2A2E2B", // 조금 더 세련된 프레임 색상으로 조정
+            boxShadow: "0 25px 50px -12px rgba(0,0,0,.7), inset 0 0 0 1px rgba(255,255,255,.1)",
+            boxSizing: "border-box"
           }}>
-            {/* 화면 */}
+            {/* 화면 (프레임 내부 실제 디스플레이) */}
             <div style={{
-              position: "relative", width: 402, height: 870, borderRadius: 56, overflow: "hidden",
+              position: "relative", width: "100%", height: "100%", borderRadius: 44, overflow: "hidden",
               background: C.bg, color: C.text, display: "flex", flexDirection: "column",
             }}>
               {/* 다이내믹 아일랜드 */}
               <div style={{
                 position: "absolute", top: 12, left: "50%", transform: "translateX(-50%)",
-                width: 126, height: 37, background: "#000", borderRadius: 20, zIndex: 50,
+                width: 110, height: 30, background: "#000", borderRadius: 15, zIndex: 50,
               }} />
+              
               {/* 상태바 */}
               <div style={{
-                height: 54, paddingTop: 18, display: "flex", alignItems: "center",
-                justifyContent: "space-between", padding: "16px 30px 0", flexShrink: 0,
+                height: 54, paddingTop: 16, display: "flex", alignItems: "center",
+                justifyContent: "space-between", paddingLeft: 24, paddingRight: 24, flexShrink: 0,
               }}>
-                <span style={{ fontSize: 15, fontWeight: 700, letterSpacing: "-0.02em" }}>9:41</span>
+                <span style={{ fontSize: 14, fontWeight: 600, letterSpacing: "-0.02em" }}>9:41</span>
                 <div style={{ display: "flex", gap: 6, alignItems: "center", color: C.text }}>
-                  <Signal size={16} strokeWidth={2.5} />
-                  <Wifi size={16} strokeWidth={2.5} />
-                  <BatteryFull size={22} strokeWidth={2} />
+                  <Signal size={15} strokeWidth={2.5} />
+                  <Wifi size={15} strokeWidth={2.5} />
+                  <BatteryFull size={20} strokeWidth={2} />
                 </div>
               </div>
 
@@ -282,11 +287,12 @@ export default function App() {
               </div>
 
               {/* 홈 인디케이터 */}
-              <div style={{ height: 24, display: "grid", placeItems: "center", flexShrink: 0 }}>
-                <div style={{ width: 134, height: 5, borderRadius: 3, background: "rgba(255,255,255,.55)" }} />
+              <div style={{ height: 20, display: "grid", placeItems: "center", flexShrink: 0, paddingBottom: 4 }}>
+                <div style={{ width: 120, height: 4, borderRadius: 2, background: "rgba(255,255,255,.4)" }} />
               </div>
             </div>
           </div>
+          
         </div>
       </div>
     </div>
