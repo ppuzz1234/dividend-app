@@ -221,7 +221,7 @@ export default function App() {
           {/* ----------------------------- 기기 프레임 ----------------------------- */}
           <div style={{
             width: 426, height: 894, borderRadius: 68, padding: 12,
-            background: "linear-gradient(145deg,#3a3d3b,#1b1e1c 45%,#2c2f2d)",
+            background: "linear-gradient(180deg,#3a3d3b,#2c2f2d)",
             boxShadow: "0 40px 80px -28px rgba(0,0,0,.85), inset 0 0 0 1px rgba(255,255,255,.06)",
           }}>
             {/* 화면 */}
@@ -466,7 +466,7 @@ function Recommend({ path, setPath, onNext }) {
           <button key={o.id} onClick={() => setPath(o.id)} style={{
             display: "flex", gap: 14, width: "100%", textAlign: "left", marginBottom: 12, cursor: "pointer",
             background: on ? C.cardHi : C.card, border: `1px solid ${on ? C.jade : C.line}`,
-            borderRadius: 16, padding: 18, transition: "all .18s",
+            borderRadius: 16, padding: 18, transition: "all .18s", color: C.text,
           }}>
             <span style={{
               width: 46, height: 46, borderRadius: 13, flexShrink: 0, display: "grid", placeItems: "center",
@@ -568,7 +568,7 @@ function StockRow({ s, on, onClick }) {
     <button onClick={onClick} style={{
       display: "flex", alignItems: "center", gap: 13, width: "100%", textAlign: "left", cursor: "pointer",
       background: on ? C.cardHi : C.card, border: `1px solid ${on ? C.jade : C.line}`, borderRadius: 15, padding: "13px 15px",
-      transition: "all .15s",
+      transition: "all .15s", color: C.text,
     }}>
       <span style={{
         width: 40, height: 40, borderRadius: 12, flexShrink: 0, display: "grid", placeItems: "center",
@@ -670,7 +670,7 @@ function Period({ years, setYears, monthly, setMonthly, reinvest, setReinvest, o
 
       <button onClick={() => setReinvest((v) => !v)} style={{
         display: "flex", alignItems: "center", gap: 12, width: "100%", marginTop: 24, cursor: "pointer",
-        background: C.card, border: `1px solid ${reinvest ? C.jade : C.line}`, borderRadius: 15, padding: "15px 16px", textAlign: "left",
+        background: C.card, border: `1px solid ${reinvest ? C.jade : C.line}`, borderRadius: 15, padding: "15px 16px", textAlign: "left", color: C.text,
       }}>
         <RefreshCw size={22} color={reinvest ? C.jade : C.faint} />
         <span style={{ flex: 1 }}>
@@ -725,7 +725,7 @@ function Account({ account, setAccount, mydata, onNext }) {
           return (
             <button key={a.id} onClick={() => setAccount(a.id)} style={{
               display: "flex", alignItems: "center", gap: 14, width: "100%", textAlign: "left", cursor: "pointer",
-              background: on ? C.cardHi : C.card, border: `1px solid ${on ? C.jade : C.line}`, borderRadius: 16, padding: 16, transition: "all .15s",
+              background: on ? C.cardHi : C.card, border: `1px solid ${on ? C.jade : C.line}`, borderRadius: 16, padding: 16, transition: "all .15s", color: C.text,
             }}>
               <span style={{ width: 44, height: 44, borderRadius: 13, flexShrink: 0, display: "grid", placeItems: "center", background: on ? C.jade : C.bg2, color: on ? "#06140C" : C.jade }}>
                 <a.icon size={22} />
