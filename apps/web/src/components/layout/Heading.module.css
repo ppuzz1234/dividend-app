@@ -1,0 +1,17 @@
+.wrap {
+  margin-bottom: 22px;
+}
+.title {
+  font-size: 25px;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.25;
+  margin: 0;
+}
+.sub {
+  font-size: 14.5px;
+  color: var(--sub);
+  margin: 9px 0 0;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+}

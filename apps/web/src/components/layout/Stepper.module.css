@@ -1,0 +1,31 @@
+.stepper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.item {
+  flex: 1;
+  text-align: center;
+}
+.bar {
+  height: 4px;
+  border-radius: 2px;
+  margin-bottom: 5px;
+  background: var(--line);
+  transition: background 0.35s;
+}
+.barOn {
+  background: var(--jade);
+}
+.barCurrent {
+  box-shadow: 0 0 10px rgba(63, 208, 139, 0.53);
+}
+.lbl {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--faint);
+}
+.lblOn {
+  color: var(--jade);
+}

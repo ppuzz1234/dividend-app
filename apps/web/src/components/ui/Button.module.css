@@ -1,0 +1,40 @@
+.btn {
+  width: 100%;
+  height: 54px;
+  border-radius: 16px;
+  border: none;
+  font-family: var(--font-sans);
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: transform 0.12s, opacity 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn:active:not(:disabled) {
+  transform: scale(0.975);
+}
+.btn:disabled {
+  opacity: 0.38;
+  cursor: default;
+}
+
+.primary {
+  background: var(--jade);
+  color: var(--on-jade);
+  box-shadow: 0 8px 24px -8px rgba(63, 208, 139, 0.55);
+}
+.gold {
+  background: var(--gold);
+  color: var(--on-gold);
+  box-shadow: 0 8px 24px -8px rgba(232, 192, 120, 0.5);
+}
+.ghost {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--line2);
+}

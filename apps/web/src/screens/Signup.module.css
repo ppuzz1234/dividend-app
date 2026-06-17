@@ -1,0 +1,39 @@
+.agree {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin-top: 8px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 14px 16px;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.2s;
+}
+.agreeOn {
+  border-color: var(--jade);
+}
+.box {
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  background: transparent;
+  border: 1.5px solid var(--line2);
+}
+.boxOn {
+  background: var(--jade);
+  border-color: var(--jade);
+}
+.text {
+  font-size: 13.5px;
+  color: var(--text);
+  line-height: 1.4;
+}
+.req {
+  color: var(--faint);
+}

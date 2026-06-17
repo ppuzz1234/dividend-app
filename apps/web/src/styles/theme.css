@@ -1,0 +1,40 @@
+/* ------------------------------------------------------------------ *
+ *  디자인 토큰 — 색상 / 폰트 (CSS 변수)
+ *  JS(차트·아이콘)에서 동일 값이 필요할 땐 src/theme/tokens.js 사용.
+ *  두 파일은 항상 같은 값을 유지해야 함.
+ * ------------------------------------------------------------------ */
+:root {
+  /* 배경 / 표면 */
+  --bg: #0a0f0d;
+  --bg2: #0e1512;
+  --card: #131b17;
+  --card-hi: #18211c;
+
+  /* 경계선 */
+  --line: #222e27;
+  --line2: #2c3a32;
+
+  /* 텍스트 */
+  --text: #eaf1ec;
+  --sub: #8a998f;
+  --faint: #5c6b62;
+
+  /* 강조 — 제이드 */
+  --jade: #3fd08b;
+  --jade-deep: #27a06c;
+  --jade-dim: #16321f;
+
+  /* 강조 — 골드 */
+  --gold: #e8c078;
+  --gold-deep: #c99a4e;
+  --gold-dim: #332915;
+
+  --danger: #e8775c;
+
+  /* 강조색 위에 올리는 글자색 */
+  --on-jade: #06140c;
+  --on-gold: #1a1305;
+
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display",
+    "Apple SD Gothic Neo", "Pretendard", system-ui, "Malgun Gothic", sans-serif;
+}

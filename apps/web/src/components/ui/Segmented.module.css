@@ -1,0 +1,32 @@
+.seg {
+  display: flex;
+  background: var(--card);
+  border-radius: 13px;
+  padding: 4px;
+  gap: 4px;
+  border: 1px solid var(--line);
+}
+.segSmall {
+  flex: 1;
+}
+.opt {
+  flex: 1;
+  height: 42px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 14.5px;
+  font-weight: 700;
+  transition: all 0.18s;
+  background: transparent;
+  color: var(--sub);
+}
+.optSmall {
+  height: 36px;
+  font-size: 13px;
+}
+.optOn {
+  background: var(--jade);
+  color: var(--on-jade);
+}

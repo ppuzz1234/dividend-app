@@ -1,0 +1,16 @@
+{
+  "name": "devidend-app",
+  "private": true,
+  "version": "0.0.0",
+  "description": "배당 눈덩이 — 배당주 투자 시뮬레이터 (monorepo)",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace apps/web",
+    "build": "npm run build --workspace apps/web",
+    "preview": "npm run preview --workspace apps/web",
+    "lint": "npm run lint --workspace apps/web",
+    "dev:api": "npm run dev --workspace apps/api"
+  }
+}

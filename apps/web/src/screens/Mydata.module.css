@@ -1,0 +1,65 @@
+.footerCol {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.skip {
+  background: none;
+  border: none;
+  color: var(--sub);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-sans);
+}
+.card {
+  border-radius: 18px;
+  padding: 22px;
+  text-align: center;
+  margin-bottom: 18px;
+  background: linear-gradient(160deg, var(--card-hi), var(--card));
+  border: 1px solid var(--line);
+}
+.icon {
+  width: 70px;
+  height: 70px;
+  border-radius: 22px;
+  margin: 0 auto 16px;
+  display: grid;
+  place-items: center;
+  background: var(--bg2);
+  border: 1px solid var(--line2);
+  transition: background 0.3s;
+}
+.iconOn {
+  background: var(--jade);
+}
+.cardTitle {
+  font-size: 16px;
+  font-weight: 700;
+}
+.cardSub {
+  font-size: 13px;
+  color: var(--sub);
+  margin-top: 6px;
+  line-height: 1.5;
+}
+.linkBtn {
+  width: 100%;
+  height: 50px;
+  border-radius: 13px;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid var(--jade);
+  background: transparent;
+  color: var(--jade);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.linkBtnOn {
+  background: var(--jade-dim);
+}
