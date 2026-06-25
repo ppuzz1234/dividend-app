@@ -1,9 +1,14 @@
 .wrap {
   font-family: var(--font-sans);
   width: 100%;
+  min-height: 100dvh;
   display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
+  gap: 14px;
   padding: 24px 0;
+  background: var(--bg);
 }
 
 /* 스케일에 따라 차지하는 실제 공간 (중앙 정렬용) */
@@ -76,39 +81,6 @@
   color: var(--text);
 }
 
-.header {
-  padding: 6px 20px 12px;
-  flex-shrink: 0;
-}
-.headerRow {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 14px;
-}
-.backBtn {
-  width: 34px;
-  height: 34px;
-  border-radius: 11px;
-  border: 1px solid var(--line);
-  background: var(--card);
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-  color: var(--text);
-}
-
-.scroll {
-  flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-.content {
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
 .home {
   height: 20px;
   display: grid;
@@ -121,4 +93,14 @@
   height: 4px;
   border-radius: 2px;
   background: rgba(255, 255, 255, 0.4);
+}
+
+.exit {
+  background: none;
+  border: none;
+  color: var(--sub);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
 }

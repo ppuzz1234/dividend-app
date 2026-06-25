@@ -19,7 +19,7 @@ devidend-app/
    │     ├─ data/            # stocks · accounts (예시 데이터)
    │     ├─ lib/             # format · simulate · flow · cx
    │     ├─ hooks/           # useCountUp
-   │     ├─ components/      # ui/ (Button·Tag·… ) · layout/ (DeviceFrame·Stepper·…)
+   │     ├─ components/      # ui/ (Button·Tag·… ) · layout/ (ChromeBody·PlainShell·PhoneShell·Stepper·…)
    │     └─ screens/         # 단계별 화면 (각 .jsx + .module.css)
    └─ api/               # Node.js 백오피스 API (현재 스텁)
 ```
@@ -40,5 +40,10 @@ npm run build        # 프런트 프로덕션 빌드
 npm run lint         # 프런트 린트
 npm run dev:api      # 백오피스 API 개발 서버 (apps/api)
 ```
+
+### 화면 모드
+
+- 기본(`/`): 베젤 없는 **일반 풀뷰** — 실서비스. 모바일은 풀화면, 데스크톱은 모바일 폭 컬럼 중앙정렬.
+- `?frame=1`(예: `localhost:5173/?frame=1`): **발표용 아이폰 베젤**. 폰 cosmetic(가짜 상태바·홈바)은 이 모드에서만 표시되며 [PhoneShell](apps/web/src/components/layout/PhoneShell.jsx)에 격리되어 실서비스에 영향 없음.
 
 자세한 백엔드 내용은 [apps/api/README.md](apps/api/README.md) 참고.

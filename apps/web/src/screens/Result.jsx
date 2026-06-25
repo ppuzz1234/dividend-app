@@ -7,7 +7,7 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
-import { ArrowRight, CircleDollarSign, Wallet, PiggyBank, TrendingUp } from "lucide-react";
+import { ArrowRight, CircleDollarSign, Wallet, PiggyBank, TrendingUp, AlertTriangle } from "lucide-react";
 import { Pad } from "../components/layout/Pad.jsx";
 import { Heading } from "../components/layout/Heading.jsx";
 import { Button } from "../components/ui/Button.jsx";
@@ -18,7 +18,7 @@ import { cx } from "../lib/cx.js";
 import { C } from "../theme/tokens.js";
 import styles from "./Result.module.css";
 
-export function Result({ sim, chosen, years, reinvest, onNext }) {
+export function Result({ sim, allocation, chosen, years, reinvest, onNext }) {
   const val = useCountUp(sim.finalValue, 1100);
   const returnPct = (sim.finalValue / sim.contributed - 1) * 100;
 
@@ -96,6 +96,34 @@ export function Result({ sim, chosen, years, reinvest, onNext }) {
         <Row k="계좌 · 배당세" v={`${sim.account.name} · ${(sim.taxRate * 100).toFixed(1)}%`} />
         <Row k="배당 재투자" v={reinvest ? "적용" : "미적용"} last />
       </div>
+
+      {/* 계좌별 배분 · 절세 분석 */}
+      <div className={styles.assume}>
+        <div className={styles.assumeTitle}>계좌별 배분 · 절세</div>
+        {sim.perAccount.map((a) => (
+          <Row key={a.accountId} k={a.account.name} v={fmtKRW(a.finalValue)} />
+        ))}
+        <Row k="절세효과 (일반계좌 대비)" v={`+${fmtKRW(sim.taxSaved)}`} />
+        {sim.pensionWithdrawalTax > 0 && (
+          <Row k="연금 인출세 추정" v={`-${fmtKRW(sim.pensionWithdrawalTax)}`} />
+        )}
+        <Row k="세후 실수령 추정" v={fmtKRW(sim.netFinalValue)} last />
+      </div>
+
+      {(sim.compTaxWarning || allocation?.warnings?.length > 0) && (
+        <div className={styles.notes}>
+          {sim.compTaxWarning && (
+            <div className={styles.note}>
+              <AlertTriangle size={14} /> 일반계좌 연 배당이 2,000만원을 넘어 금융소득종합과세 대상이 될 수 있어요 (배당가산율 11% 적용).
+            </div>
+          )}
+          {allocation?.warnings?.map((w, i) => (
+            <div key={i} className={styles.note}>
+              <AlertTriangle size={14} /> {w}
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className={styles.chips}>
         {chosen.map((s) => (

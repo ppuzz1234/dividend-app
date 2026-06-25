@@ -2,11 +2,15 @@ import { ArrowRight, RefreshCw, Lock, BadgeCheck } from "lucide-react";
 import { Pad } from "../components/layout/Pad.jsx";
 import { Heading } from "../components/layout/Heading.jsx";
 import { Button } from "../components/ui/Button.jsx";
+import { Label } from "../components/ui/Label.jsx";
+import { Field } from "../components/ui/Field.jsx";
 import { cx } from "../lib/cx.js";
 import { C } from "../theme/tokens.js";
 import styles from "./Mydata.module.css";
 
-export function Mydata({ mydata, setMydata, onNext }) {
+const digits = (v) => Number(String(v).replace(/\D/g, "")) || 0;
+
+export function Mydata({ mydata, setMydata, age, setAge, income, setIncome, onNext }) {
   return (
     <Pad
       footer={
@@ -38,6 +42,24 @@ export function Mydata({ mydata, setMydata, onNext }) {
         <RefreshCw size={17} />
         {mydata ? "다시 불러오기" : "내 계좌 연동하기"}
       </button>
+
+      <Label top>개인 현황 (맞춤 배분에 사용돼요)</Label>
+      <div className={styles.profileRow}>
+        <Field
+          label="나이"
+          value={age ? String(age) : ""}
+          onChange={(v) => setAge(digits(v))}
+          placeholder="40"
+          inputMode="numeric"
+        />
+        <Field
+          label="연소득 (만원)"
+          value={income ? String(income / 10000) : ""}
+          onChange={(v) => setIncome(digits(v) * 10000)}
+          placeholder="5000"
+          inputMode="numeric"
+        />
+      </div>
     </Pad>
   );
 }

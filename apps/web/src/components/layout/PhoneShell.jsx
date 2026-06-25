@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
-import { ChevronLeft, Signal, Wifi, BatteryFull } from "lucide-react";
-import { Stepper } from "./Stepper.jsx";
-import styles from "./DeviceFrame.module.css";
+import { Signal, Wifi, BatteryFull } from "lucide-react";
+import styles from "./PhoneShell.module.css";
 
-/* iPhone 형태의 기기 프레임. 화면 폭에 맞춰 스케일 조정.
- * stage 가 숫자면 헤더(뒤로가기 + 스텝퍼)를 표시하고, null 이면 숨김. */
-export function DeviceFrame({ stage = null, onBack, contentKey, children }) {
+/* 발표용 아이폰 베젤 셸 (?frame=1 에서만 사용).
+ * 가짜 상태바(9:41)·홈바·노치 등 폰 cosmetic 을 여기서만 그린다.
+ * 실서비스 코드(ChromeBody)와 완전히 분리 — 안 쓰면 영향 없음. */
+export function PhoneShell({ children }) {
   const [scale, setScale] = useState(1);
 
   useEffect(() => {
@@ -15,7 +15,11 @@ export function DeviceFrame({ stage = null, onBack, contentKey, children }) {
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
-  const showHeader = stage !== null;
+  const exit = () => {
+    const url = new URL(window.location.href);
+    url.searchParams.delete("frame");
+    window.location.assign(url.pathname + url.search);
+  };
 
   return (
     <div className={styles.wrap}>
@@ -24,7 +28,6 @@ export function DeviceFrame({ stage = null, onBack, contentKey, children }) {
           <div className={styles.frame}>
             <div className={styles.screen}>
               <div className={styles.island} />
-
               <div className={styles.statusbar}>
                 <span className={styles.time}>9:41</span>
                 <div className={styles.statusIcons}>
@@ -34,22 +37,7 @@ export function DeviceFrame({ stage = null, onBack, contentKey, children }) {
                 </div>
               </div>
 
-              {showHeader && (
-                <div className={styles.header}>
-                  <div className={styles.headerRow}>
-                    <button onClick={onBack} aria-label="뒤로" className={styles.backBtn}>
-                      <ChevronLeft size={20} />
-                    </button>
-                    <Stepper stage={stage} />
-                  </div>
-                </div>
-              )}
-
-              <div id="scrollArea" className={`${styles.scroll} noscroll`}>
-                <div key={contentKey} className={`${styles.content} fadeUp`}>
-                  {children}
-                </div>
-              </div>
+              {children}
 
               <div className={styles.home}>
                 <div className={styles.homeBar} />
@@ -58,6 +46,9 @@ export function DeviceFrame({ stage = null, onBack, contentKey, children }) {
           </div>
         </div>
       </div>
+      <button className={styles.exit} onClick={exit}>
+        전체 화면(일반 버전)으로 보기 →
+      </button>
     </div>
   );
 }

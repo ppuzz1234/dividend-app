@@ -3,11 +3,11 @@ export const STEPS = [
   "splash",
   "signup",
   "mydata",
-  "recommend",
+  "accounts", // 계좌 현황·진단 + 목표
+  "strategy", // 계좌별 상품 유형 제안 (Asset Location)
   "picker",
   "seed",
   "period",
-  "account",
   "simulate",
   "result",
   "done",
@@ -17,17 +17,17 @@ export const STEPS = [
 export const STAGE = {
   signup: 0,
   mydata: 0,
-  recommend: 1,
-  picker: 1,
-  seed: 2,
-  period: 2,
-  account: 3,
+  accounts: 1,
+  strategy: 1,
+  picker: 2,
+  seed: 3,
+  period: 3,
   simulate: 4,
   result: 4,
   done: 4,
 };
 
-export const STAGE_LABELS = ["가입", "종목", "금액", "계좌", "결과"];
+export const STAGE_LABELS = ["가입", "계좌·전략", "종목", "금액", "결과"];
 
 /* 헤더(스텝퍼)를 숨기는 단계 */
 export const NO_HEADER = ["splash", "simulate", "done"];

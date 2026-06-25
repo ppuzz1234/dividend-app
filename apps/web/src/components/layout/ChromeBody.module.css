@@ -1,0 +1,44 @@
+/* 앱 본체 — 부모(PlainShell 뷰포트 또는 PhoneShell 화면)를 채우는 플렉스 컬럼 */
+.shell {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+}
+
+.header {
+  padding: 6px 20px 12px;
+  flex-shrink: 0;
+}
+.headerRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.backBtn {
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
+  border: 1px solid var(--line);
+  background: var(--card);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  color: var(--text);
+}
+
+.scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.content {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}

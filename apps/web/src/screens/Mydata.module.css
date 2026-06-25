@@ -63,3 +63,10 @@
 .linkBtnOn {
   background: var(--jade-dim);
 }
+.profileRow {
+  display: flex;
+  gap: 10px;
+}
+.profileRow > * {
+  flex: 1;
+}

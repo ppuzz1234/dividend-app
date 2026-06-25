@@ -1,5 +1,5 @@
 import { STOCKS } from "../data/stocks.js";
-import { ACCOUNTS } from "../data/accounts.js";
+import { ACCOUNTS, PENSION_WITHDRAWAL, COMP_TAX } from "../data/accounts.js";
 import { avg } from "./format.js";
 
 /* ------------------------------------------------------------------ *
@@ -7,15 +7,23 @@ import { avg } from "./format.js";
  *  · 단일 통화(원) 정규화, 표기 수익률은 예시 가정치
  *  · 투자 권유가 아니며 실제 수익을 보장하지 않음
  * ------------------------------------------------------------------ */
-export function simulate({ seed, monthly, years, holdings, reinvest, account }) {
-  const list = holdings.length ? holdings : STOCKS.filter((s) => s.elite);
-  const y0 = avg(list.map((s) => s.yield));
-  const g = avg(list.map((s) => s.divG));
-  const p = avg(list.map((s) => s.priceG));
-  const acc = ACCOUNTS.find((a) => a.id === account) || ACCOUNTS[0];
-  const tax = acc.tax;
+
+/** 보유 종목 묶음 → 평균 배당/성장 가정치 블렌딩 */
+export function blend(holdings) {
+  const list = holdings?.length ? holdings : STOCKS.filter((s) => s.elite);
+  return {
+    y0: avg(list.map((s) => s.yield)),
+    g: avg(list.map((s) => s.divG)),
+    p: avg(list.map((s) => s.priceG)),
+  };
+}
+
+/** 단일 계좌 월단위 복리 시뮬레이션 (배분 엔진의 계좌별 계산 단위) */
+export function simulateOne({ seed, monthly, years, blended, reinvest, tax, fee = 0 }) {
+  const { y0, g, p } = blended;
   const n = years * 12;
   const rp = Math.pow(1 + p, 1 / 12) - 1;
+  const feeM = fee / 12; // 월 환산 총비용부담률(연 보수)
 
   let value = seed,
     contributed = seed,
@@ -24,8 +32,9 @@ export function simulate({ seed, monthly, years, holdings, reinvest, account }) 
 
   for (let m = 1; m <= n; m++) {
     value *= 1 + rp;
+    if (feeM) value -= value * feeM; // 연 보수 차감 (수수료 drag)
     const yNow = y0 * Math.pow((1 + g) / (1 + p), m / 12);
-    let div = value * (yNow / 12) * (1 - tax);
+    const div = value * (yNow / 12) * (1 - tax);
     cumDiv += div;
     if (reinvest) value += div;
     value += monthly;
@@ -48,9 +57,107 @@ export function simulate({ seed, monthly, years, holdings, reinvest, account }) 
     cumDiv,
     annualIncome: last.income,
     monthlyIncome: last.income / 12,
-    yoc: last.income / contributed,
-    blended: { y0, g, p },
-    taxRate: tax,
-    account: acc,
+    yoc: contributed > 0 ? last.income / contributed : 0,
+  };
+}
+
+/** 단일 계좌 시뮬레이션 (기존 화면 호환용) */
+export function simulate({ seed, monthly, years, holdings, reinvest, account }) {
+  const blended = blend(holdings);
+  const acc = ACCOUNTS.find((a) => a.id === account) || ACCOUNTS[0];
+  const r = simulateOne({ seed, monthly, years, blended, reinvest, tax: acc.tax, fee: acc.feeRate });
+  return { ...r, blended, taxRate: acc.tax, account: acc };
+}
+
+/* 빈 계좌 합산용 0 시계열 한 점 */
+const zero = (year) => ({ year, value: 0, principal: 0, gain: 0, income: 0 });
+
+/**
+ * 배분안(plan)에 따른 멀티계좌 시뮬레이션 + 절세효과 비교.
+ * @param {object} args  { plan, years, holdings, reinvest }
+ *   plan: [{ accountId, seed, monthly }, ...] (allocate() 결과의 plan)
+ */
+export function simulatePortfolio({ plan, years, holdings, reinvest }) {
+  const blended = blend(holdings);
+
+  const perAccount = plan
+    .filter((p) => p.seed > 0 || p.monthly > 0)
+    .map((p) => {
+      const acc = ACCOUNTS.find((a) => a.id === p.accountId) || ACCOUNTS[0];
+      const r = simulateOne({ seed: p.seed, monthly: p.monthly, years, blended, reinvest, tax: acc.tax, fee: acc.feeRate });
+      // 연금계좌는 인출 시 연금소득세 차감 → 세후 실수령 추정
+      const withdrawalTax = acc.id === "pension" ? r.finalValue * PENSION_WITHDRAWAL.defaultRate : 0;
+      return { accountId: p.accountId, account: acc, seed: p.seed, monthly: p.monthly, withdrawalTax, ...r };
+    });
+
+  // 연도별 합산 (모든 계좌가 동일 years → 인덱스 정렬됨)
+  const points = years + 1;
+  const series = Array.from({ length: points }, (_, i) => {
+    const acc0 = perAccount[0]?.series[i] ?? zero(i);
+    return perAccount.reduce(
+      (o, a) => {
+        const s = a.series[i] ?? zero(acc0.year);
+        return {
+          year: acc0.year,
+          value: o.value + s.value,
+          principal: o.principal + s.principal,
+          gain: o.gain + s.gain,
+          income: o.income + s.income,
+        };
+      },
+      zero(acc0.year)
+    );
+  });
+
+  const agg = perAccount.reduce(
+    (o, a) => ({
+      finalValue: o.finalValue + a.finalValue,
+      contributed: o.contributed + a.contributed,
+      cumDiv: o.cumDiv + a.cumDiv,
+      annualIncome: o.annualIncome + a.annualIncome,
+    }),
+    { finalValue: 0, contributed: 0, cumDiv: 0, annualIncome: 0 }
+  );
+
+  // 비교 기준선: 전액 일반계좌(배당세 15.4%)로 굴렸을 때
+  const totalSeed = plan.reduce((s, p) => s + p.seed, 0);
+  const totalMonthly = plan.reduce((s, p) => s + p.monthly, 0);
+  const general = ACCOUNTS.find((a) => a.id === "general");
+  const baseline = simulateOne({ seed: totalSeed, monthly: totalMonthly, years, blended, reinvest, tax: general.tax, fee: general.feeRate });
+
+  // 연금 인출세 합계 → 세후 실수령 평가액
+  const pensionWithdrawalTax = perAccount.reduce((s, a) => s + a.withdrawalTax, 0);
+  const netFinalValue = agg.finalValue - pensionWithdrawalTax;
+
+  // 금융소득종합과세 경고: 일반계좌 세전 연 배당이 2,000만 초과 시
+  const generalAcc = perAccount.find((a) => a.account.id === "general");
+  const generalGrossIncome = generalAcc ? generalAcc.annualIncome / (1 - general.tax) : 0;
+  const compTaxWarning = generalGrossIncome > COMP_TAX.threshold;
+
+  // 화면 호환을 위한 실효세율(납입금 가중)
+  const effTax =
+    agg.contributed > 0
+      ? perAccount.reduce((s, a) => s + a.account.tax * a.contributed, 0) / agg.contributed
+      : 0;
+
+  return {
+    series,
+    perAccount,
+    blended,
+    finalValue: agg.finalValue,
+    contributed: agg.contributed,
+    gain: agg.finalValue - agg.contributed,
+    cumDiv: agg.cumDiv,
+    annualIncome: agg.annualIncome,
+    monthlyIncome: agg.annualIncome / 12,
+    yoc: agg.contributed > 0 ? agg.annualIncome / agg.contributed : 0,
+    taxSaved: agg.finalValue - baseline.finalValue, // 일반계좌 대비 절세 복리효과(적립단계)
+    baseline: { finalValue: baseline.finalValue },
+    pensionWithdrawalTax, // 연금 인출 시 예상 연금소득세
+    netFinalValue, // 연금 인출세 차감 후 실수령 추정
+    compTaxWarning, // 금융소득종합과세 진입 가능성
+    // 기존 Result 화면 호환 필드
+    taxRate: effTax,
+    account: { name: "절세 배분 포트폴리오", id: "portfolio" },
   };
 }

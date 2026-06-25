@@ -1,0 +1,59 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  margin-bottom: 6px;
+}
+.acct {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 16px;
+  color: var(--text);
+}
+.iconBox {
+  width: 44px;
+  height: 44px;
+  border-radius: 13px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  background: var(--bg2);
+  color: var(--jade);
+}
+.txt {
+  flex: 1;
+}
+.name {
+  font-size: 15.5px;
+  font-weight: 700;
+  display: block;
+}
+.desc {
+  font-size: 12.5px;
+  color: var(--sub);
+  display: block;
+  margin-top: 3px;
+}
+.bal {
+  font-size: 14.5px;
+  font-weight: 800;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+.open {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--faint);
+}
+.goalHint {
+  font-size: 12.5px;
+  color: var(--sub);
+  line-height: 1.5;
+  margin-top: 10px;
+}

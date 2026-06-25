@@ -136,6 +136,29 @@
   font-variant-numeric: tabular-nums;
 }
 
+.notes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+.note {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--sub);
+  background: var(--gold-dim);
+  border-radius: 10px;
+  padding: 10px 11px;
+}
+.note svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--gold);
+}
+
 .chips {
   display: flex;
   flex-wrap: wrap;
