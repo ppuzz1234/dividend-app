@@ -1,0 +1,8 @@
+# Netlify 배포 설정 (대시보드 UI 설정보다 우선 적용됨)
+# 모노레포: 루트에서 빌드 → 산출물은 apps/web/dist 에 생성됨
+[build]
+  command = "npm run build"      # 루트 스크립트가 apps/web 워크스페이스를 빌드
+  publish = "apps/web/dist"      # 실제 산출물 위치 (기존 'dist' 는 비어있어 옛 화면이 남았음)
+
+[build.environment]
+  NODE_VERSION = "22"            # Vite 8 요구사항 (Node 20.19+ / 22.12+)
