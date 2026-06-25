@@ -2,6 +2,12 @@
   padding: 4px 20px 16px;
   flex: 1;
 }
+/* 본문이 길어도 버튼이 스크롤 영역 하단에 떠 있도록 고정 */
 .footer {
-  padding: 8px 20px 14px;
+  position: sticky;
+  bottom: 0;
+  padding: 10px 20px 14px;
+  background: var(--bg);
+  /* 위로 스크롤되는 콘텐츠와 자연스럽게 분리 */
+  box-shadow: 0 -8px 16px -10px rgba(0, 0, 0, 0.35);
 }

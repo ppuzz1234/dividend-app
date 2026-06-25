@@ -3,8 +3,7 @@ export const STEPS = [
   "splash",
   "signup",
   "mydata",
-  "accounts", // 계좌 현황·진단 + 목표
-  "strategy", // 계좌별 상품 유형 제안 (Asset Location)
+  "accounts", // 계좌 현황(여력) + 목표 + 운용 전략
   "picker",
   "seed",
   "period",
@@ -18,7 +17,6 @@ export const STAGE = {
   signup: 0,
   mydata: 0,
   accounts: 1,
-  strategy: 1,
   picker: 2,
   seed: 3,
   period: 3,

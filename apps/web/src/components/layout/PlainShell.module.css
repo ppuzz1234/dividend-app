@@ -4,7 +4,7 @@
   justify-content: center;
   background: var(--bg);
 }
-/* 데스크톱에선 모바일 폭 컬럼으로 중앙정렬, 모바일에선 풀폭 */
+/* 모바일 앱 — 모바일 폭 컬럼 중앙정렬(넓은 화면에선 양옆 여백). 경계선 없음. */
 .col {
   width: 100%;
   max-width: 480px;
@@ -13,11 +13,4 @@
   flex-direction: column;
   padding-top: env(safe-area-inset-top, 0);
   background: var(--bg);
-}
-/* 데스크톱에서 컬럼 경계가 보이도록 살짝 구분선 */
-@media (min-width: 481px) {
-  .col {
-    border-left: 1px solid var(--line);
-    border-right: 1px solid var(--line);
-  }
 }

@@ -1,24 +1,24 @@
 .list {
   display: flex;
   flex-direction: column;
-  gap: 11px;
-  margin-bottom: 6px;
+  gap: 10px;
 }
 .acct {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  width: 100%;
   background: var(--card);
   border: 1px solid var(--line);
   border-radius: 16px;
-  padding: 16px;
+  padding: 14px 16px;
   color: var(--text);
 }
+.acctTop {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
 .iconBox {
-  width: 44px;
-  height: 44px;
-  border-radius: 13px;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
   flex-shrink: 0;
   display: grid;
   place-items: center;
@@ -27,33 +27,139 @@
 }
 .txt {
   flex: 1;
+  min-width: 0;
 }
 .name {
-  font-size: 15.5px;
+  font-size: 15px;
   font-weight: 700;
   display: block;
 }
 .desc {
-  font-size: 12.5px;
+  font-size: 12px;
   color: var(--sub);
   display: block;
-  margin-top: 3px;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .bal {
-  font-size: 14.5px;
+  font-size: 14px;
   font-weight: 800;
   color: var(--text);
   font-variant-numeric: tabular-nums;
   flex-shrink: 0;
 }
 .open {
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 700;
   color: var(--faint);
 }
-.goalHint {
+
+/* 여력 게이지 */
+.head {
+  margin-top: 12px;
+}
+.gauge {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--bg2);
+  overflow: hidden;
+}
+.gaugeFill {
+  height: 100%;
+  border-radius: 3px;
+  background: var(--jade);
+}
+.headRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-top: 7px;
   font-size: 12.5px;
   color: var(--sub);
-  line-height: 1.5;
-  margin-top: 10px;
+}
+.headRow strong {
+  font-weight: 800;
+  color: var(--jade);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 전략 섹션 */
+.stratHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.refund {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--gold);
+  background: var(--gold-dim);
+  border-radius: 8px;
+  padding: 4px 9px;
+  font-variant-numeric: tabular-nums;
+}
+.stratList {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+.strat {
+  background: var(--bg2);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 14px;
+}
+.stratTop {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.stratName {
+  flex: 1;
+  font-size: 14.5px;
+  font-weight: 700;
+}
+.badge {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--on-jade);
+  background: var(--jade);
+  border-radius: 8px;
+  padding: 4px 10px;
+}
+.tagline {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--jade);
+  margin-top: 9px;
+}
+.actions {
+  list-style: none;
+  margin: 9px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.actions li {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--text);
+}
+.actions li svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.rationale {
+  font-size: 11.5px;
+  color: var(--sub);
+  line-height: 1.45;
+  margin-top: 9px;
+  padding-top: 9px;
+  border-top: 1px solid var(--line);
 }

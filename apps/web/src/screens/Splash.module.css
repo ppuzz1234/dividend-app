@@ -52,8 +52,11 @@
   color: var(--sub);
   margin: 12px 0 0;
   line-height: 1.55;
-  max-width: 280px;
+  max-width: 300px;
   letter-spacing: -0.01em;
+  /* 한국어 어절 단위 줄바꿈 + 줄 길이 균형 → "요." 고아 개행 방지 */
+  word-break: keep-all;
+  text-wrap: balance;
 }
 .tags {
   display: flex;

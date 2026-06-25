@@ -13,8 +13,8 @@
 
 /* 스케일에 따라 차지하는 실제 공간 (중앙 정렬용) */
 .scaler {
-  width: calc(426px * var(--scale));
-  height: calc(894px * var(--scale));
+  width: calc(402px * var(--scale));
+  height: calc(874px * var(--scale));
   display: flex;
   justify-content: center;
   align-items: center;
@@ -22,14 +22,14 @@
 .scaled {
   transform: scale(var(--scale));
   transform-origin: center center;
-  width: 426px;
-  height: 894px;
+  width: 402px;
+  height: 874px;
 }
 
-/* 기기 외곽 프레임 */
+/* 기기 외곽 프레임 — iPhone 17 Pro (402 x 874pt) */
 .frame {
-  width: 426px;
-  height: 894px;
+  width: 402px;
+  height: 874px;
   border-radius: 56px;
   padding: 14px;
   background: #2a2e2b;

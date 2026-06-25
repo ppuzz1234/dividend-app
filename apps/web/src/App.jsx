@@ -6,12 +6,11 @@ import { STEPS, STAGE, NO_HEADER } from "./lib/flow.js";
 import { STOCKS } from "./data/stocks.js";
 import { simulatePortfolio } from "./lib/simulate.js";
 import { allocate } from "./lib/allocate.js";
-import { recommendByAccount, chosenCategories } from "./lib/assetLocation.js";
+import { buildStrategy } from "./lib/strategy.js";
 import { Splash } from "./screens/Splash.jsx";
 import { Signup } from "./screens/Signup.jsx";
 import { Mydata } from "./screens/Mydata.jsx";
 import { Accounts } from "./screens/Accounts.jsx";
-import { Strategy } from "./screens/Strategy.jsx";
 import { Picker } from "./screens/Picker.jsx";
 import { Seed } from "./screens/Seed.jsx";
 import { Period } from "./screens/Period.jsx";
@@ -62,9 +61,9 @@ export default function App() {
     () => (selected.length ? STOCKS.filter((s) => selected.includes(s.id)) : STOCKS.filter((s) => s.elite)),
     [selected]
   );
-  // 계좌별 상품 유형 추천 (Asset Location)
-  const recommendations = useMemo(() => recommendByAccount({ goal, age, income }), [goal, age, income]);
-  const chosenCats = useMemo(() => chosenCategories(recommendations), [recommendations]);
+  // 계좌 운용 전략 (현황 여력 × 목표 → 상세 방안 + 종목 유형)
+  const strategy = useMemo(() => buildStrategy({ goal, income, mydata }), [goal, income, mydata]);
+  const chosenCats = strategy.chosenCats;
   // 배분 설계 엔진 → 계좌별 배분안
   const allocation = useMemo(
     () => allocate({ seed, monthly, age, income, goal }),
@@ -87,8 +86,7 @@ export default function App() {
           {...{ mydata, setMydata, age, setAge, income, setIncome, onNext: () => go("accounts") }}
         />
       )}
-      {step === "accounts" && <Accounts {...{ goal, setGoal, mydata, onNext: () => go("strategy") }} />}
-      {step === "strategy" && <Strategy recommendations={recommendations} onNext={() => go("picker")} />}
+      {step === "accounts" && <Accounts {...{ goal, setGoal, mydata, strategy, onNext: () => go("picker") }} />}
       {step === "picker" && (
         <Picker
           {...{ chosenCats, region, setRegion, query, setQuery, selected, toggle, onNext: () => go("seed") }}

@@ -18,8 +18,7 @@ export function Splash({ onStart }) {
         </div>
         <h1 className={styles.title}>배당 눈덩이</h1>
         <p className={styles.desc}>
-          상장 배당주를 골라 담고, 재투자 복리로
-          <br />내 배당금이 얼마나 굴러가는지 시뮬레이션해요.
+          상장 배당주를 골라 담고, 재투자 복리로 내 배당금이 얼마나 굴러가는지 시뮬레이션해요.
         </p>
         <div className={styles.tags}>
           <Tag>국내 · 미국 배당주</Tag>

@@ -9,7 +9,7 @@ export function PhoneShell({ children }) {
   const [scale, setScale] = useState(1);
 
   useEffect(() => {
-    const onResize = () => setScale(Math.min(1, (window.innerWidth - 16) / 426));
+    const onResize = () => setScale(Math.min(1, (window.innerWidth - 16) / 402));
     onResize();
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
