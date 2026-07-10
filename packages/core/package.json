@@ -1,0 +1,11 @@
+{
+  "name": "@devidend/core",
+  "version": "0.1.0",
+  "private": true,
+  "description": "배당 눈덩이 도메인 엔진 — 순수 JS (UI/서버 프레임워크 무관)",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js",
+    "./*": "./src/*"
+  }
+}

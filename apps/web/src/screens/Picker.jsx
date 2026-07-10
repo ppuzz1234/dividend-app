@@ -5,7 +5,7 @@ import { Heading } from "../components/layout/Heading.jsx";
 import { Button } from "../components/ui/Button.jsx";
 import { Tag } from "../components/ui/Tag.jsx";
 import { Segmented } from "../components/ui/Segmented.jsx";
-import { STOCKS, CATEGORIES } from "../data/stocks.js";
+import { STOCKS, CATEGORIES } from "@devidend/core";
 import { useQuotes } from "../hooks/useQuotes.js";
 import { fmtPrice } from "../lib/quotes.js";
 import { cx } from "../lib/cx.js";

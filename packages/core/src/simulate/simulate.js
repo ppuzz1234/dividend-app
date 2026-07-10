@@ -1,6 +1,6 @@
-import { STOCKS } from "../data/stocks.js";
-import { ACCOUNTS, PENSION_WITHDRAWAL, COMP_TAX } from "../data/accounts.js";
-import { avg } from "./format.js";
+import { STOCKS } from "../knowledge/stocks.js";
+import { ACCOUNTS, PENSION_WITHDRAWAL, COMP_TAX } from "../knowledge/accounts.js";
+import { avg } from "../util/format.js";
 
 /* ------------------------------------------------------------------ *
  *  배당 눈덩이 시뮬레이션

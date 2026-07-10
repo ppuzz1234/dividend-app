@@ -1,4 +1,4 @@
-import { ACCOUNTS, deductionRate } from "../data/accounts.js";
+import { ACCOUNTS, deductionRate } from "../knowledge/accounts.js";
 
 /* ------------------------------------------------------------------ *
  *  배당 눈덩이 — 배분 설계 엔진

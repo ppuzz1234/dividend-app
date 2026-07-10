@@ -1,0 +1,29 @@
+/* ------------------------------------------------------------------ *
+ *  @devidend/core — 배당 눈덩이 도메인 엔진 공개 API
+ *  파이프라인: profile → capacity → taxopt → (rebalance ∥ plan)
+ *              → simulate(gap) → order   (docs/ARCHITECTURE.md 참조)
+ *  세부 모듈은 딥 임포트도 가능: "@devidend/core/knowledge/accounts.js"
+ * ------------------------------------------------------------------ */
+
+/* 지식 베이스 */
+export { ACCOUNTS, PENSION_WITHDRAWAL, COMP_TAX, deductionRate } from "./knowledge/accounts.js";
+export { ACCOUNT_PROFILES, CONTRIBUTION_PRIORITY, ENGINE_ACCOUNT_MAP, profilesForEngineId, PROFILE_VERSION } from "./knowledge/accountProfiles.js";
+export { PRODUCT_ELIGIBILITY, ELIGIBILITY_ACCOUNTS, eligibleAccountsFor, productsForAccount, ELIGIBILITY_VERSION } from "./knowledge/productEligibility.js";
+export { STOCKS, CATEGORIES } from "./knowledge/stocks.js";
+
+/* 보유 현황 (holdings) */
+export { MYDATA_ACCOUNTS, normalizeSnapshot } from "./holdings/snapshot.js";
+
+/* ③ 절세 최적화 (taxopt) */
+export { accountHeadroom } from "./taxopt/headroom.js";
+export { allocate } from "./taxopt/optimizer.js";
+
+/* ⑤ 배분 제안 (plan) */
+export { buildStrategy, STRATEGY_PLAYBOOK } from "./plan/strategy.js";
+export { recommendByAccount, chosenCategories } from "./plan/assetLocation.js";
+
+/* ⑥ 시뮬레이션 */
+export { blend, simulate, simulateOne, simulatePortfolio } from "./simulate/simulate.js";
+
+/* 공용 유틸 */
+export { fmtKRW, fmtShort, avg } from "./util/format.js";

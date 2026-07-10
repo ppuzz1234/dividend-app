@@ -1,5 +1,5 @@
-import { ACCOUNTS } from "../data/accounts.js";
-import { CATEGORIES } from "../data/stocks.js";
+import { ACCOUNTS } from "../knowledge/accounts.js";
+import { CATEGORIES } from "../knowledge/stocks.js";
 
 /* ------------------------------------------------------------------ *
  *  Asset Location — 계좌 성격 × 개인 목표에 맞는 상품 유형(영역) 추천

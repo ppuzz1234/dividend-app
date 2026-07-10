@@ -1,0 +1,19 @@
+/* ------------------------------------------------------------------ *
+ *  보유 현황 스냅샷 — 파이프라인 ②·③·④의 공통 입력
+ *  마이데이터 연동 결과를 {계좌별 잔고·올해 납입액·보유상품}으로 정규화한다.
+ *  지금은 예시 목데이터 — 실연동 시 normalizeSnapshot()이 API 응답을 받는다.
+ *  · balance: 현재 평가액/예수금
+ *  · contributedThisYear: 올해 납입액 (연 한도·세액공제 한도 소진분)
+ * ------------------------------------------------------------------ */
+export const MYDATA_ACCOUNTS = {
+  general: { balance: 8_000_000, contributedThisYear: 0 },
+  isa: { balance: 12_000_000, contributedThisYear: 7_000_000 },
+  pension: { balance: 5_000_000, contributedThisYear: 3_000_000 },
+};
+
+/* (Phase 2) 실 마이데이터 응답 → 스냅샷 정규화 자리
+ * 보유상품 목록(holdings: [{productType, ticker, value}])이 추가되면
+ * rebalance 단계가 productEligibility 와 대조해 이동 제안을 만든다. */
+export function normalizeSnapshot(raw = MYDATA_ACCOUNTS) {
+  return raw;
+}

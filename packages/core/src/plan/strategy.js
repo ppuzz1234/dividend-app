@@ -1,8 +1,9 @@
-import { ACCOUNTS, deductionRate } from "../data/accounts.js";
-import { CATEGORIES } from "../data/stocks.js";
+import { ACCOUNTS, deductionRate } from "../knowledge/accounts.js";
+import { CATEGORIES } from "../knowledge/stocks.js";
 import { recommendByAccount, chosenCategories } from "./assetLocation.js";
-import { accountHeadroom, MYDATA_ACCOUNTS } from "../data/accountStatus.js";
-import { fmtKRW } from "./format.js";
+import { accountHeadroom } from "../taxopt/headroom.js";
+import { MYDATA_ACCOUNTS } from "../holdings/snapshot.js";
+import { fmtKRW } from "../util/format.js";
 
 const CATEGORY = Object.fromEntries(CATEGORIES.map((c) => [c.id, c]));
 

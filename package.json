@@ -4,7 +4,8 @@
   "version": "0.0.0",
   "description": "배당 눈덩이 — 배당주 투자 시뮬레이터 (monorepo)",
   "workspaces": [
-    "apps/*"
+    "apps/*",
+    "packages/*"
   ],
   "scripts": {
     "dev": "npm run dev --workspace apps/web",
