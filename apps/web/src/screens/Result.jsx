@@ -23,7 +23,7 @@ export function Result({ sim, allocation, chosen, years, reinvest, onNext }) {
   const returnPct = (sim.finalValue / sim.contributed - 1) * 100;
 
   return (
-    <Pad footer={<Button onClick={onNext} variant="gold" icon={ArrowRight}>요약 보기</Button>}>
+    <Pad footer={<Button onClick={onNext} variant="gold" icon={ArrowRight}>이대로 매수 진행하기</Button>}>
       <Heading>{years}년 뒤 예상 결과</Heading>
 
       {/* 히어로: 최종 평가금액 */}

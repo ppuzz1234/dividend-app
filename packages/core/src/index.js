@@ -11,8 +11,21 @@ export { ACCOUNT_PROFILES, CONTRIBUTION_PRIORITY, ENGINE_ACCOUNT_MAP, profilesFo
 export { PRODUCT_ELIGIBILITY, ELIGIBILITY_ACCOUNTS, eligibleAccountsFor, productsForAccount, ELIGIBILITY_VERSION } from "./knowledge/productEligibility.js";
 export { STOCKS, CATEGORIES } from "./knowledge/stocks.js";
 
+/* ① 고객 정보·성향 (profile) */
+export { SURVEY_QUESTIONS, SURVEY_VERSION, surveyComplete } from "./profile/survey.js";
+export { buildRiskProfile } from "./profile/riskProfile.js";
+
 /* 보유 현황 (holdings) */
 export { MYDATA_ACCOUNTS, normalizeSnapshot } from "./holdings/snapshot.js";
+
+/* ② 투자 여력 (capacity) */
+export { assessCapacity } from "./capacity/capacity.js";
+
+/* ④ 리밸런싱 (rebalance) */
+export { buildRebalance } from "./rebalance/rebalance.js";
+
+/* ⑦ 주문 계획 (order) */
+export { buildOrderPlan } from "./order/orderPlan.js";
 
 /* ③ 절세 최적화 (taxopt) */
 export { accountHeadroom } from "./taxopt/headroom.js";

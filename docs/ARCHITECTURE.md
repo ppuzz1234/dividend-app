@@ -134,7 +134,7 @@ devidend-app/
   `packages/core` 생성, 루트 workspaces에 `packages/*` 추가, 위 매핑대로 이동,
   web은 `@devidend/core`로 import 교체. 동작 변화 없음(순수 이동)이라
   기존 시뮬레이터로 회귀 확인.
-- **Phase 2 — 신규 단계 모듈 추가**
+- **Phase 2 — 신규 단계 모듈 추가** 🔶 화면 재구성 완료 (2026-07-10) — survey/capacity/rebalance/orderPlan 모듈 + Survey·Capacity·Rebalance·Plan·Order 화면. Seed·Period는 Capacity·Plan에 흡수·삭제. 잔여: simulate/gap.js 정교화
   `profile/survey` → `capacity` → `rebalance` → `simulate/gap` 순서로,
   각 모듈을 core에 먼저 만들고(테스트 포함) 화면을 붙인다.
   flow.js STEPS 확장: `survey → mydata → capacity → accounts → rebalance → plan → picker → …`

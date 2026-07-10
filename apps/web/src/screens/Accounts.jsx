@@ -23,7 +23,7 @@ function headroomLabel(hr) {
 
 export function Accounts({ goal, setGoal, mydata, strategy, onNext }) {
   return (
-    <Pad footer={<Button onClick={onNext} icon={ArrowRight}>이 전략으로 종목 보기</Button>}>
+    <Pad footer={<Button onClick={onNext} icon={ArrowRight}>보유 상품 조정 제안 보기</Button>}>
       <Heading sub={mydata ? "연동된 계좌와 올해 더 쓸 수 있는 여력이에요." : "보유(개설 가능한) 계좌와 연 한도 여력이에요."}>
         내 계좌 현황
       </Heading>

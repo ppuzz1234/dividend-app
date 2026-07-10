@@ -3,16 +3,30 @@ import { ChromeBody } from "./components/layout/ChromeBody.jsx";
 import { PlainShell } from "./components/layout/PlainShell.jsx";
 import { PhoneShell } from "./components/layout/PhoneShell.jsx";
 import { STEPS, STAGE, NO_HEADER } from "./lib/flow.js";
-import { STOCKS, simulatePortfolio, allocate, buildStrategy } from "@devidend/core";
+import {
+  STOCKS,
+  simulatePortfolio,
+  allocate,
+  buildStrategy,
+  buildRiskProfile,
+  surveyComplete,
+  assessCapacity,
+  buildRebalance,
+  buildOrderPlan,
+  MYDATA_ACCOUNTS,
+} from "@devidend/core";
 import { Splash } from "./screens/Splash.jsx";
 import { Signup } from "./screens/Signup.jsx";
+import { Survey } from "./screens/Survey.jsx";
 import { Mydata } from "./screens/Mydata.jsx";
+import { Capacity } from "./screens/Capacity.jsx";
 import { Accounts } from "./screens/Accounts.jsx";
+import { Rebalance } from "./screens/Rebalance.jsx";
+import { Plan } from "./screens/Plan.jsx";
 import { Picker } from "./screens/Picker.jsx";
-import { Seed } from "./screens/Seed.jsx";
-import { Period } from "./screens/Period.jsx";
 import { Simulating } from "./screens/Simulating.jsx";
 import { Result } from "./screens/Result.jsx";
+import { Order } from "./screens/Order.jsx";
 import { Done } from "./screens/Done.jsx";
 
 /* ------------------------------------------------------------------ *
@@ -35,6 +49,11 @@ export default function App() {
   const [age, setAge] = useState(40);
   const [income, setIncome] = useState(50000000);
   const [goal, setGoal] = useState("retirement"); // retirement | cashflow
+  // ① 성향 서베이 응답
+  const [answers, setAnswers] = useState({});
+  // ② 여력 진단 입력
+  const [monthlyExpense, setMonthlyExpense] = useState(2500000);
+  const [cash, setCash] = useState(30000000);
 
   const go = (s) => {
     setStep(s);
@@ -58,45 +77,73 @@ export default function App() {
     () => (selected.length ? STOCKS.filter((s) => selected.includes(s.id)) : STOCKS.filter((s) => s.elite)),
     [selected]
   );
-  // 계좌 운용 전략 (현황 여력 × 목표 → 상세 방안 + 종목 유형)
+  // ① 서베이 응답 → 성향 프로파일
+  const riskProfile = useMemo(() => (surveyComplete(answers) ? buildRiskProfile(answers) : null), [answers]);
+  // ② 소득·지출·현금 → 투자 여력 진단
+  const cap = useMemo(
+    () => assessCapacity({ annualIncome: income, monthlyExpense, cash }),
+    [income, monthlyExpense, cash]
+  );
+  // ③ 계좌 운용 전략 (현황 여력 × 목표 → 상세 방안 + 종목 유형)
   const strategy = useMemo(() => buildStrategy({ goal, income, mydata }), [goal, income, mydata]);
   const chosenCats = strategy.chosenCats;
-  // 배분 설계 엔진 → 계좌별 배분안
+  // ④ 보유 상품 × 편입가능표 → 계좌 조정 제안
+  const rebalance = useMemo(() => buildRebalance(mydata ? MYDATA_ACCOUNTS : null), [mydata]);
+  // ⑤ 배분 설계 엔진 → 계좌별 배분안
   const allocation = useMemo(
     () => allocate({ seed, monthly, age, income, goal }),
     [seed, monthly, age, income, goal]
   );
-  // 배분안 기반 멀티계좌 시뮬레이션
+  // ⑥ 배분안 기반 멀티계좌 시뮬레이션
   const sim = useMemo(
     () => simulatePortfolio({ plan: allocation.plan, years, holdings: chosen, reinvest }),
     [allocation, years, chosen, reinvest]
   );
+  // ⑦ 배분안 × 선택 종목 → 주문 계획
+  const orderPlan = useMemo(() => buildOrderPlan({ plan: allocation.plan, stocks: chosen }), [allocation, chosen]);
 
   const stage = NO_HEADER.includes(step) ? null : STAGE[step] ?? 0;
 
   const body = (
     <ChromeBody stage={stage} onBack={back} contentKey={step}>
       {step === "splash" && <Splash onStart={() => go("signup")} />}
-      {step === "signup" && <Signup onNext={() => go("mydata")} />}
+      {step === "signup" && <Signup onNext={() => go("survey")} />}
+      {step === "survey" && (
+        <Survey
+          {...{ answers, setAnswers }}
+          onNext={() => {
+            if (answers.goal) setGoal(answers.goal); // 서베이 목표 → 전략 엔진 목표
+            go("mydata");
+          }}
+        />
+      )}
       {step === "mydata" && (
         <Mydata
-          {...{ mydata, setMydata, age, setAge, income, setIncome, onNext: () => go("accounts") }}
+          {...{ mydata, setMydata, age, setAge, income, setIncome, onNext: () => go("capacity") }}
         />
       )}
-      {step === "accounts" && <Accounts {...{ goal, setGoal, mydata, strategy, onNext: () => go("picker") }} />}
+      {step === "capacity" && (
+        <Capacity
+          {...{ cap, monthlyExpense, setMonthlyExpense, cash, setCash, seed, setSeed, monthly, setMonthly, onNext: () => go("accounts") }}
+        />
+      )}
+      {step === "accounts" && <Accounts {...{ goal, setGoal, mydata, strategy, onNext: () => go("rebalance") }} />}
+      {step === "rebalance" && <Rebalance {...{ mydata, rebalance, onNext: () => go("plan") }} />}
+      {step === "plan" && (
+        <Plan
+          {...{ allocation, strategy, riskProfile, years, setYears, reinvest, setReinvest, onNext: () => go("picker") }}
+        />
+      )}
       {step === "picker" && (
         <Picker
-          {...{ chosenCats, region, setRegion, query, setQuery, selected, toggle, onNext: () => go("seed") }}
+          {...{ chosenCats, region, setRegion, query, setQuery, selected, toggle, onNext: () => go("simulate") }}
         />
-      )}
-      {step === "seed" && <Seed seed={seed} setSeed={setSeed} onNext={() => go("period")} />}
-      {step === "period" && (
-        <Period {...{ years, setYears, monthly, setMonthly, reinvest, setReinvest, onNext: () => go("simulate") }} />
       )}
       {step === "simulate" && <Simulating />}
       {step === "result" && (
-        <Result sim={sim} allocation={allocation} chosen={chosen} years={years} reinvest={reinvest} onNext={() => go("done")} />
+        <Result sim={sim} allocation={allocation} chosen={chosen} years={years} reinvest={reinvest} onNext={() => go("order")} />
       )}
+      {step === "order" && <Order orderPlan={orderPlan} onNext={() => go("done")} />}
       {step === "done" && (
         <Done
           sim={sim}

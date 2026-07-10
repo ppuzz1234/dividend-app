@@ -6,9 +6,28 @@
  *  · contributedThisYear: 올해 납입액 (연 한도·세액공제 한도 소진분)
  * ------------------------------------------------------------------ */
 export const MYDATA_ACCOUNTS = {
-  general: { balance: 8_000_000, contributedThisYear: 0 },
-  isa: { balance: 12_000_000, contributedThisYear: 7_000_000 },
-  pension: { balance: 5_000_000, contributedThisYear: 3_000_000 },
+  general: {
+    balance: 8_000_000,
+    contributedThisYear: 0,
+    holdings: [
+      { name: "AAPL", productType: "foreignStock", value: 3_000_000 },
+      { name: "TIGER 미국S&P500", productType: "krListedGlobalEtf", value: 3_000_000 },
+      { name: "삼성전자", productType: "krStock", value: 2_000_000 },
+    ],
+  },
+  isa: {
+    balance: 12_000_000,
+    contributedThisYear: 7_000_000,
+    holdings: [
+      { name: "KODEX 배당가치", productType: "krEtf", value: 7_000_000 },
+      { name: "TIGER 리츠부동산인프라", productType: "krReit", value: 5_000_000 },
+    ],
+  },
+  pension: {
+    balance: 5_000_000,
+    contributedThisYear: 3_000_000,
+    holdings: [{ name: "TIGER 미국배당다우존스", productType: "krListedGlobalEtf", value: 5_000_000 }],
+  },
 };
 
 /* (Phase 2) 실 마이데이터 응답 → 스냅샷 정규화 자리

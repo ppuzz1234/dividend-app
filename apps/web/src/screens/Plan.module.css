@@ -1,0 +1,141 @@
+.profileNote {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+.typeChip {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--on-jade);
+  background: var(--jade);
+  border-radius: 8px;
+  padding: 4px 10px;
+}
+.caution {
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--sub);
+}
+.refund {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--gold-dim);
+  color: var(--gold);
+  border-radius: 13px;
+  padding: 11px 14px;
+  font-size: 12.5px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+.refund strong {
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.sumHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.sumTxt {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--sub);
+  font-variant-numeric: tabular-nums;
+}
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.row {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  padding: 13px 15px;
+}
+.rowTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.name {
+  font-size: 14px;
+  font-weight: 700;
+}
+.pct {
+  font-size: 12.5px;
+  font-weight: 800;
+  color: var(--jade);
+  font-variant-numeric: tabular-nums;
+}
+.bar {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--bg2);
+  overflow: hidden;
+  margin-top: 9px;
+}
+.barFill {
+  height: 100%;
+  border-radius: 3px;
+  background: var(--jade);
+}
+.amts {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--sub);
+  font-variant-numeric: tabular-nums;
+}
+.periodVal {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin: 4px 0 8px;
+}
+.years {
+  font-size: 26px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.unit {
+  font-size: 14px;
+  color: var(--sub);
+  font-weight: 700;
+}
+.drip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  margin-top: 18px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  padding: 13px 15px;
+  cursor: pointer;
+  color: var(--text);
+}
+.dripOn {
+  border-color: var(--jade);
+}
+.dripText {
+  flex: 1;
+  min-width: 0;
+}
+.dripTitle {
+  display: block;
+  font-size: 13.5px;
+  font-weight: 700;
+}
+.dripDesc {
+  display: block;
+  font-size: 11.5px;
+  color: var(--sub);
+  margin-top: 2px;
+}
