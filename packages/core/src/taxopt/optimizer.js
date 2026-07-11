@@ -63,6 +63,14 @@ function waterfall(profile) {
   const monthlyByAcc = fill(annualInflow, order); // 연 단위로 분배 후 ÷12
   const seedByAcc = fill(seed, order); // 시드는 일시 분배 (연 한도 동일 적용 — 단순화)
 
+  // 2026 생산적 금융 ISA(청년형) — 자격(나이·소득) 충족 시 ISA 납입금 소득공제액 추정
+  const py = byId.isa.productiveYouth;
+  const isaAnnual = (seedByAcc.isa || 0) + (monthlyByAcc.isa || 0);
+  const youthEligible = !!py && age >= py.minAge && age <= py.maxAge && income <= py.maxIncome;
+  const estIsaYouthDeduction = youthEligible
+    ? Math.min(isaAnnual * py.incomeDeductRate, py.incomeDeductCap)
+    : 0;
+
   const plan = ACCOUNTS.map((a) => {
     const m = (monthlyByAcc[a.id] || 0) / 12;
     const s = seedByAcc[a.id] || 0;
@@ -71,7 +79,7 @@ function waterfall(profile) {
       account: a,
       seed: s,
       monthly: m,
-      reason: reasonFor(a.id, { m, s, goal, dRate, pUse, age }),
+      reason: reasonFor(a.id, { m, s, goal, dRate, pUse, age, youthDeduction: estIsaYouthDeduction }),
     };
   });
 
@@ -90,12 +98,19 @@ function waterfall(profile) {
       `연금계좌(IRP)는 위험자산을 최대 ${Math.round(byId.pension.riskAssetCap * 100)}%까지만 담을 수 있어, 배당주/ETF 비중에 제약이 있습니다(나머지 30%는 안전자산).`
     );
 
+  if (youthEligible && estIsaYouthDeduction > 0)
+    warnings.push(
+      "청년형 ISA 소득공제(납입금 10%, 최대 200만)는 국내 주식·펀드 대상 '생산적 금융 ISA' 기준이며, 국내상장 해외ETF는 편입할 수 없습니다."
+    );
+
   return {
     strategy: "waterfall",
     deductionRate: dRate,
     pensionUsage: pUse,
     plan,
     estAnnualRefund,
+    estIsaYouthDeduction, // 청년형 ISA 소득공제액(과세표준 차감분, 세액공제 환급과 별개)
+    youthEligible,
     warnings,
     notes: [
       goal === "retirement"
@@ -105,22 +120,30 @@ function waterfall(profile) {
       ...(pensionTotal > 0
         ? ["연금 수령 연차는 '처음 받기 시작한 해'부터 산정돼요. 55세에 소액으로 미리 개시해두면 장기수령 절세(20년 초과 구간)에 유리합니다."]
         : []),
+      ...(estIsaYouthDeduction > 0
+        ? [`청년형(만 ${py.minAge}~${py.maxAge}세·연소득 7,500만 이하) 대상이라 ISA 납입금의 10%인 약 ${Math.round(estIsaYouthDeduction / 10000)}만원을 소득공제로 받을 수 있어요.`]
+        : []),
     ],
   };
 }
 
 /** 계좌별 배분 사유 문구 */
-function reasonFor(id, { m, s, goal, dRate, pUse }) {
+function reasonFor(id, { m, s, goal, dRate, pUse, youthDeduction = 0 }) {
   if (m <= 0 && s <= 0) return "이번 배분에서는 사용하지 않았어요.";
   if (id === "pension") {
     const pct = Math.round(dRate * 1000) / 10;
     const cut = pUse < 1 ? ` (55세 인출 제약 고려해 한도의 ${Math.round(pUse * 100)}%만)` : "";
     return `세액공제 ${pct}% 환급 + 과세이연으로 가장 먼저 채웠어요${cut}.`;
   }
-  if (id === "isa")
-    return goal === "cashflow"
-      ? "비과세·분리과세로 현금흐름에 유리해 우선 배분했어요."
-      : "연금 한도 소진 후 비과세 한도까지 활용했어요.";
+  if (id === "isa") {
+    const base =
+      goal === "cashflow"
+        ? "비과세·분리과세로 현금흐름에 유리해 우선 배분했어요."
+        : "연금 한도 소진 후 비과세 한도까지 활용했어요.";
+    return youthDeduction > 0
+      ? `${base} 청년형이라 납입금의 10%(약 ${Math.round(youthDeduction / 10000)}만원) 소득공제도 받아요.`
+      : base;
+  }
   return "절세계좌 한도를 넘는 금액을 담았어요 (배당세 15.4%).";
 }
 

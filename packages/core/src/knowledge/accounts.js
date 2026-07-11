@@ -28,6 +28,15 @@ export const ACCOUNTS = [
     minTermYears: 3,
     liquidity: "mid",
     feeRate: 0,
+    // 2026 생산적 금융 ISA(청년형) — 납입금 소득공제 (출처: isa-productive-2026)
+    // 자격 충족 시 엔진이 소득공제액(과세표준 차감분)을 추정. 국민성장형·상품범위는 미확정이라 미반영.
+    productiveYouth: {
+      minAge: 19, // 만 19~34세
+      maxAge: 34,
+      maxIncome: 75_000_000, // 연소득 7,500만 이하
+      incomeDeductRate: 0.1, // 납입금 10% 소득공제
+      incomeDeductCap: 2_000_000, // 최대 200만 소득공제
+    },
   },
   {
     id: "pension",

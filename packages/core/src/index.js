@@ -34,9 +34,13 @@ export { allocate } from "./taxopt/optimizer.js";
 /* ⑤ 배분 제안 (plan) */
 export { buildStrategy, STRATEGY_PLAYBOOK } from "./plan/strategy.js";
 export { recommendByAccount, chosenCategories } from "./plan/assetLocation.js";
+export { buildAccountRooms } from "./plan/accountRooms.js";
 
 /* ⑥ 시뮬레이션 */
 export { blend, simulate, simulateOne, simulatePortfolio } from "./simulate/simulate.js";
+
+/* 인사이트 (은퇴기 배당 계좌별 세금·건보료 비교) */
+export { compareDividendTax, DIVIDEND_TAX_CONST } from "./insight/dividendTaxCompare.js";
 
 /* 공용 유틸 */
 export { fmtKRW, fmtShort, avg } from "./util/format.js";

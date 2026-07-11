@@ -46,9 +46,14 @@ export const ACCOUNT_PROFILES = {
 
     constraints: {
       minTermYears: 3, // 의무가입 3년
+      rolloverCycleYears: 3, // 만기(최소 3년)마다 재가입(롤오버)해야 비과세 한도가 새로 적용
+      rollover:
+        "만기(최소 3년) 도래 시 자금을 새 ISA로 이전(롤오버)하면 비과세 한도(200만/서민형 400만)가 새 계좌에 다시 부여됨. 만기 자금을 60일 내 연금계좌로 이전하면 추가 세액공제도 가능.",
+      eligibilityLoss:
+        "직전 3개 과세기간 중 1회라도 금융소득종합과세 대상(연 금융소득 2,000만 초과)이었다면 신규·재가입 불가 → 만기 롤오버 시점에 종합과세 대상이면 ISA를 이어갈 수 없음",
       withdrawal: "납입원금 한도 내 중도인출 가능 (혜택 유지) — 원금 초과 인출은 해지로 간주",
       products: "국내상장 주식·ETF·펀드·리츠·예적금 (해외상장 주식 직접투자 불가)",
-      renewable: true, // 만기 후 재가입·연장 가능
+      renewable: true, // 만기 후 재가입·연장 가능 (단, 재가입 시점 종합과세 대상이 아니어야 함)
     },
 
     pros: [
@@ -60,7 +65,8 @@ export const ACCOUNT_PROFILES = {
     cons: [
       "납입 단계 세액공제는 없음 (혜택은 인출·만기 시점)",
       "해외상장 주식·ETF 직접투자 불가 (국내상장 해외지수 ETF로 대체)",
-      "금융소득종합과세 대상자는 가입 자체가 막힘",
+      "3년 만기마다 재가입(롤오버)해야 비과세 혜택이 이어짐 — 방치 시 과세계좌로 전환",
+      "금융소득종합과세 대상(연 금융소득 2,000만 초과)이 되면 재가입이 막혀 ISA를 이어갈 수 없음",
     ],
 
     synergy: [
@@ -68,6 +74,25 @@ export const ACCOUNT_PROFILES = {
         with: "pensionSavings|irp",
         rule: "만기자금을 60일 내 연금계좌로 이전 시 이전액의 10%(최대 300만원) 일회성 추가 세액공제",
         source: "irp-samsung",
+      },
+    ],
+
+    /* 2026 신설: 생산적 금융 ISA — 기존 ISA와 별도로 추가 개설 가능(청년형·국민성장형 택1).
+       국내상장 해외 ETF 편입 불가, 국내 주식·펀드·국민성장펀드·BDC 대상. */
+    variants2026: [
+      {
+        id: "youth",
+        name: "청년형 ISA",
+        eligibility: { age: "만 19~34세", incomeLimit: 75_000_000 },
+        extraBenefit: "이자·배당 세금 특례 + 납입금 10% 소득공제(최대 200만원)",
+        exclusion: "청년미래적금 중복 불가, 국민성장형과 동시 개설 불가",
+      },
+      {
+        id: "nationalGrowth",
+        name: "국민성장형 ISA",
+        eligibility: { who: "청년형 대상 외 국민" },
+        extraBenefit: "소득공제 없음 / 비과세 한도 상향·분리과세율 인하 예상(미확정)",
+        exclusion: "청년형과 동시 개설 불가",
       },
     ],
 
@@ -79,7 +104,7 @@ export const ACCOUNT_PROFILES = {
       goals: ["cashflow", "retirement", "lumpsum"],
     },
 
-    sources: ["pension-letter-89", "irp-samsung"],
+    sources: ["pension-letter-89", "irp-samsung", "isa-productive-2026"],
   },
 
   /* ───────────────────────── 연금저축 (연금저축펀드) ─────────────── */

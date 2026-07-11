@@ -19,7 +19,7 @@
   background: var(--jade);
 }
 .barCurrent {
-  box-shadow: 0 0 10px rgba(63, 208, 139, 0.53);
+  box-shadow: 0 0 10px rgba(242, 194, 48, 0.53);
 }
 .lbl {
   font-size: 10px;

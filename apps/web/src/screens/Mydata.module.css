@@ -70,3 +70,189 @@
 .profileRow > * {
   flex: 1;
 }
+
+/* 불러온 계좌 목록 */
+.acctList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.acctRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--card);
+  border: 1px solid var(--line);
+}
+.acctIcon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  background: var(--bg2);
+  border: 1px solid var(--line);
+}
+.acctName {
+  font-size: 14px;
+  font-weight: 600;
+  flex: 1;
+}
+.acctBal {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--jade);
+  font-variant-numeric: tabular-nums;
+}
+.acctNone {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gold);
+}
+
+/* 나이·직접입력 행 (필드 + 태그) */
+.ageRow {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+}
+.ageRow > label {
+  flex: 1;
+}
+.autoTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 9px;
+  border-radius: 8px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--jade);
+  background: var(--jade-dim);
+  white-space: nowrap;
+}
+
+/* 개인 정보 · 투자 계획 그룹 */
+.planGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.fieldHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  min-height: 22px;
+}
+.miniLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+.miniLabel svg {
+  flex-shrink: 0;
+}
+.monthlyVal {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--jade);
+  font-variant-numeric: tabular-nums;
+}
+.presets {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.preset {
+  flex: 1;
+  height: 40px;
+  border-radius: 11px;
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid var(--line2);
+  background: var(--card);
+  color: var(--sub);
+}
+.presetOn {
+  border-color: var(--jade);
+  background: var(--jade-dim);
+  color: var(--jade);
+}
+
+/* 연소득 소스 선택 */
+.srcRow {
+  display: flex;
+  gap: 10px;
+}
+.srcBtn {
+  flex: 1;
+  height: 48px;
+  border-radius: 12px;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid var(--jade);
+  background: var(--jade-dim);
+  color: var(--jade);
+}
+.srcBtnAlt {
+  border-color: var(--line2);
+  background: var(--card);
+  color: var(--text);
+}
+.incomeDone {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--card);
+  border: 1px solid var(--line2);
+}
+.incomeVal {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 16px;
+  font-weight: 700;
+}
+.incomeSrc {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--jade);
+  background: var(--jade-dim);
+  padding: 2px 7px;
+  border-radius: 6px;
+}
+.reset {
+  background: none;
+  border: none;
+  color: var(--sub);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-sans);
+}
+.hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--sub);
+  margin: 10px 2px 0;
+  line-height: 1.5;
+}

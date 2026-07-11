@@ -1,21 +1,21 @@
 /* 화면 단계 정의 및 진행 스텝퍼 매핑
- * 7단계 비즈니스 파이프라인(docs/ARCHITECTURE.md) 순서를 따른다:
- * ①성향(survey)·정보(mydata) → ②여력(capacity) → ③절세분석(accounts)
- * → ④계좌조정(rebalance) → ⑤배분안(plan) → ⑥종목·갭시뮬(picker~result)
- * → ⑦매수(order) */
+ * 개편된 흐름:
+ *  ①성향(survey) → ②프로필·마이데이터 연동(mydata)
+ *  → ③계좌 전략(accounts, 4계좌 여력)
+ *  → ④일반 수익률 기준 시뮬레이션/분석(simulate→result)
+ *  → ⑤종목 선택(picker)  → ⑥매수(order)
+ * · 여력(capacity) 화면은 마이데이터 연동으로 대체되어 제거.
+ * · 종목 선택은 시뮬레이션/분석 이후로 이동. */
 export const STEPS = [
   "splash",
-  "signup",
+  "login",
   "survey", // ① 투자 성향 서베이
-  "mydata", // ① 보유계좌·개인정보 연동
-  "capacity", // ② 올해 투자 여력 진단
-  "accounts", // ③ 계좌 현황(여력) + 목표 + 운용 전략
-  "rebalance", // ④ 보유 상품 운용 계좌 조정
-  "plan", // ⑤ 올해 배분안 + 기간·재투자 확정
-  "picker", // ⑥ 종목 선택
-  "simulate",
-  "result", // ⑥ 갭 시뮬레이션 결과
-  "order", // ⑦ 매수 주문 확인·접수
+  "mydata", // ② 보유계좌·개인정보 마이데이터 연동
+  "accounts", // ③ 계좌 현황(4계좌 여력) + 목표 + 운용 전략
+  "simulate", // ④ 일반 수익률 기준 연산
+  "result", // ④ 시뮬레이션/분석 결과 (배당세·건보료 비교 포함)
+  "picker", // ⑤ 종목 선택
+  "order", // ⑥ 매수 주문 확인·접수
   "done",
 ];
 
@@ -24,18 +24,15 @@ export const STAGE = {
   signup: 0,
   survey: 1,
   mydata: 1,
-  capacity: 2,
-  accounts: 3,
-  rebalance: 3,
-  plan: 3,
+  accounts: 2,
+  simulate: 3,
+  result: 3,
   picker: 4,
-  simulate: 5,
-  result: 5,
   order: 5,
   done: 5,
 };
 
-export const STAGE_LABELS = ["가입", "프로필", "여력", "전략", "종목", "결과"];
+export const STAGE_LABELS = ["가입", "프로필", "전략", "분석", "종목", "매수"];
 
 /* 헤더(스텝퍼)를 숨기는 단계 */
-export const NO_HEADER = ["splash", "simulate", "done"];
+export const NO_HEADER = ["splash", "login", "simulate", "done"];

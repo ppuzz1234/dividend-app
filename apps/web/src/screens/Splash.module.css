@@ -1,72 +1,140 @@
-.screen {
+/* 스플래시 — hpr 구조 이식(그리드 배경·발광·마크·아이브로우·타이틀·슬로건·하단바).
+   앱 셸 안(콘텐츠 영역)을 가득 채우도록 flex:1 로 잡는다. */
+.splash {
+  position: relative;
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  padding: 0 24px 18px;
-}
-.center {
-  flex: 1;
+  align-self: stretch;
+  overflow: hidden;
+  cursor: none;
+  background: linear-gradient(165deg, #1a1510 0%, #0c0a07 60%, #080605 100%);
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
-  text-align: center;
+  transition: opacity 0.4s ease, transform 0.4s ease;
 }
-.logoWrap {
-  margin-bottom: 30px;
-  position: relative;
+.out {
+  opacity: 0;
+  transform: scale(1.04);
 }
-.logo {
-  width: 116px;
-  height: 116px;
-  border-radius: 36px;
-  display: grid;
-  place-items: center;
-  background: radial-gradient(circle at 30% 25%, var(--jade), var(--jade-deep));
-  box-shadow: 0 24px 50px -12px rgba(63, 208, 139, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.4);
-}
-.badge {
+
+.bg {
   position: absolute;
-  right: -10px;
-  bottom: -6px;
-  width: 44px;
-  height: 44px;
-  border-radius: 14px;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.9;
+  z-index: 0;
+}
+
+.glow {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  width: 460px;
+  height: 460px;
+  max-width: 120%;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(224, 145, 58, 0.18), transparent 62%);
+}
+
+.core {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 0 28px;
+  animation: splashUp 0.8s ease 0.15s both;
+  user-select: none;
+  cursor: none;
+}
+
+/* 노란 달러 심볼을 담는 다크 타일 — hpr splash-mark 패턴 */
+.mark {
+  width: 92px;
+  height: 92px;
+  margin: 0 auto 26px;
+  border-radius: 26px;
+  background: #0c120e;
+  border: 1px solid rgba(224, 145, 58, 0.28);
+  color: var(--gold);
   display: grid;
   place-items: center;
-  background: var(--gold);
-  color: var(--on-gold);
-  box-shadow: 0 10px 24px -6px rgba(232, 192, 120, 0.6);
+  box-shadow: 0 16px 50px rgba(224, 145, 58, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.eyebrow {
+  font-size: 10.5px;
+  letter-spacing: 3px;
+  color: var(--gold);
+  font-weight: 700;
 }
 .title {
-  font-size: 34px;
-  font-weight: 800;
-  letter-spacing: -0.04em;
-  margin: 0;
-  line-height: 1.15;
-  color: #fff;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-.desc {
-  font-size: 16px;
-  color: var(--sub);
-  margin: 12px 0 0;
-  line-height: 1.55;
-  max-width: 300px;
-  letter-spacing: -0.01em;
-  /* 한국어 어절 단위 줄바꿈 + 줄 길이 균형 → "요." 고아 개행 방지 */
-  word-break: keep-all;
-  text-wrap: balance;
-}
-.tags {
-  display: flex;
-  gap: 8px;
-  margin-top: 22px;
-}
-.disclaimer {
-  font-size: 11.5px;
-  color: var(--faint);
-  text-align: center;
+  font-size: 46px;
+  font-weight: 900;
+  letter-spacing: 4px;
+  line-height: 1.05;
   margin: 14px 0 0;
+  color: #f3f8f4;
+  font-family: var(--font-brand);
+}
+.slogan {
+  color: #a9b6ac;
+  font-size: 15px;
+  margin: 18px 0 0;
+  letter-spacing: 0.2px;
+  word-break: keep-all;
+}
+
+.foot {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(40px + env(safe-area-inset-bottom));
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 0 30px;
+  text-align: center;
+  animation: splashUp 0.8s ease 0.5s both;
+}
+.bar {
+  width: 150px;
+  height: 3px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+.bar i {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-deep) 100%);
+  animation: splashBar 2.5s ease forwards;
+}
+.foot span {
+  font-size: 11.5px;
+  color: #64726a;
+  letter-spacing: 0.3px;
   line-height: 1.5;
+  word-break: keep-all;
+}
+
+@keyframes splashUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes splashBar {
+  to {
+    width: 100%;
+  }
 }

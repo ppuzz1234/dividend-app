@@ -20,7 +20,7 @@
   place-items: center;
   margin-bottom: 24px;
   background: radial-gradient(circle at 30% 25%, var(--jade), var(--jade-deep));
-  box-shadow: 0 22px 44px -12px rgba(63, 208, 139, 0.4);
+  box-shadow: 0 22px 44px -12px rgba(242, 194, 48, 0.4);
 }
 .title {
   font-size: 26px;
@@ -39,7 +39,7 @@
   margin-top: 26px;
   width: 100%;
   background: linear-gradient(160deg, var(--gold-dim), var(--card));
-  border: 1px solid rgba(201, 154, 78, 0.33);
+  border: 1px solid rgba(179, 106, 34, 0.33);
   border-radius: 18px;
   padding: 20px;
 }

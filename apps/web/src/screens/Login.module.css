@@ -1,0 +1,197 @@
+/* 로그인 — hpr Login 구조를 dividend 토큰(제이드/골드 다크 테마)으로 이식 */
+.wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 24px 28px;
+}
+.inner {
+  width: 100%;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin-bottom: 30px;
+  user-select: none;
+  cursor: default;
+}
+.mark {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  background: #0c120e;
+  border: 1px solid rgba(224, 145, 58, 0.28);
+  color: var(--gold);
+  display: grid;
+  place-items: center;
+}
+.titles {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+}
+.titles strong {
+  font-size: 18px;
+  letter-spacing: 1px;
+  font-family: var(--font-brand);
+  color: var(--text);
+}
+.titles span {
+  font-size: 12px;
+  color: var(--sub);
+}
+
+.h {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+  margin: 0 0 18px;
+  color: var(--text);
+}
+
+.ssoList {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+.ssoBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 11px;
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 14px;
+  cursor: pointer;
+  background: var(--card);
+  border: 1px solid var(--line);
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 600;
+  font-family: inherit;
+  transition: border-color 0.15s, background 0.15s;
+}
+.ssoBtn:hover {
+  border-color: var(--line2);
+  background: var(--card-hi);
+}
+.ssoBtn:active {
+  transform: scale(0.99);
+}
+.ssoIc {
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  font-weight: 800;
+}
+.naverIc {
+  background: #03c75a;
+  color: #fff;
+  border-radius: 5px;
+  font-size: 14px;
+}
+.kakaoIc {
+  background: #fee500;
+  color: #3c1e1e;
+  border-radius: 5px;
+}
+
+.or {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 22px 0;
+  color: var(--faint);
+  font-size: 12px;
+}
+.or::before,
+.or::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+.lineBtn {
+  width: 100%;
+  height: 52px;
+  border-radius: 14px;
+  background: transparent;
+  border: 1px solid var(--line2);
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.lineBtn:hover {
+  border-color: var(--jade);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+}
+.label {
+  font-size: 13px;
+  color: var(--sub);
+  margin-bottom: 8px;
+}
+.input {
+  width: 100%;
+  height: 52px;
+  border-radius: 14px;
+  padding: 0 16px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  color: var(--text);
+  font-size: 15px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.input:focus {
+  border-color: var(--jade);
+}
+.primaryBtn {
+  margin-top: 16px;
+  width: 100%;
+  height: 52px;
+  border-radius: 14px;
+  border: none;
+  background: var(--jade);
+  color: var(--on-jade);
+  font-size: 16px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  box-shadow: 0 8px 24px -8px rgba(242, 194, 48, 0.55);
+}
+.primaryBtn:disabled {
+  opacity: 0.38;
+  cursor: default;
+  box-shadow: none;
+}
+
+.footLink {
+  display: block;
+  width: 100%;
+  text-align: center;
+  margin-top: 26px;
+  background: none;
+  border: none;
+  color: var(--sub);
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+}
+.footLink b {
+  color: var(--jade);
+}

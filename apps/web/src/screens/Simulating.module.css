@@ -3,24 +3,40 @@
   display: grid;
   place-items: center;
   padding: 30px;
+  cursor: none;
 }
 .center {
   text-align: center;
 }
-.spinner {
-  width: 76px;
-  height: 76px;
-  border-radius: 50%;
-  margin: 0 auto 26px;
-  border: 4px solid var(--line);
-  border-top-color: var(--jade);
+.word {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  height: 72px;
+  align-items: center;
+  user-select: none;
+  cursor: none;
 }
-.title {
-  font-size: 18px;
-  font-weight: 700;
+.letter {
+  font-family: var(--font-sans);
+  font-size: 58px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  line-height: 1;
+  color: var(--gold);
+  opacity: 0;
+  transform: translateY(10px) scale(0.94);
+  transition: opacity 0.45s ease, transform 0.45s ease;
+  text-shadow: 0 0 22px rgba(224, 145, 58, 0);
+}
+.on {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  text-shadow: 0 0 22px rgba(224, 145, 58, 0.45);
 }
 .msg {
   font-size: 14px;
   color: var(--sub);
-  margin-top: 8px;
+  margin-top: 26px;
+  font-weight: 600;
 }

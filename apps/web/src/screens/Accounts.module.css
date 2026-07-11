@@ -1,14 +1,18 @@
 .list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 11px;
 }
 .acct {
   background: var(--card);
   border: 1px solid var(--line);
   border-radius: 16px;
-  padding: 14px 16px;
+  padding: 15px 16px;
   color: var(--text);
+}
+.acctOpen {
+  border-color: var(--gold-deep);
+  background: linear-gradient(160deg, var(--gold-dim), var(--card));
 }
 .acctTop {
   display: flex;
@@ -23,7 +27,10 @@
   display: grid;
   place-items: center;
   background: var(--bg2);
-  color: var(--jade);
+}
+.iconBoxOpen {
+  background: var(--gold-dim);
+  border: 1px solid var(--gold-deep);
 }
 .txt {
   flex: 1;
@@ -39,127 +46,162 @@
   color: var(--sub);
   display: block;
   margin-top: 2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+}
+.status {
+  flex-shrink: 0;
 }
 .bal {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
   font-size: 14px;
   font-weight: 800;
   color: var(--text);
   font-variant-numeric: tabular-nums;
-  flex-shrink: 0;
 }
-.open {
-  font-size: 12px;
+.balCap {
+  font-size: 10.5px;
   font-weight: 700;
   color: var(--faint);
 }
+.openTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--on-gold);
+  background: var(--gold);
+  border-radius: 8px;
+  padding: 4px 9px;
+}
 
-/* 여력 게이지 */
-.head {
-  margin-top: 12px;
+/* 활용가능 room — 큰 숫자 강조 */
+.roomBox {
+  margin-top: 13px;
+}
+.roomLead {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--sub);
+}
+.maxBadge {
+  font-size: 10.5px;
+  font-weight: 800;
+  color: var(--on-gold);
+  background: var(--gold);
+  border-radius: 5px;
+  padding: 1px 6px;
+}
+.roomVal {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--jade);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.5px;
+  margin-top: 3px;
+}
+.roomValMuted {
+  color: var(--sub);
+  font-size: 20px;
 }
 .gauge {
-  height: 6px;
-  border-radius: 3px;
+  height: 7px;
+  border-radius: 4px;
   background: var(--bg2);
   overflow: hidden;
+  margin-top: 10px;
 }
 .gaugeFill {
   height: 100%;
-  border-radius: 3px;
-  background: var(--jade);
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--jade-deep), var(--jade));
 }
-.headRow {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  margin-top: 7px;
-  font-size: 12.5px;
-  color: var(--sub);
-}
-.headRow strong {
-  font-weight: 800;
-  color: var(--jade);
-  font-variant-numeric: tabular-nums;
-}
-
-/* 전략 섹션 */
-.stratHead {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.refund {
-  font-size: 12px;
+.roomRefund {
+  font-size: 11.5px;
   font-weight: 700;
   color: var(--gold);
-  background: var(--gold-dim);
-  border-radius: 8px;
-  padding: 4px 9px;
-  font-variant-numeric: tabular-nums;
+  margin-top: 8px;
 }
-.stratList {
+/* ISA 등 제약 캡션 (롤오버·가입제한) */
+.constraint {
   display: flex;
-  flex-direction: column;
-  gap: 11px;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--faint);
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
 }
-.strat {
-  background: var(--bg2);
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 14px;
+.constraint svg {
+  flex-shrink: 0;
+  margin-top: 1px;
 }
-.stratTop {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.stratName {
-  flex: 1;
-  font-size: 14.5px;
-  font-weight: 700;
-}
-.badge {
-  font-size: 12px;
-  font-weight: 800;
-  color: var(--on-jade);
-  background: var(--jade);
-  border-radius: 8px;
-  padding: 4px 10px;
-}
-.tagline {
-  font-size: 12.5px;
-  font-weight: 700;
-  color: var(--jade);
-  margin-top: 9px;
-}
-.actions {
-  list-style: none;
-  margin: 9px 0 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-}
-.actions li {
+.recommend {
   display: flex;
   align-items: flex-start;
   gap: 7px;
-  font-size: 12.5px;
+  font-size: 12px;
   line-height: 1.45;
   color: var(--text);
+  margin-top: 11px;
+  padding-top: 11px;
+  border-top: 1px dashed var(--gold-deep);
 }
-.actions li svg {
+.recommend svg {
   flex-shrink: 0;
-  margin-top: 2px;
+  margin-top: 1px;
 }
-.rationale {
-  font-size: 11.5px;
+
+/* 요약 배너 */
+.summary {
+  margin-top: 14px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: var(--bg2);
+  border: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.sumItem {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.sumK {
+  font-size: 13px;
+  color: var(--sub);
+}
+.sumV {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+}
+.sumNote {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
   color: var(--sub);
   line-height: 1.45;
-  margin-top: 9px;
-  padding-top: 9px;
-  border-top: 1px solid var(--line);
+}
+.sumNote svg {
+  flex-shrink: 0;
+}
+
+.goalHint {
+  font-size: 12px;
+  color: var(--sub);
+  margin: 9px 2px 0;
+  line-height: 1.5;
 }

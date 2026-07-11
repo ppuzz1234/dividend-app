@@ -19,22 +19,50 @@
   --sub: #8a998f;
   --faint: #5c6b62;
 
-  /* 강조 — 제이드 */
-  --jade: #3fd08b;
-  --jade-deep: #27a06c;
-  --jade-dim: #16321f;
+  /* 강조 — 메인(옐로우/골드). 토큰명은 호환을 위해 유지하되 값은 옐로우톤 */
+  --jade: #f2c230;
+  --jade-deep: #d19a24;
+  --jade-dim: #2c2409;
 
-  /* 강조 — 골드 */
-  --gold: #e8c078;
-  --gold-deep: #c99a4e;
-  --gold-dim: #332915;
+  /* 강조 — 서브(앰버/브론즈). 메인 옐로우와 대비를 위해 더 짙은 웜톤 */
+  --gold: #e0913a;
+  --gold-deep: #b36a22;
+  --gold-dim: #2e1e0c;
 
   --danger: #e8775c;
 
   /* 강조색 위에 올리는 글자색 */
-  --on-jade: #06140c;
-  --on-gold: #1a1305;
+  --on-jade: #1a1400;
+  --on-gold: #201302;
 
-  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display",
+  --font-sans: "LifePlus", -apple-system, BlinkMacSystemFont, "SF Pro Display",
     "Apple SD Gothic Neo", "Pretendard", system-ui, "Malgun Gothic", sans-serif;
+  /* 브랜드/헤딩용 — 본문과 동일 LifePlus 계열 */
+  --font-brand: "LifePlus", -apple-system, "Apple SD Gothic Neo", system-ui, sans-serif;
+}
+
+/* ------------------------------------------------------------------ *
+ *  LifePlus 웹폰트 — hpr과 동일한 브랜드 서체.
+ *  파일: public/fonts/body(Light/Medium), heading(Bold).
+ * ------------------------------------------------------------------ */
+@font-face {
+  font-family: "LifePlus";
+  src: url("/fonts/body/LIFEPLUS LIGHT.TTF") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "LifePlus";
+  src: url("/fonts/body/LIFEPLUS MEDIUM.TTF") format("truetype");
+  font-weight: 400 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "LifePlus";
+  src: url("/fonts/heading/LIFEPLUS BOLD.TTF") format("truetype");
+  font-weight: 700 900;
+  font-style: normal;
+  font-display: swap;
 }
