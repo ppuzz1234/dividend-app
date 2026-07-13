@@ -1,11 +1,14 @@
 import express from "express";
 import { KIS } from "./kis/config.js";
 import { getQuote } from "./kis/quote.js";
+import { strategyRouter } from "./strategy/handler.js";
 
 /* ------------------------------------------------------------------ *
  *  배당 눈덩이 백오피스 API
  *  · 한국투자증권(KIS) 시세 프록시 — 프론트는 이 서버만 호출
  *  · APP KEY/SECRET 미설정 시 stub(가상) 시세로 응답 (키 없이 개발 가능)
+ *  · 전략 엔진 (HPR: handler→provider→repository, src/db 파일 기반 —
+ *    실제 DB 이관 시 repository만 교체)
  * ------------------------------------------------------------------ */
 const app = express();
 const PORT = process.env.PORT ?? 4000;
@@ -20,6 +23,9 @@ app.use((req, res, next) => {
 app.get("/health", (req, res) => {
   res.json({ ok: true, service: "devidend-api", ts: Date.now() });
 });
+
+// 전략 엔진 (사용자 입력 → 계좌 여력·비교표·배분안)
+app.use("/api/strategy", strategyRouter);
 
 // KIS 연동 상태
 app.get("/api/kis/status", (req, res) => {

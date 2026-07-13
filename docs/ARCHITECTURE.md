@@ -41,10 +41,20 @@ devidend-app/
 │  │     ├─ hooks/                # useQuotes 등 (기존)
 │  │     └─ lib/flow.js           # 화면 순서·스텝퍼 (기존)
 │  │
-│  └─ api/                        # Express — 외부 연동 전담
+│  └─ api/                        # Express — 외부 연동 + 전략 엔진(백엔드 비즈니스 로직)
 │     └─ src/
 │        ├─ kis/                  # 한투 시세·인증 (기존)
-│        └─ orders/               # 7. 주문 접수·체결 프록시 (신규, KIS 주문 API)
+│        ├─ strategy/             # 전략 엔진 — HPR 계층
+│        │  ├─ handler.js         #   H: 라우트 (POST /api/strategy, GET /api/strategy/tables)
+│        │  ├─ provider.js        #   P: 비즈니스 로직 (입력→여력·현재/제안 비교표·배분)
+│        │  └─ repository.js      #   R: 데이터 접근 — DB 이관 시 이 파일만 교체
+│        ├─ db/                   # 파일 기반 "테이블" (실 DB 이관 대상)
+│        │  ├─ accounts.json      #   ① 계좌 특성 (한도·세율·잠금·제약)
+│        │  ├─ products.json      #   ② 운용 상품 (편입 가능·과세 구분)
+│        │  ├─ isa-rollover.json  #   ③ ISA 롤오버 (만기·비과세·가입제한·전환보너스)
+│        │  ├─ horizons.json      #   ④ 운용기간 룰 (우선순위·리밸런싱 허용 대상)
+│        │  └─ sample-snapshot.json # 개발용 마이데이터 표본
+│        └─ orders/               # 7. 주문 접수·체결 프록시 (예정, KIS 주문 API)
 │
 ├─ packages/
 │  └─ core/                       # ★ 도메인 엔진 — 순수 JS, React/Express 무관

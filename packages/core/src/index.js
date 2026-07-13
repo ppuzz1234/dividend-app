@@ -12,11 +12,11 @@ export { PRODUCT_ELIGIBILITY, ELIGIBILITY_ACCOUNTS, eligibleAccountsFor, product
 export { STOCKS, CATEGORIES } from "./knowledge/stocks.js";
 
 /* ① 고객 정보·성향 (profile) */
-export { SURVEY_QUESTIONS, SURVEY_VERSION, surveyComplete } from "./profile/survey.js";
+export { SURVEY_QUESTIONS, SURVEY_MONTHLY, SURVEY_VERSION, surveyComplete, surveyGoal } from "./profile/survey.js";
 export { buildRiskProfile } from "./profile/riskProfile.js";
 
 /* 보유 현황 (holdings) */
-export { MYDATA_ACCOUNTS, normalizeSnapshot } from "./holdings/snapshot.js";
+export { MYDATA_ACCOUNTS, MYDATA_PROFILE, normalizeSnapshot } from "./holdings/snapshot.js";
 
 /* ② 투자 여력 (capacity) */
 export { assessCapacity } from "./capacity/capacity.js";
@@ -35,6 +35,7 @@ export { allocate } from "./taxopt/optimizer.js";
 export { buildStrategy, STRATEGY_PLAYBOOK } from "./plan/strategy.js";
 export { recommendByAccount, chosenCategories } from "./plan/assetLocation.js";
 export { buildAccountRooms } from "./plan/accountRooms.js";
+export { buildStrategyComparison, PRODUCT_GROUP_LABELS } from "./plan/strategyTable.js";
 
 /* ⑥ 시뮬레이션 */
 export { blend, simulate, simulateOne, simulatePortfolio } from "./simulate/simulate.js";

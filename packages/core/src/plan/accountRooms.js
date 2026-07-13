@@ -8,6 +8,7 @@
  *  · 보유·납입 현황은 MYDATA_ACCOUNTS(engine id: general/isa/pension)에서 매핑
  * ------------------------------------------------------------------ */
 import { MYDATA_ACCOUNTS } from "../holdings/snapshot.js";
+import { deductionRate } from "../knowledge/accounts.js";
 
 /* 4계좌 정의 — 연금계좌 세액공제 합산 한도(900만)를 연금저축600 + IRP300 으로 분해 */
 const ROOM_DEFS = [
@@ -49,14 +50,14 @@ const ROOM_DEFS = [
   },
 ];
 
-const DEDUCT_RATE = 0.165; // 세액공제 환급률(총급여 5,500만 이하 기준, 단순화)
-
 /**
  * @param {object} p
  * @param {boolean} [p.mydata=false]  마이데이터 연동 여부(미연동이면 여력=한도 최대)
+ * @param {number} [p.income]  전년도 총소득 — 세액공제 환급률(16.5%/13.2%) 분기
  * @returns 4계좌 room 목록 + 요약
  */
-export function buildAccountRooms({ mydata = false } = {}) {
+export function buildAccountRooms({ mydata = false, income = 50_000_000 } = {}) {
+  const DEDUCT_RATE = deductionRate(income); // 총급여 5,500만 이하 16.5%, 초과 13.2%
   // 연금계좌 납입액을 연금저축(600 우선) → IRP 순으로 배분
   const pensionContributed = mydata ? MYDATA_ACCOUNTS.pension?.contributedThisYear || 0 : 0;
   const pensionUsed = { pensionSavings: Math.min(pensionContributed, 6_000_000), irp: Math.max(0, pensionContributed - 6_000_000) };
@@ -67,9 +68,10 @@ export function buildAccountRooms({ mydata = false } = {}) {
     // engine 'pension' 잔고는 두 계좌가 공유 — 연금저축을 대표 보유로 표기
     const held = !mydata ? null : d.id === "irp" ? false : !!snap;
     const balance = held ? snap?.balance ?? 0 : 0;
+    const institution = held ? snap?.institution || null : null; // 보유 금융사
 
     if (d.roomType === "none") {
-      return { ...d, held, balance, used: 0, room: Infinity, roomText: "한도 없음", pct: 0 };
+      return { ...d, held, balance, institution, used: 0, room: Infinity, roomText: "한도 없음", pct: 0 };
     }
 
     const used =
@@ -83,6 +85,7 @@ export function buildAccountRooms({ mydata = false } = {}) {
       ...d,
       held,
       balance,
+      institution,
       used,
       room,
       pct,

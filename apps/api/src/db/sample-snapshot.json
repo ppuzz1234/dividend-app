@@ -1,0 +1,32 @@
+{
+  "table": "sampleSnapshot",
+  "version": "2026.07",
+  "description": "마이데이터 수집 결과 예시 — 요청 body에 snapshot이 없을 때 사용하는 개발용 표본.",
+  "accounts": {
+    "general": {
+      "institution": "한국투자증권",
+      "balance": 857142857,
+      "contributedThisYear": 0,
+      "holdings": [
+        { "name": "QQQ 나스닥100", "productType": "foreignEtf", "value": 857142857 }
+      ]
+    },
+    "isa": {
+      "institution": "미래에셋증권",
+      "balance": 12000000,
+      "contributedThisYear": 7000000,
+      "holdings": [
+        { "name": "KODEX 배당가치", "productType": "krEtf", "value": 7000000 },
+        { "name": "TIGER 리츠부동산인프라", "productType": "krReit", "value": 5000000 }
+      ]
+    },
+    "pension": {
+      "institution": "한국투자증권",
+      "balance": 5000000,
+      "contributedThisYear": 3000000,
+      "holdings": [
+        { "name": "TIGER 미국배당다우존스", "productType": "krListedGlobalEtf", "value": 5000000 }
+      ]
+    }
+  }
+}

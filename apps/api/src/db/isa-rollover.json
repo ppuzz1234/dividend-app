@@ -1,0 +1,27 @@
+{
+  "table": "isaRollover",
+  "version": "2026.07",
+  "description": "ISA 롤오버·세제 규칙 — 만기 정산·재가입·연금 전환 보너스·가입 제한.",
+  "rows": [
+    {
+      "id": "default",
+      "termYears": 3,
+      "taxFreeProfit": 2000000,
+      "taxFreeProfitSeomin": 4000000,
+      "excessSeparateRate": 0.099,
+      "rejoinAllowed": true,
+      "rolloverNote": "3년 만기마다 순이익 비과세 정산 후 재가입(롤오버) — 비과세 한도를 주기마다 새로 받는다",
+      "joinRestriction": {
+        "finIncomeThreshold": 20000000,
+        "lookbackYears": 3,
+        "note": "직전 3개년 중 금융소득 2,000만 초과(금융소득종합과세 대상)면 신규 가입·재가입 불가"
+      },
+      "pensionTransferBonus": {
+        "rate": 0.1,
+        "cap": 3000000,
+        "withinDays": 60,
+        "note": "만기자금을 60일 내 연금계좌로 이전 시 이전액 10%(최대 300만) 추가 세액공제"
+      }
+    }
+  ]
+}

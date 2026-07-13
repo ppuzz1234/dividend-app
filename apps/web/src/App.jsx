@@ -8,9 +8,9 @@ import {
   simulatePortfolio,
   allocate,
   buildStrategy,
-  buildRiskProfile,
-  surveyComplete,
   buildOrderPlan,
+  surveyComplete,
+  surveyGoal,
   MYDATA_ACCOUNTS,
 } from "@devidend/core";
 import { Splash } from "./screens/Splash.jsx";
@@ -25,7 +25,7 @@ import { Order } from "./screens/Order.jsx";
 import { Done } from "./screens/Done.jsx";
 
 /* ------------------------------------------------------------------ *
- *  CLEVR — 상장 배당주 투자·절세 시뮬레이터
+ *  GENIUS — 상장 배당주 투자·절세 시뮬레이터
  *  App 은 단계 상태 관리와 화면 조립만 담당. (UI/스타일은 각 화면 모듈)
  *  흐름: 성향 → 마이데이터 → 계좌 전략 → 시뮬/분석 → 종목 → 매수
  * ------------------------------------------------------------------ */
@@ -36,14 +36,15 @@ export default function App() {
   const [region, setRegion] = useState("ALL");
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState([]);
-  const [seed, setSeed] = useState(10000000);
-  const [years, setYears] = useState(20);
+  const [seed] = useState(10000000); // 미연동 시 기본 시드
+  const [years] = useState(20);
   const [monthly, setMonthly] = useState(500000);
-  const [reinvest, setReinvest] = useState(true);
+  const [reinvest] = useState(true);
   const [mydata, setMydata] = useState(false);
   // 개인 프로파일 (배분 엔진 입력)
   const [age, setAge] = useState(40);
-  const [income, setIncome] = useState(50000000);
+  const [income, setIncome] = useState(50000000); // 전년도 총소득
+  const [finIncome, setFinIncome] = useState(0); // 전년도 금융소득 (이자+배당)
   const [goal, setGoal] = useState("retirement"); // retirement | cashflow
   // ① 성향 서베이 응답
   const [answers, setAnswers] = useState({});
@@ -53,16 +54,19 @@ export default function App() {
     document.getElementById("scrollArea")?.scrollTo(0, 0);
   };
   const idx = STEPS.indexOf(step);
-  const back = () => idx > 1 && go(STEPS[idx - 1]);
+  const back = () => {
+    if (idx <= 1) return;
+    let i = idx - 1;
+    while (i > 1 && STEPS[i] === "simulate") i--; // 로딩(시뮬) 화면은 건너뛰고 이전 실화면으로
+    go(STEPS[i]);
+  };
 
   // 마이데이터 총 잔고 → 연동 시 투자 시드로 사용 (여력 화면 대체)
   const mydataTotal = useMemo(
     () => Object.values(MYDATA_ACCOUNTS).reduce((s, a) => s + (a.balance || 0), 0),
     []
   );
-  useEffect(() => {
-    if (mydata) setSeed(mydataTotal);
-  }, [mydata, mydataTotal]);
+  const effectiveSeed = mydata ? mydataTotal : seed;
 
   // 시뮬레이션 단계 → 자동 진행
   useEffect(() => {
@@ -79,15 +83,13 @@ export default function App() {
     () => (selected.length ? STOCKS.filter((s) => selected.includes(s.id)) : STOCKS.filter((s) => s.elite)),
     [selected]
   );
-  // ① 서베이 응답 → 성향 프로파일
-  const riskProfile = useMemo(() => (surveyComplete(answers) ? buildRiskProfile(answers) : null), [answers]);
   // ③ 계좌 운용 전략 (현황 여력 × 목표 → 상세 방안 + 종목 유형)
   const strategy = useMemo(() => buildStrategy({ goal, income, mydata }), [goal, income, mydata]);
   const chosenCats = strategy.chosenCats;
   // ⑤ 배분 설계 엔진 → 계좌별 배분안
   const allocation = useMemo(
-    () => allocate({ seed, monthly, age, income, goal }),
-    [seed, monthly, age, income, goal]
+    () => allocate({ seed: effectiveSeed, monthly, age, income, goal }),
+    [effectiveSeed, monthly, age, income, goal]
   );
   // ④ 배분안 기반 멀티계좌 시뮬레이션 (일반 수익률 가정)
   const sim = useMemo(
@@ -106,19 +108,21 @@ export default function App() {
       {step === "login" && <Login onNext={() => go("survey")} />}
       {step === "survey" && (
         <Survey
-          {...{ answers, setAnswers }}
+          {...{ answers, setAnswers, monthly, setMonthly }}
           onNext={() => {
-            if (answers.goal) setGoal(answers.goal); // 서베이 목표 → 전략 엔진 목표
+            if (surveyComplete(answers)) setGoal(surveyGoal(answers)); // 투자기간 응답 → 전략 엔진 목표
             go("mydata");
           }}
         />
       )}
       {step === "mydata" && (
         <Mydata
-          {...{ mydata, setMydata, age, setAge, income, setIncome, monthly, setMonthly, mydataTotal, onNext: () => go("accounts") }}
+          {...{ mydata, setMydata, age, setAge, income, setIncome, finIncome, setFinIncome, mydataTotal, onNext: () => go("accounts") }}
         />
       )}
-      {step === "accounts" && <Accounts {...{ goal, setGoal, mydata, strategy, onNext: () => go("simulate") }} />}
+      {step === "accounts" && (
+        <Accounts {...{ mydata, answers, monthly, finIncome, income, age, onNext: () => go("simulate") }} />
+      )}
       {step === "simulate" && <Simulating />}
       {step === "result" && (
         <Result sim={sim} allocation={allocation} chosen={chosen} years={years} reinvest={reinvest} age={age} onNext={() => go("picker")} />

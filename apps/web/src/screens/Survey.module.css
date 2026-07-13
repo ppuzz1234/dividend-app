@@ -1,5 +1,5 @@
 .q {
-  margin-top: 18px;
+  margin-top: 20px;
 }
 .q:first-of-type {
   margin-top: 4px;
@@ -10,7 +10,7 @@
   gap: 8px;
   font-size: 14px;
   font-weight: 700;
-  margin-bottom: 9px;
+  margin-bottom: 10px;
 }
 .qNum {
   width: 20px;
@@ -24,45 +24,94 @@
   font-size: 11.5px;
   font-weight: 800;
 }
-.opts {
+
+/* 양자택일 타일 */
+.tiles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.tile {
+  position: relative;
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: 7px;
-}
-.opt {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
+  min-height: 116px;
   text-align: left;
   background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 13px;
-  padding: 11px 14px;
+  border: 1.5px solid var(--line);
+  border-radius: 16px;
+  padding: 16px 14px;
   color: var(--text);
   cursor: pointer;
 }
-.optOn {
+.tileOn {
   border-color: var(--jade);
   background: var(--jade-dim, var(--bg2));
+}
+.tileCheck {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--jade);
+  color: var(--on-jade);
+}
+.tileLabel {
+  font-size: 15.5px;
+  font-weight: 800;
+}
+.tileOn .tileLabel {
   color: var(--jade);
 }
-.optTxt {
-  flex: 1;
-  min-width: 0;
+.tileDesc {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--sub);
+  word-break: keep-all;
 }
-.optLabel {
-  display: block;
+
+/* 3. 월 불입 슬라이더 (Mydata 슬라이더와 동일 패턴) */
+.monthlyVal {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: auto;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--jade);
+  font-variant-numeric: tabular-nums;
+}
+.rangeLabels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--faint);
+  margin: 2px 0 10px;
+}
+.presets {
+  display: flex;
+  gap: 8px;
+}
+.preset {
+  flex: 1;
+  height: 40px;
+  border-radius: 11px;
+  font-family: var(--font-sans);
   font-size: 13.5px;
   font-weight: 700;
-}
-.optDesc {
-  display: block;
-  font-size: 11.5px;
+  cursor: pointer;
+  border: 1px solid var(--line2);
+  background: var(--card);
   color: var(--sub);
-  margin-top: 2px;
 }
-.optOn .optDesc {
-  color: inherit;
-  opacity: 0.75;
+.presetOn {
+  border-color: var(--jade);
+  background: var(--jade-dim);
+  color: var(--jade);
 }

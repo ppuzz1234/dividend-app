@@ -1,0 +1,85 @@
+{
+  "table": "products",
+  "version": "2026.07",
+  "description": "운용 상품 — 상품 구분별 계좌 편입 가능 여부(ok/no/cond)와 과세 구분. 조특법·소득세법 시행령·퇴직연금감독규정 기준.",
+  "rows": [
+    {
+      "id": "krStock",
+      "label": "국내 개별주식",
+      "taxClass": "krTransferFree",
+      "eligibility": { "general": "ok", "isa": "cond", "pensionSavings": "no", "irp": "no" },
+      "condNote": "ISA는 중개형만 가능 — 신탁형·일임형 불가"
+    },
+    {
+      "id": "krEtf",
+      "label": "국내 ETF",
+      "taxClass": "krDividend",
+      "eligibility": { "general": "ok", "isa": "ok", "pensionSavings": "cond", "irp": "cond" },
+      "condNote": "연금계좌는 레버리지·인버스 불가, IRP는 위험자산 70% 한도"
+    },
+    {
+      "id": "krReit",
+      "label": "국내 리츠",
+      "taxClass": "krDividend",
+      "eligibility": { "general": "ok", "isa": "ok", "pensionSavings": "ok", "irp": "cond" },
+      "condNote": "IRP는 위험자산 70% 한도 (연금저축은 2022-10부터 허용)"
+    },
+    {
+      "id": "bondFund",
+      "label": "채권형 펀드",
+      "taxClass": "krDividend",
+      "eligibility": { "general": "ok", "isa": "ok", "pensionSavings": "ok", "irp": "ok" }
+    },
+    {
+      "id": "equityFund",
+      "label": "주식형 펀드",
+      "taxClass": "krDividend",
+      "eligibility": { "general": "ok", "isa": "ok", "pensionSavings": "ok", "irp": "cond" },
+      "condNote": "IRP는 위험자산 70% 한도"
+    },
+    {
+      "id": "foreignStock",
+      "label": "해외상장 주식",
+      "taxClass": "foreignTransfer",
+      "eligibility": { "general": "ok", "isa": "no", "pensionSavings": "no", "irp": "no" },
+      "switchTo": "krListedGlobalEtf",
+      "switchNote": "동일·유사 지수 국내상장 ETF로 교체하면 절세계좌 편입 가능"
+    },
+    {
+      "id": "foreignEtf",
+      "label": "해외상장 ETF",
+      "taxClass": "foreignTransfer",
+      "eligibility": { "general": "ok", "isa": "no", "pensionSavings": "no", "irp": "no" },
+      "switchTo": "krListedGlobalEtf",
+      "switchNote": "동일 지수 국내상장 ETF로 교체하면 절세계좌 편입 가능"
+    },
+    {
+      "id": "krListedGlobalEtf",
+      "label": "국내상장 해외ETF",
+      "taxClass": "krDividend",
+      "eligibility": { "general": "ok", "isa": "ok", "pensionSavings": "ok", "irp": "cond" },
+      "condNote": "IRP는 위험자산 70% 한도. 일반계좌 매매차익은 배당소득 15.4% 과세(종합과세 합산)"
+    },
+    {
+      "id": "elsDls",
+      "label": "ELS/DLS",
+      "taxClass": "krDividend",
+      "eligibility": { "general": "ok", "isa": "cond", "pensionSavings": "no", "irp": "cond" },
+      "condNote": "ISA는 유형·증권사별 상이. IRP 비보장형은 최대손실 원금 40% 이내 상품만"
+    },
+    {
+      "id": "realEstateFund",
+      "label": "부동산펀드",
+      "taxClass": "krDividend",
+      "eligibility": { "general": "ok", "isa": "ok", "pensionSavings": "ok", "irp": "cond" },
+      "condNote": "IRP는 위험자산 70% 한도"
+    },
+    {
+      "id": "deposit",
+      "label": "예·적금",
+      "taxClass": "interest",
+      "eligibility": { "general": "no", "isa": "cond", "pensionSavings": "no", "irp": "ok" },
+      "condNote": "ISA는 신탁형만 예금 편입 가능. IRP 안전자산 30% 충족 수단"
+    }
+  ]
+}

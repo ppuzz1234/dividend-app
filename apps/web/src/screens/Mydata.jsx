@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { ArrowRight, RefreshCw, Lock, BadgeCheck, Plus, Building2, Check, Wallet } from "lucide-react";
-import { MYDATA_ACCOUNTS } from "@devidend/core";
+import { ArrowRight, RefreshCw, Lock, BadgeCheck, Check, Pencil } from "lucide-react";
+import { MYDATA_ACCOUNTS, MYDATA_PROFILE } from "@devidend/core";
+import { AccountRooms } from "../components/AccountRooms.jsx";
 import { Pad } from "../components/layout/Pad.jsx";
 import { Heading } from "../components/layout/Heading.jsx";
 import { Button } from "../components/ui/Button.jsx";
@@ -17,31 +17,23 @@ const digits = (v) => Number(String(v).replace(/\D/g, "")) || 0;
 const ACCT_TYPES = [
   { id: "general", name: "일반 위탁계좌" },
   { id: "isa", name: "ISA" },
-  { id: "pension", name: "연금저축" },
   { id: "irp", name: "IRP" },
+  { id: "pension", name: "연금저축" },
 ];
 
-const MYDATA_AGE = 45; // 마이데이터(본인 인증)로 불러온 나이
-const MONTHLY_PRESETS = [10, 30, 50, 100]; // 만원
-
-export function Mydata({ mydata, setMydata, age, setAge, income, setIncome, monthly, setMonthly, mydataTotal = 0, onNext }) {
-  // 연소득은 마이데이터로 받을 수 없음 → 국세청 연동 또는 직접입력
-  const [incomeSource, setIncomeSource] = useState(null); // 'nts' | 'manual' | null
-
+export function Mydata({ mydata, setMydata, age, setAge, income, setIncome, finIncome, setFinIncome, mydataTotal = 0, onNext }) {
   const heldCount = ACCT_TYPES.filter((t) => MYDATA_ACCOUNTS[t.id]).length;
 
   const connect = () => {
     const next = !mydata;
     setMydata(next);
-    if (next) setAge(MYDATA_AGE); // 나이 자동 로드
+    if (next) {
+      // 마이데이터·소득정보 자동 로드 (아래에서 직접 수정 가능)
+      setAge(MYDATA_PROFILE.age);
+      setFinIncome(MYDATA_PROFILE.financialIncomePrevYear);
+      setIncome(MYDATA_PROFILE.totalIncomePrevYear);
+    }
   };
-
-  const linkNts = () => {
-    setIncomeSource("nts");
-    setIncome(90_000_000); // 국세청 홈택스 연동으로 불러온 연소득(예시)
-  };
-
-  const incomeReady = income > 0 && incomeSource !== null;
 
   return (
     <Pad
@@ -58,8 +50,8 @@ export function Mydata({ mydata, setMydata, age, setAge, income, setIncome, mont
         </div>
       }
     >
-      <Heading sub="흩어진 4개 계좌와 나이를 한 번에 불러오고, 월 불입금만 정하면 맞춤 전략이 완성돼요.">
-        마이데이터 연동
+      <Heading sub="흩어진 4개 계좌와 전년도 소득을 한 번에 불러와요. 불러온 소득은 직접 수정할 수 있어요.">
+        마이데이터로 내 정보 가져오기
       </Heading>
 
       {/* 연동 상태 카드 */}
@@ -70,42 +62,25 @@ export function Mydata({ mydata, setMydata, age, setAge, income, setIncome, mont
         <div className={styles.cardTitle}>{mydata ? "연동되었어요" : "안전하게 연동돼요"}</div>
         <div className={styles.cardSub}>
           {mydata
-            ? `계좌 ${heldCount}개 · 총 평가 ${fmtKRW(mydataTotal)} · 나이 ${MYDATA_AGE}세를 불러왔어요`
+            ? `계좌 ${heldCount}개 · 총 평가 ${fmtKRW(mydataTotal)} · 전년도 소득정보를 불러왔어요`
             : "금융보안원 인증 · 조회 전용 권한만 사용"}
         </div>
       </div>
       <button onClick={connect} className={cx(styles.linkBtn, mydata && styles.linkBtnOn)}>
         <RefreshCw size={17} />
-        {mydata ? "다시 불러오기" : "내 계좌 연동하기"}
+        {mydata ? "다시 불러오기" : "내 정보 가져오기"}
       </button>
 
-      {/* 연동 결과: 4개 계좌 유형 현황 */}
+      {/* 연동 결과: 화면 전환 없이 전략 화면의 4계좌 여력 카드를 그대로 표시 (금융사 포함) */}
       {mydata && (
         <>
-          <Label top>불러온 계좌</Label>
-          <div className={styles.acctList}>
-            {ACCT_TYPES.map((t) => {
-              const acc = MYDATA_ACCOUNTS[t.id];
-              return (
-                <div key={t.id} className={styles.acctRow}>
-                  <span className={styles.acctIcon}>
-                    <Building2 size={16} color={acc ? C.jade : C.faint} />
-                  </span>
-                  <span className={styles.acctName}>{t.name}</span>
-                  {acc ? (
-                    <span className={styles.acctBal}>{fmtKRW(acc.balance)}</span>
-                  ) : (
-                    <span className={styles.acctNone}>미보유 · 개설 추천</span>
-                  )}
-                </div>
-              );
-            })}
-          </div>
+          <Label top>불러온 계좌 · 올해 여력</Label>
+          <AccountRooms mydata income={income} />
         </>
       )}
 
-      {/* 개인 정보 · 투자 계획 — 나이(자동) / 월 불입금(입력) / 연소득 */}
-      <Label top>개인 정보 · 투자 계획</Label>
+      {/* 개인 정보 — 나이(자동) / 전년도 금융소득·총소득(자동 로드 + 수정 가능) */}
+      <Label top>내 정보 확인</Label>
       <div className={styles.planGroup}>
         {/* 나이 */}
         <div className={styles.planField}>
@@ -125,71 +100,53 @@ export function Mydata({ mydata, setMydata, age, setAge, income, setIncome, mont
           />
         </div>
 
-        {/* 월 불입금 */}
+        {/* 전년도 금융소득 */}
         <div className={styles.planField}>
           <div className={styles.fieldHead}>
-            <span className={styles.miniLabel}>
-              <Wallet size={13} color={C.jade} /> 월 불입금 · 매달 투자할 금액
-            </span>
-            <span className={styles.monthlyVal}>{monthly > 0 ? `월 ${fmtKRW(monthly)}` : ""}</span>
-          </div>
-          <div className={styles.presets}>
-            {MONTHLY_PRESETS.map((v) => (
-              <button
-                key={v}
-                type="button"
-                onClick={() => setMonthly(v * 10000)}
-                className={cx(styles.preset, monthly === v * 10000 && styles.presetOn)}
-              >
-                {v}만원
-              </button>
-            ))}
+            <span className={styles.miniLabel}>전년도 금융소득 (만원) · 이자+배당</span>
+            {mydata ? (
+              <span className={styles.autoTag}>
+                <BadgeCheck size={12} /> 자동 · 수정 가능
+              </span>
+            ) : (
+              <span className={styles.editTag}>
+                <Pencil size={11} /> 직접 입력
+              </span>
+            )}
           </div>
           <Field
-            value={monthly ? String(monthly / 10000) : ""}
-            onChange={(v) => setMonthly(digits(v) * 10000)}
-            placeholder="직접 입력 (만원)"
+            value={finIncome ? String(finIncome / 10000) : ""}
+            onChange={(v) => setFinIncome(digits(v) * 10000)}
+            placeholder="1200"
             inputMode="numeric"
           />
+          <p className={styles.hint}>
+            <Check size={12} color={C.jade} /> 연 2,000만원을 넘으면 금융소득종합과세 대상 — ISA 가입 제한 판정에도 쓰여요.
+          </p>
         </div>
 
-        {/* 연소득 */}
+        {/* 전년도 총소득 */}
         <div className={styles.planField}>
           <div className={styles.fieldHead}>
-            <span className={styles.miniLabel}>연소득 · 절세·세액공제 계산에 사용</span>
-          </div>
-          {incomeReady ? (
-            <div className={styles.incomeDone}>
-              <span className={styles.incomeVal}>
-                {incomeSource === "nts" && <BadgeCheck size={15} color={C.jade} />}
-                연 {fmtKRW(income)}
-                {incomeSource === "nts" && <span className={styles.incomeSrc}>국세청 인증</span>}
+            <span className={styles.miniLabel}>전년도 총소득 (만원)</span>
+            {mydata ? (
+              <span className={styles.autoTag}>
+                <BadgeCheck size={12} /> 자동 · 수정 가능
               </span>
-              <button className={styles.reset} onClick={() => setIncomeSource(null)}>
-                변경
-              </button>
-            </div>
-          ) : incomeSource === "manual" ? (
-            <Field
-              value={income ? String(income / 10000) : ""}
-              onChange={(v) => setIncome(digits(v) * 10000)}
-              placeholder="연소득 직접 입력 (만원)"
-              inputMode="numeric"
-            />
-          ) : (
-            <div className={styles.srcRow}>
-              <button className={styles.srcBtn} onClick={linkNts}>
-                <Building2 size={16} />
-                국세청 홈택스 연동
-              </button>
-              <button className={cx(styles.srcBtn, styles.srcBtnAlt)} onClick={() => setIncomeSource("manual")}>
-                <Plus size={16} />
-                직접 입력
-              </button>
-            </div>
-          )}
+            ) : (
+              <span className={styles.editTag}>
+                <Pencil size={11} /> 직접 입력
+              </span>
+            )}
+          </div>
+          <Field
+            value={income ? String(income / 10000) : ""}
+            onChange={(v) => setIncome(digits(v) * 10000)}
+            placeholder="9000"
+            inputMode="numeric"
+          />
           <p className={styles.hint}>
-            <Check size={12} color={C.jade} /> 연소득은 마이데이터로 조회되지 않아 국세청 연동 또는 직접 입력으로 받아요.
+            <Check size={12} color={C.jade} /> 총급여 5,500만원 이하면 연금 세액공제율이 16.5%로 높아져요.
           </p>
         </div>
       </div>

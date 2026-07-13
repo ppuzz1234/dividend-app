@@ -3,7 +3,7 @@ import BrandMark from "../components/ui/BrandMark.jsx";
 import styles from "./Login.module.css";
 
 /* 로그인 — hpr Login과 동일한 구조(브랜드 헤더 · SSO 목록 · "또는" 구분 ·
-   휴대폰 로그인 · 하단 링크). CLEVR은 별도 인증 백엔드가 없는 데모 플로우라,
+   휴대폰 로그인 · 하단 링크). GENIUS는 별도 인증 백엔드가 없는 데모 플로우라,
    어떤 로그인 수단을 눌러도 기존 온보딩(회원가입)으로 진입한다. */
 export function Login({ onNext }) {
   const [phoneMode, setPhoneMode] = useState(false);
@@ -23,7 +23,7 @@ export function Login({ onNext }) {
             <BrandMark size={26} />
           </div>
           <div className={styles.titles}>
-            <strong>CLEVR</strong>
+            <strong>GENIUS</strong>
             <span>절세와 투자를 현명하게</span>
           </div>
         </header>
@@ -71,7 +71,7 @@ export function Login({ onNext }) {
         )}
 
         <button className={styles.footLink} onClick={onNext}>
-          이미 CLEVR 회원이신가요? <b>로그인하세요</b>
+          이미 GENIUS 회원이신가요? <b>로그인하세요</b>
         </button>
       </div>
     </div>

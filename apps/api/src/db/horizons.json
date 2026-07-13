@@ -1,0 +1,37 @@
+{
+  "table": "horizons",
+  "version": "2026.07",
+  "description": "운용기간 룰 — 서베이 horizon 응답별 계좌 우선순위·리밸런싱 허용 대상. 전략이 사용자 입력에 따라 달라지는 축.",
+  "rows": [
+    {
+      "id": "anytime",
+      "label": "상시",
+      "goal": "cashflow",
+      "accountPriority": ["general"],
+      "rebalanceTargets": [],
+      "usePension": false,
+      "useIsa": false,
+      "note": "언제든 해지 — 의무기간 있는 계좌(ISA 3년·연금 55세)는 신규 활용하지 않는다"
+    },
+    {
+      "id": "midshort",
+      "label": "중단기",
+      "goal": "cashflow",
+      "accountPriority": ["isa", "general"],
+      "rebalanceTargets": ["isa"],
+      "usePension": false,
+      "useIsa": true,
+      "note": "3년 이상 중기 — ISA 비과세·손익통산 중심, 연금계좌는 잠금 부담으로 제외"
+    },
+    {
+      "id": "ultralong",
+      "label": "초장기",
+      "goal": "retirement",
+      "accountPriority": ["pensionSavings", "irp", "isa", "general"],
+      "rebalanceTargets": ["pension", "isa"],
+      "usePension": true,
+      "useIsa": true,
+      "note": "55세 이후 월배당 — 연금 세액공제부터 채우고 ISA, 초과분은 일반계좌"
+    }
+  ]
+}
