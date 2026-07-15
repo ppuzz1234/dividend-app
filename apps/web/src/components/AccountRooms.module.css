@@ -117,8 +117,8 @@
   padding: 9px 11px;
 }
 .roomCellAccent {
-  background: var(--jade-dim, var(--bg2));
-  border: 1px solid var(--jade);
+  background: var(--bg2);
+  border: 1px solid var(--green);
 }
 .roomK {
   display: inline-flex;

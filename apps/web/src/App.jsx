@@ -15,6 +15,8 @@ import {
 } from "@devidend/core";
 import { Splash } from "./screens/Splash.jsx";
 import { Login } from "./screens/Login.jsx";
+import { Intro } from "./screens/Intro.jsx";
+import { Onboarding } from "./screens/Onboarding.jsx";
 import { Survey } from "./screens/Survey.jsx";
 import { Mydata } from "./screens/Mydata.jsx";
 import { Accounts } from "./screens/Accounts.jsx";
@@ -39,6 +41,7 @@ export default function App() {
   const [seed] = useState(10000000); // 미연동 시 기본 시드
   const [years] = useState(20);
   const [monthly, setMonthly] = useState(500000);
+  const [monthlyGoal, setMonthlyGoal] = useState(300); // 온보딩 훅: 목표 생활비(만원)
   const [reinvest] = useState(true);
   const [mydata, setMydata] = useState(false);
   // 개인 프로파일 (배분 엔진 입력)
@@ -104,8 +107,12 @@ export default function App() {
   const body = (
     <ChromeBody stage={stage} onBack={back} contentKey={step}>
       {step === "splash" && <Splash onStart={() => go("login")} />}
-      {/* 로그인 완료 → 회원가입은 건너뛰고 바로 프로필(성향 서베이)로 진입 */}
-      {step === "login" && <Login onNext={() => go("survey")} />}
+      {/* 로그인 완료 → 회원가입은 건너뛰고 서비스 콘셉트 안내로 진입 */}
+      {step === "login" && <Login onNext={() => go("intro")} />}
+      {step === "intro" && <Intro onNext={() => go("onboarding")} />}
+      {step === "onboarding" && (
+        <Onboarding monthlyGoal={monthlyGoal} setMonthlyGoal={setMonthlyGoal} onNext={() => go("survey")} />
+      )}
       {step === "survey" && (
         <Survey
           {...{ answers, setAnswers, monthly, setMonthly }}

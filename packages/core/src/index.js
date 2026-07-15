@@ -10,6 +10,7 @@ export { ACCOUNTS, PENSION_WITHDRAWAL, COMP_TAX, deductionRate } from "./knowled
 export { ACCOUNT_PROFILES, CONTRIBUTION_PRIORITY, ENGINE_ACCOUNT_MAP, profilesForEngineId, PROFILE_VERSION } from "./knowledge/accountProfiles.js";
 export { PRODUCT_ELIGIBILITY, ELIGIBILITY_ACCOUNTS, eligibleAccountsFor, productsForAccount, ELIGIBILITY_VERSION } from "./knowledge/productEligibility.js";
 export { STOCKS, CATEGORIES } from "./knowledge/stocks.js";
+export { ETF_BENCHMARKS } from "./knowledge/etfBenchmarks.js";
 
 /* ① 고객 정보·성향 (profile) */
 export { SURVEY_QUESTIONS, SURVEY_MONTHLY, SURVEY_VERSION, surveyComplete, surveyGoal } from "./profile/survey.js";
@@ -39,6 +40,7 @@ export { buildStrategyComparison, PRODUCT_GROUP_LABELS } from "./plan/strategyTa
 
 /* ⑥ 시뮬레이션 */
 export { blend, simulate, simulateOne, simulatePortfolio } from "./simulate/simulate.js";
+export { projectRetirementScenario } from "./simulate/retirementScenario.js";
 
 /* 인사이트 (은퇴기 배당 계좌별 세금·건보료 비교) */
 export { compareDividendTax, DIVIDEND_TAX_CONST } from "./insight/dividendTaxCompare.js";

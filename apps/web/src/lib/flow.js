@@ -9,6 +9,8 @@
 export const STEPS = [
   "splash",
   "login",
+  "intro", // 서비스 콘셉트 3장 안내(진짜 온보딩)
+  "onboarding", // 서베이 진입 전 훅 화면 — 목표 생활비 × 20년 ETF 시나리오
   "survey", // ① 투자 성향 서베이
   "mydata", // ② 보유계좌·개인정보 마이데이터 연동
   "accounts", // ③ 계좌 현황(4계좌 여력) + 목표 + 운용 전략
@@ -35,4 +37,4 @@ export const STAGE = {
 export const STAGE_LABELS = ["가입", "프로필", "전략", "분석", "종목", "매수"];
 
 /* 헤더(스텝퍼)를 숨기는 단계 */
-export const NO_HEADER = ["splash", "login", "simulate", "done"];
+export const NO_HEADER = ["splash", "login", "intro", "onboarding", "simulate", "done"];

@@ -19,6 +19,7 @@ export const C = {
   goldDeep: "#B36A22",
   goldDim: "#2E1E0C",
   danger: "#E8775C",
+  green: "#3ECF8E",
   onJade: "#1A1400",
   onGold: "#201302",
 };

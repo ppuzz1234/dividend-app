@@ -39,8 +39,8 @@ export function Splash({ onStart }) {
           <BrandMark size={56} glow />
         </div>
         <div className={styles.eyebrow}>SMART DIVIDEND · TAX SAVING</div>
-        <h1 className={styles.title}>GENIUS</h1>
-        <p className={styles.slogan}>절세와 투자를 현명하게</p>
+        <h1 className={styles.title}>PLUS GENIUS</h1>
+        <p className={styles.slogan}>절세 최적화 기반 ETF 은퇴 자산 확보 노하우</p>
       </div>
 
       <div className={styles.foot}>
