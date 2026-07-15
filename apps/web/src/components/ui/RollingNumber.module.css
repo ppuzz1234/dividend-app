@@ -1,0 +1,52 @@
+.root {
+  display: inline-flex;
+  align-items: flex-end; /* 동일 높이 릴들을 하단 정렬 */
+  vertical-align: -0.15em; /* 그룹 전체를 주변 텍스트 베이스라인에 맞춘 미세 보정 */
+  /* 숫자 폭이 튀지 않도록 고정폭 숫자 */
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* 모든 문자를 동일한 1em 높이 박스로 감싸 정렬을 균일하게 유지 */
+.reel {
+  display: inline-block;
+  height: 1em;
+  line-height: 1;
+  overflow: hidden;
+}
+
+.strip {
+  display: block;
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.cell {
+  display: block;
+  height: 1em;
+  line-height: 1;
+  text-align: center;
+}
+
+/* 공백 문자가 접히지 않도록 */
+.reel .cell {
+  white-space: pre;
+}
+
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .strip {
+    transition: none;
+  }
+}

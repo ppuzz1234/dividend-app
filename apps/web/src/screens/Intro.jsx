@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { ArrowRight, ChevronRight, ShieldCheck, Repeat } from "lucide-react";
+import { ArrowRight, ChevronRight, ChevronsRight, ShieldCheck, Repeat } from "lucide-react";
 import BrandMark from "../components/ui/BrandMark.jsx";
 import { Button } from "../components/ui/Button.jsx";
 import { cx } from "../lib/cx.js";
@@ -8,19 +8,20 @@ import styles from "./Intro.module.css";
 const SLIDES = [
   {
     Icon: ShieldCheck,
-    title: "은퇴 후에도 흔들리지 않는\n고정수익이 필요해요",
+    title: "우리는 100세 시대의 절반을,\n근로 소득 없이 살아야 할 운명",
     desc: "근로소득이 사라진 뒤에도 생활비를 지탱할 안정적인 현금흐름이 반드시 있어야 해요.",
   },
   {
-    Icon: Repeat,
-    title: "젊을 땐 배당성장주,\n은퇴 후엔 배당주로",
-    desc: "젊을 때는 매달 배당성장 ETF에 꾸준히 투자해 자산을 키우고, 은퇴 후에는 배당 ETF로 전환해 그 배당금으로 생활비를 마련해요.",
+    Icon: null, // BrandMark 로 대체
+    title: "PLUS GENIUS가\n똑똑한 해결책을 제안합니다",
+    desc: "절세 계좌 최적화,\n 시기에 맞는 ETF 선택 \n 그리고 은퇴 이후의 똑똑한 배당 전략까지, 당신의 20년을 설계해드려요.",
   },
   {
-    Icon: null, // BrandMark 로 대체
-    title: "PLUS GENIUS가\n최적의 포트폴리오를 설계해요",
-    desc: "세금 최적화 기반의 ETF 투자 전략과, 은퇴 이후 최적의 배당주 포트폴리오까지 함께 설계해드려요.",
+    Icon: Repeat,
+    title: "젊을 땐 배당성장주,\n은퇴 후엔 고배당주!",
+    desc: "성장주 ETF 장기 투자로 기초 자산을 불리고, 은퇴 후에는 배당 ETF로 전환, 그 배당금이 당신의 생활비가 될거예요.",
   },
+
 ];
 
 /* 온보딩 훅(목표 생활비 계산) 화면 진입 전 — 서비스 콘셉트를 3장으로 안내하는
@@ -59,6 +60,13 @@ export function Intro({ onNext }) {
 
   return (
     <div className={styles.wrap}>
+      {!last && (
+        <button type="button" className={styles.skip} onClick={onNext}>
+          건너뛰기
+          <ChevronsRight size={15} strokeWidth={2.4} />
+        </button>
+      )}
+
       <div ref={listRef} className={styles.track} onScroll={handleScroll}>
         {SLIDES.map(({ Icon, title, desc }, i) => (
           <div key={i} className={styles.slide}>
@@ -82,16 +90,9 @@ export function Intro({ onNext }) {
       </div>
 
       <div className={styles.footerRow}>
-        {!last && (
-          <button type="button" className={styles.skip} onClick={onNext}>
-            건너뛰기
-          </button>
-        )}
-        <div className={styles.grow}>
-          <Button onClick={last ? onNext : () => goTo(slide + 1)} icon={last ? ArrowRight : ChevronRight}>
-            {last ? "시작하기" : "다음"}
-          </Button>
-        </div>
+        <Button onClick={last ? onNext : () => goTo(slide + 1)} icon={last ? ArrowRight : ChevronRight}>
+          {last ? "시작하기" : "다음"}
+        </Button>
       </div>
     </div>
   );

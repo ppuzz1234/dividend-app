@@ -1,4 +1,5 @@
 .wrap {
+  position: relative;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -77,20 +78,29 @@
 }
 
 .footerRow {
-  display: flex;
-  align-items: center;
-  gap: 12px;
   margin-top: 36px;
 }
-.grow {
-  flex: 1;
-  min-width: 0;
-}
+
+/* 우측 상단에 고정된 '건너뛰기' 칩 — 헤더가 없는 인트로에서 안전영역을 피해 배치 */
 .skip {
-  flex-shrink: 0;
-  font-size: 13.5px;
+  position: absolute;
+  top: max(12px, env(safe-area-inset-top));
+  right: 16px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 7px 10px 7px 13px;
+  font-size: 13px;
   font-weight: 700;
   color: var(--sub);
-  padding: 8px 2px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 999px;
   cursor: pointer;
+  transition: color 0.18s, border-color 0.18s, background 0.18s;
+}
+.skip:hover {
+  color: var(--text);
+  border-color: var(--line2);
 }

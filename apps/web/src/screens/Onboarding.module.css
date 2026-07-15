@@ -5,67 +5,86 @@
   background: linear-gradient(160deg, var(--card-hi), var(--card));
   border: 1px solid var(--line);
 }
+/* 좌측 정렬 — 알약 폭이 변해도 문장 시작점("저는")이 고정되도록 */
 .goalRow {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 6px;
-  text-align: center;
+  text-align: left;
   word-break: keep-all;
 }
 .goalText {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 700;
   color: var(--text);
   letter-spacing: -0.01em;
 }
-.goalInput {
-  width: 62px;
-  height: 32px;
+/* 숫자(가변) + 만원(고정)을 한 알약 안에 담는 래퍼 */
+.goalPill {
+  display: inline-flex;
+  align-items: center; /* 내부 숫자·단위를 알약 중앙에 정렬 → 좌우 설명글과 높이 일치 */
+  gap: 3px;
+  height: 34px;
+  padding: 0 15px;
   flex-shrink: 0;
-  border-radius: 9px;
-  border: 1.5px solid var(--jade);
+  border-radius: 999px; /* 알약 형태 */
   background: var(--bg2);
+  cursor: text; /* 알약 어디를 눌러도 숫자 입력으로 진입 */
+}
+.goalPill:focus-within {
+  box-shadow: 0 0 0 2px var(--jade-dim);
+}
+.goalInput {
+  field-sizing: content; /* 입력값 길이에 맞춰 폭 자동 확장 (미지원 시 size 속성으로 폴백) */
+  min-width: 18px;
+  padding: 0;
+  border: none;
+  background: transparent;
   color: var(--jade);
-  text-align: center;
+  text-align: right;
   font-family: var(--font-sans);
   font-size: 17px;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   outline: none;
 }
-.goalInput:focus {
-  border-color: var(--jade-deep);
+/* '만원' — 편집 불가 고정 단위 (클릭 시 숫자 입력으로 포커스 전달) */
+.goalUnit {
+  color: var(--jade);
+  font-size: 14px;
+  font-weight: 700;
+  flex-shrink: 0;
+  cursor: text;
+  user-select: none;
 }
 
-.presets {
+/* 금액 선택 슬라이더 (구 프리셋 버튼 대체) */
+.goalSlider {
+  margin-top: 16px;
+  padding: 0 4px;
+}
+.stopLabels {
   display: flex;
-  gap: 7px;
-  margin-top: 12px;
+  justify-content: space-between;
+  margin-top: 8px;
 }
-.preset {
-  flex: 1;
-  height: 32px;
-  border-radius: 9px;
-  font-family: var(--font-sans);
-  font-size: 12.5px;
-  font-weight: 700;
-  cursor: pointer;
-  border: 1px solid var(--line2);
-  background: var(--bg2);
-  color: var(--sub);
+.stopLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--faint);
+  transition: color 0.2s;
 }
-.presetOn {
-  border-color: var(--jade);
-  background: var(--jade-dim);
+.stopOn {
   color: var(--jade);
+  font-weight: 800;
 }
 
 .scenarioHead {
   display: flex;
   align-items: flex-start;
   gap: 6px;
-  font-size: 13.5px;
+  font-size: 20px;
   font-weight: 600;
   color: var(--text);
   line-height: 1.5;
@@ -81,10 +100,10 @@
   color: var(--jade);
 }
 
-/* 2열 좌우 배치 — 각 카드 내부는 세로형(로고→지표→각주) */
+/* 2열 좌우 배치 — 각 카드 내부는 세로형(캡션→불입금→로고·이름) */
 .grid {
   display: flex;
-  gap: 10px;
+  gap: 12px;
   align-items: stretch;
 }
 
@@ -93,25 +112,67 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  border-radius: 16px;
-  padding: 14px 12px;
+  border-radius: 18px;
+  padding: 24px 14px 20px;
   background: var(--card);
   border: 1px solid var(--line);
 }
-.cardHead {
+
+/* 상단 캡션 — "국내/해외 ETF로 모은다면," */
+.cardCaption {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--text);
+  text-align: center;
+  word-break: keep-all;
+  letter-spacing: -0.02em;
+  margin-bottom: 18px;
+}
+
+.metric {
+  text-align: center;
+}
+.metricLabel {
+  font-size: 13.5px;
+  color: var(--faint);
+  margin-bottom: 8px;
+}
+/* 롤링 숫자를 플렉스로 정중앙 배치 — 베이스라인 보정에 의한 기울어짐 방지 */
+.metricValue {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--jade);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+/* 하단 — 대형 로고(이름 위) + [국가배지·이름·상세(i)] 행 */
+.brandArea {
   display: flex;
   flex-direction: column;
   align-items: center;
-  text-align: center;
-  gap: 4px;
-  margin-bottom: 12px;
+  gap: 12px;
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+.nameRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
 .cardTitle {
-  font-size: 14px;
+  font-size: 14.5px;
   font-weight: 800;
   color: var(--text);
-  margin-top: 4px;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
 }
+/* 국가 배지 — 최초 스타일(작은 칩) 유지 */
 .cardRegion {
   font-size: 10px;
   font-weight: 700;
@@ -120,58 +181,141 @@
   border: 1px solid var(--line2);
   border-radius: 6px;
   padding: 1px 6px;
+  flex-shrink: 0;
 }
-.cardDesc {
-  font-size: 11px;
+.infoBtn {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 1px solid var(--line2);
+  background: var(--bg2);
   color: var(--sub);
-  margin-top: 4px;
-  line-height: 1.4;
-  word-break: keep-all;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.infoBtn:hover {
+  color: var(--text);
+  border-color: var(--sub);
 }
 
-.metrics {
+/* ETF 상세 레이어팝업 */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(0, 0, 0, 0.58);
+  backdrop-filter: blur(2px);
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.popup {
+  position: relative;
+  width: 100%;
+  max-width: 340px;
+  max-height: 80vh;
+  overflow-y: auto;
+  border-radius: 20px;
+  padding: 20px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.5);
+}
+.popupClose {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: var(--bg2);
+  color: var(--sub);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.popupClose:hover {
+  color: var(--text);
+}
+.popupHead {
+  display: flex;
+  align-items: center;
   gap: 10px;
-  padding: 12px 0;
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
+  padding-right: 30px; /* X 버튼 자리 */
 }
-.metric {
-  text-align: center;
+.popupTitle {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
 }
-.metricLabel {
-  font-size: 10.5px;
-  color: var(--faint);
-  margin-bottom: 4px;
+.popupSub {
+  font-size: 11.5px;
+  color: var(--sub);
+  margin-top: 2px;
 }
-.metricValue {
-  font-size: 16.5px;
+.popupSection {
+  margin-top: 16px;
+}
+.popupSectionTitle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
   font-weight: 800;
   color: var(--jade);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.02em;
-  word-break: keep-all;
+  margin-bottom: 6px;
 }
-.cardFoot {
-  display: flex;
-  align-items: flex-start;
-  gap: 5px;
-  margin-top: 10px;
-  font-size: 10px;
-  line-height: 1.45;
+.popupDesc {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text);
+  word-break: keep-all;
+  margin: 0;
+}
+.popupNote {
+  font-size: 11px;
+  line-height: 1.55;
   color: var(--faint);
   word-break: keep-all;
+  margin: 8px 0 0;
 }
-.cardFoot svg {
+.specList {
+  margin: 10px 0 0;
+}
+.specRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 12px;
+}
+.specRow:last-child {
+  border-bottom: none;
+}
+.specRow dt {
   flex-shrink: 0;
-  margin-top: 2px;
+  color: var(--sub);
+}
+.specRow dd {
+  margin: 0;
+  color: var(--text);
+  font-weight: 600;
+  text-align: right;
+  word-break: keep-all;
 }
 
 .disclaimer {
-  font-size: 11px;
-  line-height: 1.6;
+  font-size: 12px;
+  line-height: 1.65;
   color: var(--faint);
-  margin: 12px 2px 0;
+  margin: 14px 2px 0;
   word-break: keep-all;
 }

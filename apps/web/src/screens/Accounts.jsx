@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
-import { ArrowRight, Sparkles, MoveRight, Server, ServerOff } from "lucide-react";
-import { buildStrategyComparison } from "@devidend/core";
+import { ArrowRight, Sparkles, MoveRight, Server, ServerOff, RefreshCw, BadgeCheck } from "lucide-react";
+import { buildStrategyComparison, MYDATA_ACCOUNTS } from "@devidend/core";
 import { fetchStrategy } from "../lib/strategyApi.js";
 import { Pad } from "../components/layout/Pad.jsx";
 import { Heading } from "../components/layout/Heading.jsx";
 import { Button } from "../components/ui/Button.jsx";
 import { Segmented } from "../components/ui/Segmented.jsx";
+import { GeniusLoader } from "../components/ui/GeniusLoader.jsx";
 import { AccountRooms } from "../components/AccountRooms.jsx";
 import { fmtKRW } from "../lib/format.js";
 import { cx } from "../lib/cx.js";
@@ -20,9 +21,26 @@ const VIEWS = [
  * 사용자 변수(성향·월 불입·나이·전년도 금융/총소득)를 백엔드 전략 엔진
  * (POST /api/strategy, 파일 DB 기반 HPR)에 태워 결과를 렌더링한다.
  * 엔진 미기동 시에는 로컬(@devidend/core) 추정으로 폴백. */
-export function Accounts({ mydata, answers, monthly, finIncome, income, age, onNext }) {
+export function Accounts({ mydata, answers, monthly, finIncome, income, age, onLinked, onNext }) {
   const [view, setView] = useState("current");
   const [remote, setRemote] = useState(null);
+  // 마이데이터 연동 플로우 — idle(미연동) → loading(GENIUS) → done(연동 계좌내역)
+  const [phase, setPhase] = useState(mydata ? "table" : "idle");
+
+  // GENIUS 로딩 후 연동 완료 처리 (앱 상태에도 반영)
+  useEffect(() => {
+    if (phase !== "loading") return;
+    const t = setTimeout(() => {
+      setPhase("done");
+      onLinked?.();
+    }, 2600);
+    return () => clearTimeout(t);
+  }, [phase, onLinked]);
+
+  const mydataTotal = useMemo(
+    () => Object.values(MYDATA_ACCOUNTS).reduce((s, a) => s + (a.balance || 0), 0),
+    []
+  );
 
   // 사용자 입력이 바뀌면 백엔드 로직 재실행
   useEffect(() => {
@@ -39,14 +57,44 @@ export function Accounts({ mydata, answers, monthly, finIncome, income, age, onN
   const applied = view === "proposed";
   const t = applied ? cmp.proposed : cmp.current;
 
-  /* 미연동: 비교할 보유 데이터가 없음 → 4계좌 여력 카드로 안내 */
-  if (!mydata) {
+  /* 미연동 → 연동 플로우: 버튼 클릭 → GENIUS 로딩 → 하단에 연동 계좌내역 */
+  if (phase !== "table") {
     return (
       <Pad footer={<Button onClick={onNext} icon={ArrowRight}>이 전략으로 시뮬레이션</Button>}>
-        <Heading sub="마이데이터를 연동하면 현재 vs 제안 세금 비교표를 볼 수 있어요. 지금은 계좌별 연간 여력을 보여드려요.">
+        <Heading
+          sub={
+            phase === "done"
+              ? "연동이 완료됐어요. 불러온 계좌 현황을 확인해 보세요."
+              : "마이데이터를 연동하면 흩어진 계좌와 소득정보를 한 번에 불러와요."
+          }
+        >
           내 계좌 전략
         </Heading>
-        <AccountRooms mydata={false} income={income} />
+
+        {/* 마이데이터 연동하기 — 완료 후엔 상태 배지로 전환 */}
+        {phase === "done" ? (
+          <div className={styles.linkedBadge}>
+            <BadgeCheck size={16} />
+            마이데이터 연동 완료 · 총 평가 {fmtKRW(mydataTotal)}
+          </div>
+        ) : (
+          <button
+            type="button"
+            className={styles.linkBtn}
+            disabled={phase === "loading"}
+            onClick={() => setPhase("loading")}
+          >
+            <RefreshCw size={17} className={phase === "loading" ? styles.spin : undefined} />
+            {phase === "loading" ? "연동 중..." : "마이데이터 연동하기"}
+          </button>
+        )}
+
+        {/* 하단 영역 — 여력 안내 → GENIUS 로딩 → 연동완료 계좌내역 */}
+        {phase === "idle" && <AccountRooms mydata={false} income={income} />}
+        {phase === "loading" && (
+          <GeniusLoader msgs={["금융사 계좌 조회 중", "잔고·거래내역 취합 중", "전년도 소득정보 확인 중"]} />
+        )}
+        {phase === "done" && <AccountRooms mydata income={income} />}
       </Pad>
     );
   }

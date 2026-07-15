@@ -9,16 +9,13 @@ import {
   allocate,
   buildStrategy,
   buildOrderPlan,
-  surveyComplete,
-  surveyGoal,
   MYDATA_ACCOUNTS,
+  MYDATA_PROFILE,
 } from "@devidend/core";
 import { Splash } from "./screens/Splash.jsx";
 import { Login } from "./screens/Login.jsx";
 import { Intro } from "./screens/Intro.jsx";
 import { Onboarding } from "./screens/Onboarding.jsx";
-import { Survey } from "./screens/Survey.jsx";
-import { Mydata } from "./screens/Mydata.jsx";
 import { Accounts } from "./screens/Accounts.jsx";
 import { Picker } from "./screens/Picker.jsx";
 import { Simulating } from "./screens/Simulating.jsx";
@@ -29,7 +26,7 @@ import { Done } from "./screens/Done.jsx";
 /* ------------------------------------------------------------------ *
  *  GENIUS — 상장 배당주 투자·절세 시뮬레이터
  *  App 은 단계 상태 관리와 화면 조립만 담당. (UI/스타일은 각 화면 모듈)
- *  흐름: 성향 → 마이데이터 → 계좌 전략 → 시뮬/분석 → 종목 → 매수
+ *  흐름: 목표 → 계좌 전략 → 시뮬/분석 → 종목 → 매수
  * ------------------------------------------------------------------ */
 export default function App() {
   // 발표용 아이폰 베젤 모드 (?frame=1). 기본은 일반 풀뷰(실서비스).
@@ -40,17 +37,24 @@ export default function App() {
   const [selected, setSelected] = useState([]);
   const [seed] = useState(10000000); // 미연동 시 기본 시드
   const [years] = useState(20);
-  const [monthly, setMonthly] = useState(500000);
+  const [monthly] = useState(500000);
   const [monthlyGoal, setMonthlyGoal] = useState(300); // 온보딩 훅: 목표 생활비(만원)
   const [reinvest] = useState(true);
+  // 프로필 단계 제거 — 기본 프로파일로 시작, 전략 화면에서 마이데이터 연동 시 갱신
   const [mydata, setMydata] = useState(false);
-  // 개인 프로파일 (배분 엔진 입력)
   const [age, setAge] = useState(40);
   const [income, setIncome] = useState(50000000); // 전년도 총소득
   const [finIncome, setFinIncome] = useState(0); // 전년도 금융소득 (이자+배당)
-  const [goal, setGoal] = useState("retirement"); // retirement | cashflow
-  // ① 성향 서베이 응답
-  const [answers, setAnswers] = useState({});
+  const [goal] = useState("retirement"); // retirement | cashflow
+  const [answers] = useState({}); // 성향 응답 (서베이 제거로 빈 값 유지)
+
+  // 전략 화면의 마이데이터 연동 완료 → 프로필·시드 반영
+  const linkMydata = () => {
+    setMydata(true);
+    setAge(MYDATA_PROFILE.age);
+    setFinIncome(MYDATA_PROFILE.financialIncomePrevYear);
+    setIncome(MYDATA_PROFILE.totalIncomePrevYear);
+  };
 
   const go = (s) => {
     setStep(s);
@@ -106,29 +110,16 @@ export default function App() {
 
   const body = (
     <ChromeBody stage={stage} onBack={back} contentKey={step}>
-      {step === "splash" && <Splash onStart={() => go("login")} />}
-      {/* 로그인 완료 → 회원가입은 건너뛰고 서비스 콘셉트 안내로 진입 */}
-      {step === "login" && <Login onNext={() => go("intro")} />}
-      {step === "intro" && <Intro onNext={() => go("onboarding")} />}
+      {step === "splash" && <Splash onStart={() => go("intro")} />}
+      {step === "intro" && <Intro onNext={() => go("login")} />}
+      {/* 서비스 콘셉트 안내 후 로그인 → 회원가입은 건너뛰고 온보딩 훅 화면으로 진입 */}
+      {step === "login" && <Login onNext={() => go("onboarding")} />}
+      {/* 프로필 단계(성향 서베이·마이데이터) 제거 — 목표에서 곧바로 전략으로 */}
       {step === "onboarding" && (
-        <Onboarding monthlyGoal={monthlyGoal} setMonthlyGoal={setMonthlyGoal} onNext={() => go("survey")} />
-      )}
-      {step === "survey" && (
-        <Survey
-          {...{ answers, setAnswers, monthly, setMonthly }}
-          onNext={() => {
-            if (surveyComplete(answers)) setGoal(surveyGoal(answers)); // 투자기간 응답 → 전략 엔진 목표
-            go("mydata");
-          }}
-        />
-      )}
-      {step === "mydata" && (
-        <Mydata
-          {...{ mydata, setMydata, age, setAge, income, setIncome, finIncome, setFinIncome, mydataTotal, onNext: () => go("accounts") }}
-        />
+        <Onboarding monthlyGoal={monthlyGoal} setMonthlyGoal={setMonthlyGoal} onNext={() => go("accounts")} />
       )}
       {step === "accounts" && (
-        <Accounts {...{ mydata, answers, monthly, finIncome, income, age, onNext: () => go("simulate") }} />
+        <Accounts {...{ mydata, answers, monthly, finIncome, income, age, onLinked: linkMydata, onNext: () => go("simulate") }} />
       )}
       {step === "simulate" && <Simulating />}
       {step === "result" && (
