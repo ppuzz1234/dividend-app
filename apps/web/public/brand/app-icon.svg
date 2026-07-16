@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-  <!-- 파비콘 (G2) — 비비드 옐로우 + 다크 도넛 -->
+  <!-- 앱 아이콘 (G2) — 비비드 옐로우 + 다크 도넛(ETF 파이, 한 조각 오픈) -->
   <rect width="512" height="512" rx="116" fill="#FFCF24"/>
   <circle cx="256" cy="256" r="126" fill="none" stroke="#1A1400" stroke-width="86"
           pathLength="100" stroke-dasharray="86 14" transform="rotate(-90 256 256)"/>

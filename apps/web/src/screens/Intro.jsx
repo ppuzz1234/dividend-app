@@ -70,7 +70,9 @@ export function Intro({ onNext }) {
       <div ref={listRef} className={styles.track} onScroll={handleScroll}>
         {SLIDES.map(({ Icon, title, desc }, i) => (
           <div key={i} className={styles.slide}>
-            <div className={styles.iconWrap}>{Icon ? <Icon size={38} /> : <BrandMark size={54} glow />}</div>
+            <div className={cx(styles.iconWrap, !Icon && styles.iconWrapBrand)}>
+              {Icon ? <Icon size={38} /> : <BrandMark size={84} glow />}
+            </div>
             <h2 className={styles.title}>{title}</h2>
             <p className={styles.desc}>{desc}</p>
           </div>

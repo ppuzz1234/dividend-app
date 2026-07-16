@@ -36,7 +36,7 @@ export function Splash({ onStart }) {
 
       <div className={styles.core}>
         <div className={styles.mark}>
-          <BrandMark size={56} glow />
+          <BrandMark size={92} glow />
         </div>
         <div className={styles.eyebrow}>SMART DIVIDEND · TAX SAVING</div>
         <h1 className={styles.title}>PLUS GENIUS</h1>

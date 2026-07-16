@@ -22,10 +22,6 @@
   width: 44px;
   height: 44px;
   flex-shrink: 0;
-  border-radius: 12px;
-  background: #0c120e;
-  border: 1px solid rgba(224, 145, 58, 0.28);
-  color: var(--gold);
   display: grid;
   place-items: center;
 }

@@ -20,7 +20,7 @@ export function Login({ onNext }) {
       <div className={styles.inner}>
         <header className={styles.brand}>
           <div className={styles.mark}>
-            <BrandMark size={26} />
+            <BrandMark size={44} />
           </div>
           <div className={styles.titles}>
             <strong>GENIUS</strong>

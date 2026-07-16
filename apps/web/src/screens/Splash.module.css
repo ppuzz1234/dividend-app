@@ -50,18 +50,13 @@
   cursor: none;
 }
 
-/* 노란 달러 심볼을 담는 다크 타일 — hpr splash-mark 패턴 */
+/* 브랜드 마크(노란 스퀘어클) 자체가 아이콘 — 별도 타일/테두리 없이 그대로 노출 */
 .mark {
   width: 92px;
   height: 92px;
   margin: 0 auto 26px;
-  border-radius: 26px;
-  background: #0c120e;
-  border: 1px solid rgba(224, 145, 58, 0.28);
-  color: var(--gold);
   display: grid;
   place-items: center;
-  box-shadow: 0 16px 50px rgba(224, 145, 58, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .eyebrow {

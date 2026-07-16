@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import {
   AreaChart,
   Area,
@@ -19,6 +19,9 @@ import {
   ReceiptText,
   HeartPulse,
   RefreshCw,
+  ChevronRight,
+  X,
+  ShieldCheck,
 } from "lucide-react";
 import { compareDividendTax } from "@devidend/core";
 import { Pad } from "../components/layout/Pad.jsx";
@@ -31,6 +34,14 @@ import { cx } from "../lib/cx.js";
 import { C } from "../theme/tokens.js";
 import styles from "./Result.module.css";
 
+/* 이 페이지 한정 청녹(민트/틸) 팔레트 — CSS의 .mintScope 오버라이드와 값 동기화.
+   차트·아이콘은 CSS 변수가 아닌 JS 색상 문자열을 쓰므로 여기서 별도 치환. */
+const MINT = {
+  main: "#2dd4bf", // = --jade
+  mainDeep: "#14b8a6", // = --jade-deep
+  sub: "#34d399", // = --gold
+};
+
 export function Result({ sim, allocation, chosen, years, reinvest, age = 65, onNext }) {
   const val = useCountUp(sim.finalValue, 1100);
   const returnPct = (sim.finalValue / sim.contributed - 1) * 100;
@@ -38,7 +49,8 @@ export function Result({ sim, allocation, chosen, years, reinvest, age = 65, onN
   const cmp = useMemo(() => compareDividendTax({ annualDividend: sim.annualIncome, age }), [sim.annualIncome, age]);
 
   return (
-    <Pad footer={<Button onClick={onNext} variant="gold" icon={ArrowRight}>종목 고르러 가기</Button>}>
+    <Pad footer={<Button onClick={onNext} variant="primary" icon={ArrowRight}>종목 고르러 가기</Button>}>
+      <div className={styles.mintScope}>
       <Heading>{years}년 뒤 예상 결과</Heading>
 
       {/* 핵심 인사이트: 배당 수령 계좌별 세금·건강보험료 비교 */}
@@ -66,12 +78,12 @@ export function Result({ sim, allocation, chosen, years, reinvest, age = 65, onN
             <AreaChart data={sim.series} margin={{ top: 4, right: 12, bottom: 0, left: 4 }}>
               <defs>
                 <linearGradient id="gP" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor={C.jade} stopOpacity={0.7} />
-                  <stop offset="100%" stopColor={C.jade} stopOpacity={0.08} />
+                  <stop offset="0%" stopColor={MINT.main} stopOpacity={0.7} />
+                  <stop offset="100%" stopColor={MINT.main} stopOpacity={0.08} />
                 </linearGradient>
                 <linearGradient id="gG" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor={C.gold} stopOpacity={0.75} />
-                  <stop offset="100%" stopColor={C.gold} stopOpacity={0.1} />
+                  <stop offset="0%" stopColor={MINT.sub} stopOpacity={0.75} />
+                  <stop offset="100%" stopColor={MINT.sub} stopOpacity={0.1} />
                 </linearGradient>
               </defs>
               <CartesianGrid stroke={C.line} vertical={false} />
@@ -91,8 +103,8 @@ export function Result({ sim, allocation, chosen, years, reinvest, age = 65, onN
                 tickFormatter={fmtShort}
               />
               <Tooltip content={<ChartTip />} />
-              <Area type="monotone" dataKey="principal" stackId="1" stroke={C.jadeDeep} strokeWidth={2} fill="url(#gP)" />
-              <Area type="monotone" dataKey="gain" stackId="1" stroke={C.gold} strokeWidth={2} fill="url(#gG)" />
+              <Area type="monotone" dataKey="principal" stackId="1" stroke={MINT.mainDeep} strokeWidth={2} fill="url(#gP)" />
+              <Area type="monotone" dataKey="gain" stackId="1" stroke={MINT.sub} strokeWidth={2} fill="url(#gG)" />
             </AreaChart>
           </ResponsiveContainer>
         </div>
@@ -164,6 +176,7 @@ export function Result({ sim, allocation, chosen, years, reinvest, age = 65, onN
       <p className={styles.disclaimer}>
         예시 가정치를 적용한 추정 결과로, 실제 수익률·배당은 시장 상황에 따라 달라지며 손실이 발생할 수 있습니다. 투자 권유가 아닙니다.
       </p>
+      </div>
     </Pad>
   );
 }
@@ -171,6 +184,15 @@ export function Result({ sim, allocation, chosen, years, reinvest, age = 65, onN
 /* 배당 수령 계좌별 소득세·건강보험료 비교 인사이트 */
 function TaxInsight({ cmp }) {
   const { annual, general, pension, diff, mechanisms, assumptions } = cmp;
+  const [infoAcct, setInfoAcct] = useState(null); // 상세보기 팝업(계좌 데이터 | null)
+
+  useEffect(() => {
+    if (!infoAcct) return;
+    const onKey = (e) => e.key === "Escape" && setInfoAcct(null);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [infoAcct]);
+
   return (
     <section className={styles.insight}>
       <div className={styles.insHead}>
@@ -178,20 +200,33 @@ function TaxInsight({ cmp }) {
           <Sparkles size={13} strokeWidth={2.6} /> 핵심 인사이트
         </span>
         <h2 className={styles.insTitle}>이 배당, 어느 계좌에서 받느냐가 현금흐름을 가릅니다</h2>
-        <p className={styles.insSub}>
-          은퇴 후 연 <b>{fmtKRW(annual)}</b> 수령 기준 · 계좌별 소득세·건강보험료 비교
-        </p>
+        <p className={styles.insSub}>은퇴 후 수령 기준 · 계좌별 소득세·건강보험료 비교</p>
+      </div>
+
+      {/* 세전 연 배당액 — 크게 (두 계좌 공통) */}
+      <div className={styles.grossBox}>
+        <span className={styles.grossCap}>세전 연 배당액</span>
+        <strong className={styles.grossVal}>{fmtKRW(annual)}</strong>
       </div>
 
       <div className={styles.cmpGrid}>
-        <CmpCol data={general} tone="danger" caption="발생 시점 과세 · 건보료 반영" />
-        <CmpCol data={pension} tone="jade" caption="분리과세 · 건보료 제외" />
+        <CmpCol data={general} tone="danger" title="기존" onDetail={() => setInfoAcct(general)} />
+        <div className={styles.flowArrow} aria-hidden="true">
+          <ChevronRight size={15} strokeWidth={3} />
+          <ChevronRight size={15} strokeWidth={3} />
+          <ChevronRight size={15} strokeWidth={3} />
+        </div>
+        <CmpCol data={pension} tone="jade" title="향후" onDetail={() => setInfoAcct(pension)} />
       </div>
 
       <div className={styles.diffBar}>
-        <span>연금계좌로 받으면 매년</span>
-        <strong>+{fmtKRW(diff.netGain)}</strong>
-        <span>더 손에 쥐어요</span>
+        <PiggyBank size={18} strokeWidth={2.4} />
+        <span className={styles.diffText}>
+          <span>GENIUS를 통해서 매년</span>
+          <span>
+            <strong>{fmtKRW(diff.netGain)}</strong> 절세할 수 있습니다
+          </span>
+        </span>
       </div>
 
       <ul className={styles.mech}>
@@ -204,38 +239,91 @@ function TaxInsight({ cmp }) {
       </ul>
 
       <p className={styles.insNote}>※ {assumptions.join(" · ")}. 단순화 추정치이며 세무 자문이 아닙니다.</p>
+
+      {infoAcct && <TaxDetailPopup data={infoAcct} annual={annual} onClose={() => setInfoAcct(null)} />}
     </section>
   );
 }
 
-function CmpCol({ data, tone, caption }) {
+/* 계좌 타일 — 세후 연 수령액(크게) + 실효 요율 + 상세보기 진입 */
+function CmpCol({ data, tone, title, onDetail }) {
   const isGood = tone === "jade";
   return (
     <div className={cx(styles.cmpCol, isGood ? styles.cmpGood : styles.cmpBad)}>
-      <div className={styles.cmpLabel}>{data.label}</div>
-      <div className={styles.cmpCaption}>{caption}</div>
+      <div className={styles.cmpLabel}>{title}</div>
+      <div className={styles.cmpCaption}>{data.caption}</div>
 
-      <div className={styles.cmpLine}>
-        <span className={styles.cmpLineK}>
-          <ReceiptText size={13} /> 소득세
-        </span>
-        <span className={styles.cmpLineV}>{fmtKRW(data.incomeTax)}</span>
-      </div>
-      <div className={styles.cmpSubNote}>{data.incomeTaxNote}</div>
-
-      <div className={styles.cmpLine}>
-        <span className={styles.cmpLineK}>
-          <HeartPulse size={13} /> 건강보험료
-        </span>
-        <span className={styles.cmpLineV}>{data.health > 0 ? fmtKRW(data.health) : "0원"}</span>
-      </div>
-      <div className={styles.cmpSubNote}>{data.healthNote}</div>
-
-      <div className={styles.cmpNet}>
-        <span>세후 순수령</span>
-        <strong>{fmtKRW(data.net)}</strong>
-      </div>
+      <div className={styles.cmpNetCap}>세후 연 수령액</div>
+      <strong className={styles.cmpNetVal}>{fmtKRW(data.net)}</strong>
       <div className={styles.cmpRate}>실효 부담 {(data.effectiveRate * 100).toFixed(1)}%</div>
+
+      <button type="button" className={styles.detailBtn} onClick={onDetail}>
+        상세보기 <ChevronRight size={13} strokeWidth={2.6} />
+      </button>
+    </div>
+  );
+}
+
+/* 상세보기 팝업 — 소득세·건강보험료·절세 세법 상세 */
+function TaxDetailPopup({ data, annual, onClose }) {
+  return (
+    <div className={styles.overlay} onClick={onClose}>
+      <div
+        className={styles.popup}
+        role="dialog"
+        aria-modal="true"
+        aria-label={`${data.label} 과세 상세`}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button type="button" className={styles.popupClose} aria-label="닫기" onClick={onClose}>
+          <X size={16} />
+        </button>
+
+        <div className={styles.popTitle}>{data.label}</div>
+        <div className={styles.popCaption}>{data.caption}</div>
+
+        <div className={styles.popGross}>
+          <span>세전 연 배당액</span>
+          <b>{fmtKRW(annual)}</b>
+        </div>
+
+        <div className={styles.popSection}>
+          <div className={styles.popSecHead}>
+            <span className={styles.popSecTitle}>
+              <ReceiptText size={14} /> 소득세
+            </span>
+            <span className={styles.popSecAmt}>{data.incomeTax > 0 ? fmtKRW(data.incomeTax) : "0원"}</span>
+          </div>
+          <div className={styles.popSecTag}>{data.incomeTaxNote}</div>
+          <p className={styles.popDesc}>{data.taxLaw}</p>
+        </div>
+
+        <div className={styles.popSection}>
+          <div className={styles.popSecHead}>
+            <span className={styles.popSecTitle}>
+              <HeartPulse size={14} /> 건강보험료
+            </span>
+            <span className={styles.popSecAmt}>{data.health > 0 ? fmtKRW(data.health) : "0원"}</span>
+          </div>
+          <div className={styles.popSecTag}>{data.healthNote}</div>
+          <p className={styles.popDesc}>{data.healthLaw}</p>
+        </div>
+
+        <div className={styles.popNet}>
+          <div className={styles.popNetRow}>
+            <span>세후 연 수령액</span>
+            <strong>{fmtKRW(data.net)}</strong>
+          </div>
+          <div className={styles.popNetRate}>실효 부담 {(data.effectiveRate * 100).toFixed(1)}%</div>
+        </div>
+
+        <div className={styles.popSection}>
+          <div className={styles.popSecTitle}>
+            <ShieldCheck size={14} /> 절세 포인트
+          </div>
+          <p className={styles.popDesc}>{data.savingPoint}</p>
+        </div>
+      </div>
     </div>
   );
 }
@@ -261,7 +349,7 @@ function Legend({ tone, t }) {
 function Stat({ icon: Icon, label, v, tone }) {
   return (
     <div className={styles.stat}>
-      <Icon size={18} color={tone === "gold" ? C.gold : C.jade} />
+      <Icon size={18} color={tone === "gold" ? MINT.sub : MINT.main} />
       <div className={styles.statLabel}>{label}</div>
       <div className={cx(styles.statVal, tone === "gold" && styles.statValGold)}>{v}</div>
     </div>

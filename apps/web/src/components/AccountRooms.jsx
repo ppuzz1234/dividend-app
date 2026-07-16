@@ -171,12 +171,14 @@ function AccountSheet({ room, onClose }) {
   const [offset, setOffset] = useState(0);
   const [dragging, setDragging] = useState(false);
   const [closing, setClosing] = useState(false);
+  const [sheetH, setSheetH] = useState(640); // 시트 높이 — 드래그/닫기 시작 시 측정 (렌더 중 ref 접근 금지)
 
   const DISMISS_PX = 90; // 이 이상 내리면 닫힘, 아니면 스냅백
 
   // 닫기 — 슬라이드 다운 + 페이드아웃 후 트랜지션 종료 시 실제 언마운트
   const dismiss = () => {
     const h = sheetRef.current?.offsetHeight || 640;
+    setSheetH(h);
     setDragging(false);
     setClosing(true);
     curY.current = h;
@@ -191,6 +193,7 @@ function AccountSheet({ room, onClose }) {
     dragActive.current = true;
     startY.current = e.clientY;
     curY.current = 0;
+    setSheetH(sheetRef.current?.offsetHeight || 640);
     setDragging(true);
     e.currentTarget.setPointerCapture?.(e.pointerId);
   };
@@ -211,8 +214,7 @@ function AccountSheet({ room, onClose }) {
     }
   };
 
-  const h = sheetRef.current?.offsetHeight || 640;
-  const progress = Math.min(1, offset / (h * 0.7));
+  const progress = Math.min(1, offset / (sheetH * 0.7));
   const sheetOpacity = offset ? Math.max(0, 1 - progress) : undefined;
   const springTransition = "transform 0.3s cubic-bezier(0.33, 0, 0.2, 1), opacity 0.3s ease";
 

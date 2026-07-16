@@ -94,27 +94,45 @@ export function compareDividendTax({ annualDividend = 0, age = 65 } = {}) {
   const pTotal = pIncomeTax + pHealth;
   const pNet = annual - pTotal;
 
+  const overComp = annual > DIVIDEND_TAX_CONST.compTaxThreshold;
+  const overPension = annual > DIVIDEND_TAX_CONST.privatePensionThreshold;
+
   const general = {
     accountId: "general",
     label: "일반 주식계좌",
+    caption: "발생 시점 과세 · 건보료 반영",
     incomeTax: gIncomeTax,
-    incomeTaxNote: annual > DIVIDEND_TAX_CONST.compTaxThreshold ? "금융소득종합과세(누진세율)" : "15.4% 분리과세",
+    incomeTaxNote: overComp ? "금융소득종합과세(누진세율)" : "15.4% 분리과세",
     health: gHealth,
     healthNote: gHealth > 0 ? "지역가입자 전환 · 소득 100% 반영" : "부과 없음",
     total: gTotal,
     net: gNet,
     effectiveRate: annual > 0 ? gTotal / annual : 0,
+    // 상세보기 팝업용 세법 설명
+    taxLaw: overComp
+      ? "연 배당이 2,000만원을 넘으면 금융소득종합과세 대상이에요. 2,000만원까지는 14%(지방 포함 15.4%) 원천징수로 유지되지만, 초과분은 근로·사업 등 다른 소득과 합산되어 6~45% 누진세율로 과세되고 배당가산(Gross-up 11%)까지 붙어요. 소득이 커질수록 최고 49.5%(지방세 포함)까지 올라갈 수 있어요."
+      : "연 2,000만원 이하 배당은 15.4%(소득세 14% + 지방소득세 1.4%) 원천징수로 분리과세돼요. 종합소득에 합산되지 않아 세율이 고정되고, 별도 신고 없이 정산이 끝나요.",
+    healthLaw: gHealth > 0
+      ? "연 소득 1,000만원(피부양자 소득요건)을 넘으면 건강보험 피부양자 자격을 잃고 지역가입자로 전환돼요. 이때 배당소득 100%가 보험료 부과 대상이 되어, 소득보험료+장기요양보험료 합산 약 8%가 매년 추가로 부과돼요."
+      : "연 소득 1,000만원 이하라 건강보험 피부양자 자격이 유지돼, 배당에 대한 별도 건강보험료 부담이 없어요.",
+    savingPoint: "배당이 발생하는 시점에 즉시 과세되고 건보료까지 얹혀, 배당 규모가 커질수록 실효 부담이 가파르게 오르는 구조예요.",
   };
   const pension = {
     accountId: "pension",
     label: "연금저축 · IRP",
+    caption: "분리과세 · 건보료 제외",
     incomeTax: pIncomeTax,
-    incomeTaxNote: annual > DIVIDEND_TAX_CONST.privatePensionThreshold ? "16.5% 분리과세 선택" : "연금소득세 저율",
+    incomeTaxNote: overPension ? "16.5% 분리과세 선택" : "연금소득세 저율",
     health: pHealth,
     healthNote: "사적연금 — 건보료 산정 제외",
     total: pTotal,
     net: pNet,
     effectiveRate: annual > 0 ? pTotal / annual : 0,
+    taxLaw: overPension
+      ? "사적연금(연금저축·IRP) 인출액이 연 1,500만원을 넘으면, 종합과세 대신 16.5% 분리과세를 선택할 수 있어요. 누진세율이 아닌 단일세율이라 수령액이 클수록 일반계좌 대비 유리해요. (적립 단계에서 이미 세액공제를 받은 재원이라 인출 시 과세하는 구조)"
+      : "만 55세 이후 연금으로 나눠 받으면, 연 1,500만원까지 저율 연금소득세(3.3~5.5%)만 부담해요. 수령 나이가 많을수록(70세·80세) 세율이 더 낮아지고, 과세이연으로 불린 재원을 낮은 세율로 인출할 수 있어요.",
+    healthLaw: "국민건강보험법상 사적연금 소득은 건강보험료 산정 대상에서 제외돼요. 연금을 아무리 많이 받아도 건보료가 늘지 않고, 피부양자 자격 유지에도 유리해요.",
+    savingPoint: "누진세율의 파급과 건보료 폭탄을 동시에 피할 수 있어, 같은 배당 현금흐름도 더 많이 손에 쥐게 돼요.",
   };
 
   const diff = {

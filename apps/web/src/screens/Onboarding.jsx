@@ -122,7 +122,8 @@ export function Onboarding({ monthlyGoal, setMonthlyGoal, onNext }) {
         <TrendingUp size={15} />
         <span>
           은퇴 시점에는 최소{" "}
-          <RollingNumber className={styles.scenarioAmount} value={fmtKRW(requiredNestEgg)} />의 기초 자산이 필요해요.
+          <RollingNumber className={styles.scenarioAmount} value={fmtKRW(requiredNestEgg)} />의
+          <br />기초 자산이 필요해요.
         </span>
       </div>
 

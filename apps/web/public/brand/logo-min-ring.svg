@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- 배당 눈덩이 로고 (미니멀 C) — 코인 링을 뚫고 나가는 성장 라인 -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#151D18"/>
+      <stop offset="1" stop-color="#0A0F0D"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#D19A24"/>
+      <stop offset="1" stop-color="#F2C230"/>
+    </linearGradient>
+  </defs>
+  <rect x="16" y="16" width="480" height="480" rx="112" fill="url(#bg)" stroke="#2C3A32" stroke-width="4"/>
+
+  <!-- 코인 링 (자산의 테두리) -->
+  <circle cx="248" cy="280" r="126" fill="none" stroke="#8A6A1C" stroke-width="13" opacity="0.85"/>
+
+  <!-- 링을 뚫고 나가는 상승·눌림·재상승 라인 -->
+  <path d="M168 342 L 248 254 L 282 290 L 372 178" fill="none"
+        stroke="url(#gold)" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M324 188 L 374 176 L 362 226" fill="none"
+        stroke="url(#gold)" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- 시작점 (시드) -->
+  <circle cx="168" cy="342" r="19" fill="#E0913A"/>
+</svg>

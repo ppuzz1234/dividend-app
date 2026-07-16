@@ -38,6 +38,11 @@
   color: var(--jade);
   margin-bottom: 24px;
 }
+/* 브랜드 마크 슬라이드 — 노란 스퀘어클이 곧 아이콘. 타일 배경 없이 그대로 노출 */
+.iconWrapBrand {
+  background: none;
+  border-radius: 0;
+}
 .title {
   font-size: 21px;
   font-weight: 800;
