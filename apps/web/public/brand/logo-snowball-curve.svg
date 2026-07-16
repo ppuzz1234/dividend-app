@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- 배당 눈덩이 로고 — 눈덩이(복리 레이어) × 상승-눌림-재상승 곡선 -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1A231E"/>
+      <stop offset="1" stop-color="#0A0F0D"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#D19A24"/>
+      <stop offset="1" stop-color="#F2C230"/>
+    </linearGradient>
+  </defs>
+  <rect x="16" y="16" width="480" height="480" rx="112" fill="url(#bg)" stroke="#2C3A32" stroke-width="4"/>
+
+  <!-- 상승 → 눌림목 → 재상승 -->
+  <path d="M148 340 L 238 246 L 274 284 L 352 188" fill="none"
+        stroke="url(#gold)" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M306 184 L 358 178 L 364 230" fill="none"
+        stroke="url(#gold)" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- 눈덩이: 굴러온 복리 레이어(동심 링) -->
+  <circle cx="148" cy="340" r="70" fill="url(#gold)" stroke="#8A6A1C" stroke-width="4"/>
+  <circle cx="160" cy="328" r="44" fill="none" stroke="#1A1400" stroke-width="6" opacity="0.32"/>
+  <circle cx="170" cy="318" r="22" fill="none" stroke="#1A1400" stroke-width="6" opacity="0.32"/>
+
+  <!-- 눌림목 액센트 -->
+  <circle cx="274" cy="284" r="13" fill="#E0913A"/>
+</svg>

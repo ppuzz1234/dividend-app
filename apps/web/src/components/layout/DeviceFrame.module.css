@@ -1,0 +1,172 @@
+/* iPhone 17 Pro 디바이스 시뮬레이터 (경로: /device)
+   hpr DeviceFrame 을 제이드/골드 테마로 이식 — 기기 프레임은 테마 무관 메탈 톤 유지 */
+.sim {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 24px;
+  font-family: var(--font-sans);
+  background:
+    radial-gradient(1100px 620px at 50% -12%, rgba(242, 194, 48, 0.1), transparent 60%),
+    radial-gradient(900px 620px at 50% 120%, rgba(224, 145, 58, 0.08), transparent 55%),
+    #06090c;
+}
+
+.stage {
+  position: relative;
+  overflow: hidden;
+}
+
+/* 기기 본체 — 402×874 논리 해상도 + 14px 베젤 */
+.device {
+  --w: 402px;
+  --h: 874px;
+  --bezel: 14px;
+  transform-origin: 0 0;
+  position: relative;
+  width: calc(var(--w) + var(--bezel) * 2);
+  height: calc(var(--h) + var(--bezel) * 2);
+  border-radius: 64px;
+  padding: var(--bezel);
+  background: linear-gradient(145deg, #4a5057 0%, #14171b 38%, #0b0d10 62%, #3a3f46 100%);
+  box-shadow:
+    0 0 0 2px #08090b,
+    0 40px 90px rgba(0, 0, 0, 0.65),
+    0 4px 14px rgba(0, 0, 0, 0.5),
+    inset 0 0 4px rgba(255, 255, 255, 0.28);
+}
+.device::before {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border-radius: 60px;
+  pointer-events: none;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.12), transparent 28%, transparent 72%, rgba(255, 255, 255, 0.09));
+}
+
+.screen {
+  position: relative;
+  width: var(--w);
+  height: var(--h);
+  border-radius: 50px;
+  overflow: hidden;
+  background: var(--bg);
+  box-shadow: inset 0 0 0 2.5px #000;
+}
+.frameEmbed {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+  background: var(--bg);
+}
+
+/* 다이나믹 아일랜드 */
+.island {
+  position: absolute;
+  top: 11px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 124px;
+  height: 35px;
+  background: #000;
+  border-radius: 20px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 13px;
+}
+.island::before {
+  content: "";
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 32%, #25384a, #050608);
+  box-shadow: inset 0 0 2px #14222e, 0 0 1px rgba(80, 160, 200, 0.4);
+}
+
+/* 측면 버튼 */
+.btn {
+  position: absolute;
+  background: linear-gradient(180deg, #353a41, #14171b);
+  border-radius: 2px 0 0 2px;
+  box-shadow: -1px 0 1px rgba(0, 0, 0, 0.5);
+}
+.bAction {
+  left: -3px;
+  top: 118px;
+  width: 4px;
+  height: 28px;
+  border-radius: 3px 0 0 3px;
+}
+.bVolup {
+  left: -3px;
+  top: 172px;
+  width: 4px;
+  height: 56px;
+}
+.bVoldn {
+  left: -3px;
+  top: 240px;
+  width: 4px;
+  height: 56px;
+}
+.bPower {
+  right: -3px;
+  top: 205px;
+  width: 4px;
+  height: 92px;
+  border-radius: 0 3px 3px 0;
+}
+.bCam {
+  right: -3px;
+  top: 128px;
+  width: 4px;
+  height: 38px;
+  border-radius: 0 3px 3px 0;
+  background: linear-gradient(180deg, #3a3f46, #1a1d22);
+}
+
+.caption {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  text-align: center;
+}
+.captionText {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  color: var(--sub);
+}
+.captionText b {
+  color: var(--jade);
+}
+.caption a {
+  font-size: 12px;
+  color: var(--jade);
+  text-decoration: none;
+  border: 1px solid rgba(242, 194, 48, 0.35);
+  padding: 7px 16px;
+  border-radius: 10px;
+  transition: background 0.15s;
+}
+.caption a:hover {
+  background: rgba(242, 194, 48, 0.08);
+}
+
+@media (max-width: 520px) {
+  .sim {
+    padding: 0;
+  }
+  .caption {
+    display: none;
+  }
+}

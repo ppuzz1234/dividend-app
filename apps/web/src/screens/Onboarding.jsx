@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ArrowRight, TrendingUp, Info, X, Landmark } from "lucide-react";
+import { ArrowRight, TrendingUp, Info, X, Landmark, Check, ShieldCheck, Lock, RefreshCw } from "lucide-react";
 import { projectRetirementScenario } from "@devidend/core";
 import { Pad } from "../components/layout/Pad.jsx";
 import { Heading } from "../components/layout/Heading.jsx";
@@ -29,18 +29,32 @@ export function Onboarding({ monthlyGoal, setMonthlyGoal, onNext }) {
   });
   // ETF 상세 레이어팝업 (null 이면 닫힘)
   const [infoEtf, setInfoEtf] = useState(null);
+  // 국내·해외 중 선택한 ETF (id). 선택해야 하단 버튼 활성화
+  const [selectedId, setSelectedId] = useState(null);
+  // 마이데이터 연동 바텀시트 열림 여부
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const selectedEtf = perEtf.find((p) => p.etf.id === selectedId)?.etf || null;
+
   useEffect(() => {
-    if (!infoEtf) return;
-    const onKey = (e) => e.key === "Escape" && setInfoEtf(null);
+    if (!infoEtf && !sheetOpen) return;
+    const onKey = (e) => {
+      if (e.key !== "Escape") return;
+      setInfoEtf(null);
+      setSheetOpen(false);
+    };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [infoEtf]);
+  }, [infoEtf, sheetOpen]);
 
   return (
     <Pad
       footer={
-        <Button onClick={onNext} icon={ArrowRight}>
-          목표 확인했어요 · 시작하기
+        <Button
+          onClick={selectedId ? () => setSheetOpen(true) : undefined}
+          disabled={!selectedId}
+          icon={ArrowRight}
+        >
+          {selectedId ? "목표를 확인했어요" : "국내·해외 ETF 중 하나를 선택하세요"}
         </Button>
       }
     >
@@ -52,7 +66,7 @@ export function Onboarding({ monthlyGoal, setMonthlyGoal, onNext }) {
 
       <div className={styles.goalCard}>
         <div className={styles.goalRow}>
-          <span className={styles.goalText}>저는 20년 뒤, 매월</span>
+          <span className={styles.goalText}>"저는 20년 뒤, 월</span>
           <label className={styles.goalPill}>
             <input
               type="text"
@@ -64,7 +78,7 @@ export function Onboarding({ monthlyGoal, setMonthlyGoal, onNext }) {
             />
             <span className={styles.goalUnit}>만원</span>
           </label>
-          <span className={styles.goalText}>의 생활비가 필요해요</span>
+          <span className={styles.goalText}>생활비가 필요해요"</span>
         </div>
         {/* 금액 선택 슬라이더 — 구간 라벨(100~2,000)은 균등 배치, 구간 사이는 50만원 단위로
          * 이동 가능하도록 인덱스 공간 ↔ 금액을 구간별 선형 매핑한다. */}
@@ -107,8 +121,8 @@ export function Onboarding({ monthlyGoal, setMonthlyGoal, onNext }) {
       <div className={styles.scenarioHead}>
         <TrendingUp size={15} />
         <span>
-          매달 {monthlyGoal.toLocaleString()}만원의 이자배당 소득을 위해서는 20년뒤 최소{" "}
-          <RollingNumber className={styles.scenarioAmount} value={fmtKRW(requiredNestEgg)} />의 기초 자산이 필요합니다. ETF로 이 금액을 모으려면,
+          은퇴 시점에는 최소{" "}
+          <RollingNumber className={styles.scenarioAmount} value={fmtKRW(requiredNestEgg)} />의 기초 자산이 필요해요.
         </span>
       </div>
 
@@ -116,15 +130,29 @@ export function Onboarding({ monthlyGoal, setMonthlyGoal, onNext }) {
         {perEtf.map(({ etf, requiredMonthly }) => {
           const Logo = LOGOS[etf.id];
           const kr = etf.region === "KR";
+          const on = selectedId === etf.id;
           return (
-            <div key={etf.id} className={styles.card}>
+            <div
+              key={etf.id}
+              className={cx(styles.card, on && styles.cardOn)}
+              role="radio"
+              aria-checked={on}
+              tabIndex={0}
+              onClick={() => setSelectedId(etf.id)}
+              onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), setSelectedId(etf.id))}
+            >
+              <span className={cx(styles.radio, on && styles.radioOn)} aria-hidden="true">
+                {on && <Check size={14} strokeWidth={3.5} />}
+              </span>
+
               <div className={styles.cardCaption}>{kr ? "국내" : "해외"} ETF로 모은다면,</div>
 
               <div className={styles.metric}>
-                <div className={styles.metricLabel}>{YEARS}년 동안 매월 불입금</div>
+                <div className={styles.metricLabel}>매월</div>
                 <div className={styles.metricValue}>
                   <RollingNumber value={fmtKRW(requiredMonthly)} />
                 </div>
+                <div className={styles.metricSuffix}>납입 필요</div>
               </div>
 
               <div className={styles.brandArea}>
@@ -136,7 +164,10 @@ export function Onboarding({ monthlyGoal, setMonthlyGoal, onNext }) {
                     type="button"
                     className={styles.infoBtn}
                     aria-label={`${etf.name} 상세 설명`}
-                    onClick={() => setInfoEtf(etf)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setInfoEtf(etf);
+                    }}
                   >
                     <Info size={13} />
                   </button>
@@ -209,6 +240,57 @@ export function Onboarding({ monthlyGoal, setMonthlyGoal, onNext }) {
                   향후 동일한 수익을 보장하지 않아요.
                 </p>
                 <p className={styles.popupNote}>{infoEtf.sourceNote}</p>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* 마이데이터 연동 바텀시트 — 하단 목표확인 버튼 → 슬라이드업. 백드롭/닫기로 해제 */}
+      {sheetOpen && selectedEtf && (() => {
+        const Logo = LOGOS[selectedEtf.id];
+        return (
+          <div className={styles.sheetBackdrop} onClick={() => setSheetOpen(false)}>
+            <div
+              className={styles.sheet}
+              role="dialog"
+              aria-modal="true"
+              aria-label="마이데이터 연동 안내"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className={styles.sheetHandle} aria-hidden="true" />
+              <button type="button" className={styles.popupClose} aria-label="닫기" onClick={() => setSheetOpen(false)}>
+                <X size={16} />
+              </button>
+
+              <div className={styles.sheetLogo}>
+                <Logo size={48} />
+              </div>
+
+              <p className={styles.sheetMsg}>
+                선택하신 <b className={styles.sheetFund}>{selectedEtf.name}</b> ETF를 활용한 계좌 배분 전략을
+                파악하기 위해 마이데이터로 정보를 연동할게요.
+              </p>
+
+              <div className={styles.sheetNotice}>
+                <div className={styles.sheetNoticeRow}>
+                  <ShieldCheck size={15} />
+                  <span>금융보안원 인증을 거친 안전한 마이데이터 표준 API로 연동돼요.</span>
+                </div>
+                <div className={styles.sheetNoticeRow}>
+                  <Lock size={15} />
+                  <span>여러 금융사에 흩어진 계좌·잔고·소득 정보를 조회 목적으로만 불러오며, 이체·출금 권한은 없어요.</span>
+                </div>
+                <div className={styles.sheetNoticeRow}>
+                  <Landmark size={15} />
+                  <span>연동 정보는 암호화되어 전송되고, 동의를 철회하면 즉시 파기돼요.</span>
+                </div>
+              </div>
+
+              <div className={styles.sheetFooter}>
+                <Button onClick={onNext} icon={RefreshCw}>
+                  마이데이터 연동하기
+                </Button>
               </div>
             </div>
           </div>

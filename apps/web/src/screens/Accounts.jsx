@@ -21,11 +21,14 @@ const VIEWS = [
  * 사용자 변수(성향·월 불입·나이·전년도 금융/총소득)를 백엔드 전략 엔진
  * (POST /api/strategy, 파일 DB 기반 HPR)에 태워 결과를 렌더링한다.
  * 엔진 미기동 시에는 로컬(@devidend/core) 추정으로 폴백. */
-export function Accounts({ mydata, answers, monthly, finIncome, income, age, onLinked, onNext }) {
+export function Accounts({ mydata, answers, monthly, finIncome, income, age, autoLoad = false, onLinked, onNext }) {
   const [view, setView] = useState("current");
   const [remote, setRemote] = useState(null);
   // 마이데이터 연동 플로우 — idle(미연동) → loading(GENIUS) → done(연동 계좌내역)
-  const [phase, setPhase] = useState(mydata ? "table" : "idle");
+  // · autoLoad(온보딩 시트 진입): 곧바로 GENIUS 로딩부터 시작
+  // · 이미 연동됨(뒤로가기 재진입): 계좌 샘플(done)을 바로 표시
+  // · 전략 비교표(table)는 현재 플로우에서 사용하지 않음(현재/전략적용 화면 비활성)
+  const [phase, setPhase] = useState(mydata ? "done" : autoLoad ? "loading" : "idle");
 
   // GENIUS 로딩 후 연동 완료 처리 (앱 상태에도 반영)
   useEffect(() => {

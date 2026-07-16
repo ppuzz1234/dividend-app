@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- 배당 눈덩이 로고 시안 A — 투자(성장): 상승 바 + 눈덩이 굴리는 궤적 화살표 -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1A231E"/>
+      <stop offset="1" stop-color="#0A0F0D"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#D19A24"/>
+      <stop offset="1" stop-color="#F2C230"/>
+    </linearGradient>
+  </defs>
+  <rect x="16" y="16" width="480" height="480" rx="112" fill="url(#bg)" stroke="#2C3A32" stroke-width="4"/>
+
+  <!-- 상승 바 3개 (은은한 골드 딤) -->
+  <rect x="118" y="300" width="58" height="94"  rx="14" fill="#2C2409" stroke="#8A6A1C" stroke-width="3"/>
+  <rect x="212" y="252" width="58" height="142" rx="14" fill="#2C2409" stroke="#8A6A1C" stroke-width="3"/>
+  <rect x="306" y="196" width="58" height="198" rx="14" fill="#3A2F0D" stroke="#D19A24" stroke-width="3"/>
+
+  <!-- 성장 궤적 화살표 (메인 골드) -->
+  <path d="M120 318 C 190 300, 232 262, 300 196 L 356 140" fill="none"
+        stroke="url(#gold)" stroke-width="26" stroke-linecap="round"/>
+  <path d="M296 128 L 372 124 L 366 200" fill="none"
+        stroke="url(#gold)" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- 굴러가는 눈덩이(코인) 액센트 -->
+  <circle cx="120" cy="318" r="34" fill="url(#gold)"/>
+  <circle cx="120" cy="318" r="22" fill="none" stroke="#1A1400" stroke-width="5" opacity="0.55"/>
+</svg>

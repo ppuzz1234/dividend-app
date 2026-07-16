@@ -14,3 +14,8 @@
   padding-top: env(safe-area-inset-top, 0);
   background: var(--bg);
 }
+/* /device 프레임의 다이나믹 아일랜드(상단 ~46px)를 피하는 상단 인셋.
+   실기기 안전영역이 없는 iframe 환경에서 헤더·뒤로가기가 아일랜드에 가리지 않도록 함. */
+.inset {
+  padding-top: 54px;
+}

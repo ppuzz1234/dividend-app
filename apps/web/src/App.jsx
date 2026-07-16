@@ -29,8 +29,12 @@ import { Done } from "./screens/Done.jsx";
  *  흐름: 목표 → 계좌 전략 → 시뮬/분석 → 종목 → 매수
  * ------------------------------------------------------------------ */
 export default function App() {
+  const params = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : new URLSearchParams();
   // 발표용 아이폰 베젤 모드 (?frame=1). 기본은 일반 풀뷰(실서비스).
-  const framed = typeof window !== "undefined" && new URLSearchParams(window.location.search).has("frame");
+  const framed = params.has("frame");
+  // /device 프레임 시뮬레이터의 iframe(?device=1)으로 임베드된 경우 —
+  // 상단 콘텐츠(헤더·뒤로가기)가 다이나믹 아일랜드에 가리지 않도록 상단 인셋 적용.
+  const deviceInset = params.has("device");
   const [step, setStep] = useState("splash");
   const [region, setRegion] = useState("ALL");
   const [query, setQuery] = useState("");
@@ -47,6 +51,8 @@ export default function App() {
   const [finIncome, setFinIncome] = useState(0); // 전년도 금융소득 (이자+배당)
   const [goal] = useState("retirement"); // retirement | cashflow
   const [answers] = useState({}); // 성향 응답 (서베이 제거로 빈 값 유지)
+  // 온보딩 시트의 "마이데이터 연동하기" 진입 여부 → 계좌 화면을 GENIUS 로딩부터 자동 시작
+  const [autoLinkAccounts, setAutoLinkAccounts] = useState(false);
 
   // 전략 화면의 마이데이터 연동 완료 → 프로필·시드 반영
   const linkMydata = () => {
@@ -114,12 +120,19 @@ export default function App() {
       {step === "intro" && <Intro onNext={() => go("login")} />}
       {/* 서비스 콘셉트 안내 후 로그인 → 회원가입은 건너뛰고 온보딩 훅 화면으로 진입 */}
       {step === "login" && <Login onNext={() => go("onboarding")} />}
-      {/* 프로필 단계(성향 서베이·마이데이터) 제거 — 목표에서 곧바로 전략으로 */}
+      {/* 온보딩 시트의 "마이데이터 연동하기" → 계좌 화면을 GENIUS 로딩부터 자동 시작 */}
       {step === "onboarding" && (
-        <Onboarding monthlyGoal={monthlyGoal} setMonthlyGoal={setMonthlyGoal} onNext={() => go("accounts")} />
+        <Onboarding
+          monthlyGoal={monthlyGoal}
+          setMonthlyGoal={setMonthlyGoal}
+          onNext={() => {
+            setAutoLinkAccounts(true);
+            go("accounts");
+          }}
+        />
       )}
       {step === "accounts" && (
-        <Accounts {...{ mydata, answers, monthly, finIncome, income, age, onLinked: linkMydata, onNext: () => go("simulate") }} />
+        <Accounts {...{ mydata, answers, monthly, finIncome, income, age, autoLoad: autoLinkAccounts, onLinked: linkMydata, onNext: () => go("simulate") }} />
       )}
       {step === "simulate" && <Simulating />}
       {step === "result" && (
@@ -143,5 +156,5 @@ export default function App() {
     </ChromeBody>
   );
 
-  return framed ? <PhoneShell>{body}</PhoneShell> : <PlainShell>{body}</PlainShell>;
+  return framed ? <PhoneShell>{body}</PhoneShell> : <PlainShell inset={deviceInset}>{body}</PlainShell>;
 }

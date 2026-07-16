@@ -7,7 +7,7 @@
  * ------------------------------------------------------------------ */
 export const MYDATA_ACCOUNTS = {
   general: {
-    institution: "한국투자증권",
+    institution: "한화투자증권",
     // 해외ETF에서 연 배당 3,000만 발생 가정 → 평가액 = 3,000만 ÷ 3.5%(배당수익률 가정) 역산
     balance: 857_142_857,
     contributedThisYear: 0,
@@ -23,7 +23,7 @@ export const MYDATA_ACCOUNTS = {
     ],
   },
   pension: {
-    institution: "한국투자증권",
+    institution: "한화투자증권",
     balance: 5_000_000,
     contributedThisYear: 3_000_000,
     holdings: [{ name: "TIGER 미국배당다우존스", productType: "krListedGlobalEtf", value: 5_000_000 }],

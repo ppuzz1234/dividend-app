@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- 배당 눈덩이 로고 — 방패 × 상승곡선 (솔리드 골드 변형: 방패를 골드로 채움) -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1A231E"/>
+      <stop offset="1" stop-color="#0A0F0D"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#D19A24"/>
+      <stop offset="1" stop-color="#F2C230"/>
+    </linearGradient>
+  </defs>
+  <rect x="16" y="16" width="480" height="480" rx="112" fill="url(#bg)" stroke="#2C3A32" stroke-width="4"/>
+
+  <!-- 방패 (골드 솔리드) -->
+  <path d="M256 84 L 392 132 V 268 C 392 350 332 402 256 434 C 180 402 120 350 120 268 V 132 Z"
+        fill="url(#gold)" stroke="#8A6A1C" stroke-width="6" stroke-linejoin="round"/>
+
+  <!-- 상승 → 약하락 → 재상승 라인 (다크 각인) -->
+  <path d="M162 328 L 226 244 L 258 282 L 330 192" fill="none"
+        stroke="#1A1400" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- 화살촉 -->
+  <path d="M284 190 L 336 184 L 342 236" fill="none"
+        stroke="#1A1400" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- 시작점 코인 · 눌림목 액센트 -->
+  <circle cx="162" cy="328" r="17" fill="#1A1400"/>
+  <circle cx="258" cy="282" r="12" fill="#B36A22"/>
+</svg>

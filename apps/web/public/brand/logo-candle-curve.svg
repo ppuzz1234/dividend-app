@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- 배당 눈덩이 로고 — 캔들차트(상승·음봉 눌림·재상승) × 곡선 -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1A231E"/>
+      <stop offset="1" stop-color="#0A0F0D"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#D19A24"/>
+      <stop offset="1" stop-color="#F2C230"/>
+    </linearGradient>
+  </defs>
+  <rect x="16" y="16" width="480" height="480" rx="112" fill="url(#bg)" stroke="#2C3A32" stroke-width="4"/>
+
+  <!-- 캔들 1: 상승 (골드) -->
+  <line x1="160" y1="196" x2="160" y2="392" stroke="#8A6A1C" stroke-width="8" stroke-linecap="round"/>
+  <rect x="130" y="228" width="60" height="126" rx="13" fill="url(#gold)"/>
+
+  <!-- 캔들 2: 눌림목 음봉 (아웃라인 앰버, 짧게) -->
+  <line x1="256" y1="268" x2="256" y2="420" stroke="#8A6A1C" stroke-width="8" stroke-linecap="round"/>
+  <rect x="226" y="296" width="60" height="92" rx="13" fill="#241C07" stroke="#E0913A" stroke-width="7"/>
+
+  <!-- 캔들 3: 재상승 (골드, 가장 큼) -->
+  <line x1="352" y1="108" x2="352" y2="360" stroke="#8A6A1C" stroke-width="8" stroke-linecap="round"/>
+  <rect x="322" y="142" width="60" height="164" rx="13" fill="url(#gold)"/>
+</svg>
