@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { ArrowRight, Sparkles, MoveRight, Server, ServerOff, RefreshCw, TrendingUp } from "lucide-react";
+import { ArrowRight, ChevronDown, Sparkles, MoveRight, Server, ServerOff, RefreshCw } from "lucide-react";
 import { buildStrategyComparison, projectRetirementScenario, MYDATA_ACCOUNTS } from "@devidend/core";
 import { fetchStrategy } from "../lib/strategyApi.js";
 import { Pad } from "../components/layout/Pad.jsx";
@@ -30,6 +30,16 @@ export function Accounts({ mydata, answers, monthly, monthlyGoal, finIncome, inc
   // · 온보딩에서 로딩·확인까지 마치고 진입(mydata=true): 곧바로 done 으로 시작
   // · 전략 비교표(table)는 현재 플로우에서 사용하지 않음(현재/전략적용 화면 비활성)
   const [phase, setPhase] = useState(mydata ? "done" : "idle");
+  // 연동 완료 후 단계 공개 — 1단계(계산+멘트+▼) → ▼ 클릭 → 2단계(투자금 타일+계좌 배분)
+  const [expanded, setExpanded] = useState(false);
+  const [leaving, setLeaving] = useState(false); // 멘트·▼ 가 위로 사라지는 전환 중
+  const toDetail = () => {
+    setLeaving(true);
+    setTimeout(() => {
+      setLeaving(false);
+      setExpanded(true);
+    }, 320);
+  };
 
   // GENIUS 로딩 후 연동 완료 처리 (앱 상태에도 반영)
   useEffect(() => {
@@ -72,7 +82,14 @@ export function Accounts({ mydata, answers, monthly, monthlyGoal, finIncome, inc
   /* 미연동 → 연동 플로우: (온보딩 자동 진입 시) GENIUS 로딩 → 하단에 연동 계좌내역 */
   if (phase !== "table") {
     return (
-      <Pad footer={<Button onClick={onNext} icon={ArrowRight}>이 전략으로 시뮬레이션</Button>}>
+      <Pad
+        footer={
+          /* 1단계(멘트+▼)에서는 하단 버튼도 숨긴다 — ▼로 상세를 연 뒤에만 노출 */
+          phase === "done" && !expanded ? null : (
+            <Button onClick={onNext} icon={ArrowRight}>이 전략으로 시뮬레이션</Button>
+          )
+        }
+      >
         {/* 목표 요약 타일 — 온보딩 마지막 화면과 동일한 최상단 위치로, 전환 시 그대로 이어짐.
          * 연동 완료 시 두 타일이 좌측으로 줄며 우측에 "내 자산"(연동 총 평가액) 타일이 열린다 */}
         <GoalTiles
@@ -91,27 +108,53 @@ export function Accounts({ mydata, answers, monthly, monthlyGoal, finIncome, inc
         )}
 
         {/* 연동 완료 — 필요 자산 − 연동 자산 = 남은 금액 순차 등장(계산 과정이 읽히도록)
-         * 이어서 남은 금액을 20년간 모으기 위한 PLUS ETF 월 투자 시나리오 */}
+         * 이어서 월 투자 멘트까지만 보여주고 ▼ 로 다음 단계 진행:
+         * ▼ 클릭 시 계산 카드가 절반으로 줄며 멘트가 우측 "매달 투자금" 타일로 떠오르고,
+         * 그 아래 숨겨뒀던 계좌 배분 콘텐츠가 비로소 열린다 */}
         {phase === "done" && (
           <div className={styles.scenarioWrap}>
-            <div className={styles.gapCard}>
-              <div className={cx(styles.gapRow, styles.seq1)}>
-                <span>필요 자산</span>
-                <b className={styles.flashNeed}>{fmtKRW(scenario.requiredNestEgg)}</b>
+            <div className={styles.gapSplit}>
+              <div className={cx(styles.gapCard, expanded && styles.gapCardHalf)}>
+                {expanded ? (
+                  /* 2단계 — 계산 과정은 접고 다른 타일처럼 제목 + 금액만 */
+                  <>
+                    <span className={styles.monthlyK}>더 모아야 할 금액</span>
+                    <b className={styles.monthlyV}>{fmtKRW(scenario.gap)}</b>
+                  </>
+                ) : (
+                  <>
+                    <div className={cx(styles.gapRow, styles.seq1)}>
+                      <span>필요 자산</span>
+                      <b className={styles.flashNeed}>{fmtKRW(scenario.requiredNestEgg)}</b>
+                    </div>
+                    <div className={cx(styles.gapRow, styles.seq2)}>
+                      <span>내 총 자산 (마이데이터)</span>
+                      <b className={cx(styles.gapMinus, styles.flashMine)}>− {fmtKRW(mydataTotal)}</b>
+                    </div>
+                    <div className={cx(styles.gapRow, styles.gapTotal, styles.seq3)}>
+                      <span>더 모아야 할 금액</span>
+                      <b className={styles.gapPop}>{fmtKRW(scenario.gap)}</b>
+                    </div>
+                  </>
+                )}
               </div>
-              <div className={cx(styles.gapRow, styles.seq2)}>
-                <span>내 총 자산 (마이데이터)</span>
-                <b className={cx(styles.gapMinus, styles.flashMine)}>− {fmtKRW(mydataTotal)}</b>
-              </div>
-              <div className={cx(styles.gapRow, styles.gapTotal, styles.seq3)}>
-                <span>더 모아야 할 금액</span>
-                <b className={styles.gapPop}>{fmtKRW(scenario.gap)}</b>
-              </div>
+
+              {/* 멘트가 변신한 매달 투자금 타일 — 우측 상단 빈 공간으로 떠오른다 */}
+              {expanded && (
+                <div className={styles.monthlyTile}>
+                  <span className={styles.monthlyK}>매달 투자금</span>
+                  <b className={styles.monthlyV}>{fmtKRW(requiredMonthly)}</b>
+                  <span className={styles.monthlyEtf}>
+                    {etf.name}
+                    <EtfInfoButton etf={etf} />
+                  </span>
+                </div>
+              )}
             </div>
 
-            {/* 월 투자 시나리오 문구 — ETF명 옆 (i) 클릭 시 상세 모달 */}
-            {scenario.gap > 0 && (
-              <div className={cx(styles.scenarioHead, styles.seq4)}>
+            {/* 1단계 — 월 투자 시나리오 멘트, ETF명 옆 (i) 클릭 시 상세 모달 */}
+            {!expanded && scenario.gap > 0 && (
+              <div className={cx(styles.scenarioHead, styles.seq4, leaving && styles.leave)}>
                 <span>
                   남은 금액은 매달 <b className={styles.scenarioAmount}>{fmtKRW(requiredMonthly)}</b>을
                   <br />
@@ -124,13 +167,25 @@ export function Accounts({ mydata, answers, monthly, monthlyGoal, finIncome, inc
           </div>
         )}
 
-        {/* 하단 영역 — 여력 안내 → GENIUS 로딩 → 연동완료 계좌내역 */}
+        {/* 1단계 진행 ▼ — 멘트를 읽고 나면 계좌 배분 단계로 */}
+        {phase === "done" && !expanded && (
+          <button
+            type="button"
+            className={cx(styles.stepNext, leaving && styles.leave)}
+            aria-label="다음 단계"
+            onClick={toDetail}
+          >
+            <ChevronDown size={26} strokeWidth={2.6} />
+          </button>
+        )}
+
+        {/* 하단 영역 — 여력 안내 → GENIUS 로딩 → (▼ 이후) 연동완료 계좌 배분 */}
         {phase === "idle" && <AccountRooms mydata={false} income={income} />}
         {phase === "loading" && (
           <GeniusLoader msgs={["금융사 계좌 조회 중", "잔고·거래내역 취합 중", "전년도 소득정보 확인 중"]} />
         )}
-        {phase === "done" && (
-          <div className={styles.seq5}>
+        {phase === "done" && expanded && (
+          <div className={styles.revealBlock}>
             {/* 월 투자금(requiredMonthly)을 절세 한도 waterfall 로 계좌별 배분해 표시 */}
             <AccountRooms mydata income={income} monthlyContribution={scenario.gap > 0 ? requiredMonthly : 0} />
           </div>

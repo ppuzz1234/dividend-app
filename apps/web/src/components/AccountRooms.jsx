@@ -49,8 +49,8 @@ function InstLogo({ institution }) {
 const TAB_ORDER = ["isa", "pensionSavings", "irp", "general"];
 const TAB_LABELS = { isa: "ISA", pensionSavings: "연금저축", irp: "IRP", general: "일반" };
 
-/* 월 불입 배분 표시 순서 — 배분 우선순위(연금저축→ISA→IRP→일반) 그대로 */
-const PLAN_VIEW_ORDER = ["pensionSavings", "isa", "irp", "general"];
+/* 월 불입 배분 표시 순서 — 탭과 동일하게 ISA → 연금저축 → IRP → 일반 */
+const PLAN_VIEW_ORDER = TAB_ORDER;
 
 /* 4계좌(ISA·연금저축·IRP·일반) 탭 — 선택한 계좌 하나의 전략을 한 패널에 정리.
  * 기존 계좌 타일(한도·납입·여력 게이지)과 상세 시트(한줄 정리·보유 상품 조정 추천·
@@ -82,7 +82,11 @@ export function AccountRooms({ mydata, income, monthlyContribution = 0 }) {
             {planned.map((r) => (
               <div
                 key={r.id}
-                className={cx(styles.allocSeg, styles[`seg_${r.id}`])}
+                className={cx(
+                  styles.allocSeg,
+                  styles[`seg_${r.id}`],
+                  tab === r.id && styles.allocSegOn // 선택 계좌의 바를 테두리로 강조
+                )}
                 style={{ flexGrow: r.planShare }}
               />
             ))}
@@ -120,12 +124,19 @@ export function AccountRooms({ mydata, income, monthlyContribution = 0 }) {
         ))}
       </div>
 
-      {/* 선택 계좌 패널 — key 교체로 탭 전환마다 페이드인 */}
-      <div key={room.id} className={styles.panel}>
-        {/* 헤더 — 계좌명·금융사 / 누적 평가액 또는 개설 추천 태그 */}
+      {/* 선택 계좌 패널 — key 교체로 탭 전환마다 페이드인.
+       * 끝 탭 선택 시 해당 쪽 상단 모서리를 각지게 해 탭 옆면과 직선으로 잇는다 */}
+      <div
+        key={room.id}
+        className={cx(
+          styles.panel,
+          tab === ordered[0].id && styles.panelFirst,
+          tab === ordered[ordered.length - 1].id && styles.panelLast
+        )}
+      >
+        {/* 헤더 — 금융사 / 누적 평가액 또는 개설 추천 태그 (계좌명은 탭이 대신한다) */}
         <div className={styles.panelTop}>
           <div className={styles.txt}>
-            <span className={styles.name}>{room.name}</span>
             {room.institution ? (
               <span className={styles.inst}>
                 <InstLogo institution={room.institution} />

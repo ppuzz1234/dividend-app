@@ -24,6 +24,127 @@
 .scenarioWrap {
   margin-bottom: 16px;
 }
+/* 계산 카드 + (2단계) 매달 투자금 타일 분할 행 */
+.gapSplit {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.gapSplit .gapCard {
+  flex: 1;
+  min-width: 0;
+  margin-bottom: 0;
+}
+/* 절반 폭이 된 계산 카드 — 계산 과정을 접고 다른 타일과 같은 제목+금액 형태로 */
+.gapCardHalf {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  text-align: center;
+  background: linear-gradient(160deg, var(--card-hi), var(--card));
+}
+/* 매달 투자금 타일 — 멘트가 우측 상단으로 떠오르며 타일로 변신.
+ * flex-grow 0→1 로 자리가 열리며 계산 카드가 좌측으로 줄어든다 */
+.monthlyTile {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 15px 10px;
+  border-radius: 16px;
+  text-align: center;
+  background: linear-gradient(160deg, var(--card-hi), var(--card));
+  border: 1px solid var(--line);
+  animation: tileRise 0.55s cubic-bezier(0.22, 0.61, 0.36, 1) 0.05s both;
+}
+@keyframes tileRise {
+  from {
+    flex-grow: 0.001;
+    opacity: 0;
+    transform: translateY(46px);
+    padding-left: 0;
+    padding-right: 0;
+  }
+  to {
+    flex-grow: 1;
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.monthlyK {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--sub);
+}
+.monthlyV {
+  font-size: 21px;
+  font-weight: 800;
+  color: var(--jade);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.monthlyEtf {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--faint);
+  white-space: nowrap;
+}
+/* 1단계 진행 ▼ — 온보딩과 동일한 펄스 버튼, 멘트가 다 나온 뒤 등장 */
+.stepNext {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  margin: 22px auto 0;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid var(--line2);
+  background: var(--card);
+  color: var(--jade);
+  cursor: pointer;
+  animation: accFadeUp 0.6s ease 2.2s both, accPulse 1.5s ease-in-out 2.9s infinite;
+}
+.stepNext:hover {
+  border-color: var(--jade);
+}
+@keyframes accPulse {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(5px);
+  }
+}
+/* 전환 — 멘트·▼ 가 위로 떠오르며 사라짐 */
+.leave {
+  animation: accFadeOutUp 0.32s ease both !important;
+}
+@keyframes accFadeOutUp {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-18px);
+  }
+}
+/* 2단계 — 숨겨뒀던 계좌 배분 콘텐츠 공개 */
+.revealBlock {
+  animation: accFadeUp 0.5s ease 0.25s both;
+}
 /* 필요 자산 − 내 총 자산 = 남은 금액 계산 카드 */
 .gapCard {
   display: flex;
@@ -78,9 +199,6 @@
 .seq4 {
   animation: accFadeUp 0.55s ease 1.55s both;
 }
-.seq5 {
-  animation: accFadeUp 0.55s ease 1.8s both;
-}
 /* 남은 금액 숫자 — 마지막에 탄력 있게 커지며 시선을 고정 */
 .gapPop {
   display: inline-block;
@@ -134,10 +252,13 @@
   .seq2,
   .seq3,
   .seq4,
-  .seq5,
   .gapPop,
   .flashNeed,
-  .flashMine {
+  .flashMine,
+  .monthlyTile,
+  .stepNext,
+  .leave,
+  .revealBlock {
     animation: none;
   }
 }
