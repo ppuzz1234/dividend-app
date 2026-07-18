@@ -51,8 +51,6 @@ export default function App() {
   const [finIncome, setFinIncome] = useState(0); // 전년도 금융소득 (이자+배당)
   const [goal] = useState("retirement"); // retirement | cashflow
   const [answers] = useState({}); // 성향 응답 (서베이 제거로 빈 값 유지)
-  // 온보딩 시트의 "마이데이터 연동하기" 진입 여부 → 계좌 화면을 GENIUS 로딩부터 자동 시작
-  const [autoLinkAccounts, setAutoLinkAccounts] = useState(false);
 
   // 전략 화면의 마이데이터 연동 완료 → 프로필·시드 반영
   const linkMydata = () => {
@@ -120,19 +118,19 @@ export default function App() {
       {step === "intro" && <Intro onNext={() => go("login")} />}
       {/* 서비스 콘셉트 안내 후 로그인 → 회원가입은 건너뛰고 온보딩 훅 화면으로 진입 */}
       {step === "login" && <Login onNext={() => go("onboarding")} />}
-      {/* 온보딩 시트의 "마이데이터 연동하기" → 계좌 화면을 GENIUS 로딩부터 자동 시작 */}
+      {/* 온보딩에서 마이데이터 로딩·확인까지 마치고 진입 → 계좌 화면은 연동 완료 상태로 시작 */}
       {step === "onboarding" && (
         <Onboarding
           monthlyGoal={monthlyGoal}
           setMonthlyGoal={setMonthlyGoal}
           onNext={() => {
-            setAutoLinkAccounts(true);
+            linkMydata();
             go("accounts");
           }}
         />
       )}
       {step === "accounts" && (
-        <Accounts {...{ mydata, answers, monthly, finIncome, income, age, autoLoad: autoLinkAccounts, onLinked: linkMydata, onNext: () => go("simulate") }} />
+        <Accounts {...{ mydata, answers, monthly, monthlyGoal, finIncome, income, age, onLinked: linkMydata, onNext: () => go("simulate") }} />
       )}
       {step === "simulate" && <Simulating />}
       {step === "result" && (

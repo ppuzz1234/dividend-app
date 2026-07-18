@@ -36,6 +36,7 @@ export { allocate } from "./taxopt/optimizer.js";
 export { buildStrategy, STRATEGY_PLAYBOOK } from "./plan/strategy.js";
 export { recommendByAccount, chosenCategories } from "./plan/assetLocation.js";
 export { buildAccountRooms } from "./plan/accountRooms.js";
+export { projectIsaRollover } from "./plan/isaRollover.js";
 export { buildStrategyComparison, PRODUCT_GROUP_LABELS } from "./plan/strategyTable.js";
 
 /* ⑥ 시뮬레이션 */

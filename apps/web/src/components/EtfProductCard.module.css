@@ -1,0 +1,162 @@
+/* 문장 속 ⓘ 상세보기 버튼 — 테두리 없는 연회색 원형(토스풍),
+ * 본문(23px) 글자 중앙에 맞춰 정렬되고 누르면 살짝 눌린다 */
+.infoBtn {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  margin-left: 7px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: var(--bg2);
+  color: var(--sub);
+  vertical-align: -4px; /* 24px 원을 본문 글자 세로 중앙에 맞춤 */
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, transform 0.12s;
+  -webkit-tap-highlight-color: transparent;
+}
+.infoBtn:hover {
+  background: var(--line);
+  color: var(--text);
+}
+.infoBtn:active {
+  transform: scale(0.92);
+}
+
+/* ETF 상세 레이어팝업 — 백드롭 딤+블러 페이드, 팝업은 살짝 떠오르며 등장 */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: rgba(0, 0, 0, 0.58);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: epFade 0.2s ease;
+}
+.popup {
+  position: relative;
+  width: 100%;
+  max-width: 340px;
+  max-height: 80vh;
+  overflow-y: auto;
+  border-radius: 20px;
+  padding: 20px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.5);
+  animation: epPop 0.28s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+@keyframes epFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes epPop {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .overlay,
+  .popup {
+    animation: none;
+  }
+}
+.popupClose {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: var(--bg2);
+  color: var(--sub);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.popupClose:hover {
+  color: var(--text);
+}
+.popupHead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-right: 30px; /* X 버튼 자리 */
+}
+.popupTitle {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+}
+.popupSub {
+  font-size: 11.5px;
+  color: var(--sub);
+  margin-top: 2px;
+}
+.popupSection {
+  margin-top: 16px;
+}
+.popupSectionTitle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--jade);
+  margin-bottom: 6px;
+}
+.popupDesc {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text);
+  word-break: keep-all;
+  margin: 0;
+}
+.popupNote {
+  font-size: 11px;
+  line-height: 1.55;
+  color: var(--faint);
+  word-break: keep-all;
+  margin: 8px 0 0;
+}
+.specList {
+  margin: 10px 0 0;
+}
+.specRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 12px;
+}
+.specRow:last-child {
+  border-bottom: none;
+}
+.specRow dt {
+  flex-shrink: 0;
+  color: var(--sub);
+}
+.specRow dd {
+  margin: 0;
+  color: var(--text);
+  font-weight: 600;
+  text-align: right;
+  word-break: keep-all;
+}

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { ArrowRight, Sparkles, MoveRight, Server, ServerOff, RefreshCw, BadgeCheck } from "lucide-react";
-import { buildStrategyComparison, MYDATA_ACCOUNTS } from "@devidend/core";
+import { ArrowRight, Sparkles, MoveRight, Server, ServerOff, RefreshCw, TrendingUp } from "lucide-react";
+import { buildStrategyComparison, projectRetirementScenario, MYDATA_ACCOUNTS } from "@devidend/core";
 import { fetchStrategy } from "../lib/strategyApi.js";
 import { Pad } from "../components/layout/Pad.jsx";
 import { Heading } from "../components/layout/Heading.jsx";
@@ -8,6 +8,8 @@ import { Button } from "../components/ui/Button.jsx";
 import { Segmented } from "../components/ui/Segmented.jsx";
 import { GeniusLoader } from "../components/ui/GeniusLoader.jsx";
 import { AccountRooms } from "../components/AccountRooms.jsx";
+import { EtfInfoButton } from "../components/EtfProductCard.jsx";
+import { GoalTiles } from "../components/GoalTiles.jsx";
 import { fmtKRW } from "../lib/format.js";
 import { cx } from "../lib/cx.js";
 import styles from "./Accounts.module.css";
@@ -21,14 +23,13 @@ const VIEWS = [
  * 사용자 변수(성향·월 불입·나이·전년도 금융/총소득)를 백엔드 전략 엔진
  * (POST /api/strategy, 파일 DB 기반 HPR)에 태워 결과를 렌더링한다.
  * 엔진 미기동 시에는 로컬(@devidend/core) 추정으로 폴백. */
-export function Accounts({ mydata, answers, monthly, finIncome, income, age, autoLoad = false, onLinked, onNext }) {
+export function Accounts({ mydata, answers, monthly, monthlyGoal, finIncome, income, age, onLinked, onNext }) {
   const [view, setView] = useState("current");
   const [remote, setRemote] = useState(null);
   // 마이데이터 연동 플로우 — idle(미연동) → loading(GENIUS) → done(연동 계좌내역)
-  // · autoLoad(온보딩 시트 진입): 곧바로 GENIUS 로딩부터 시작
-  // · 이미 연동됨(뒤로가기 재진입): 계좌 샘플(done)을 바로 표시
+  // · 온보딩에서 로딩·확인까지 마치고 진입(mydata=true): 곧바로 done 으로 시작
   // · 전략 비교표(table)는 현재 플로우에서 사용하지 않음(현재/전략적용 화면 비활성)
-  const [phase, setPhase] = useState(mydata ? "done" : autoLoad ? "loading" : "idle");
+  const [phase, setPhase] = useState(mydata ? "done" : "idle");
 
   // GENIUS 로딩 후 연동 완료 처리 (앱 상태에도 반영)
   useEffect(() => {
@@ -45,6 +46,14 @@ export function Accounts({ mydata, answers, monthly, finIncome, income, age, aut
     []
   );
 
+  /* 온보딩에서 정한 목표 생활비 기준 은퇴 필요 자산에서 연동된 총 금융자산을 뺀
+   * 차액(gap)을 20년간 만들기 위한 월 투자금 역산 — 연동 완료 후 상단에 표시 */
+  const scenario = useMemo(
+    () => projectRetirementScenario({ monthlyLivingCost: monthlyGoal * 10_000, currentAssets: mydataTotal }),
+    [monthlyGoal, mydataTotal]
+  );
+  const [{ etf, requiredMonthly }] = scenario.perEtf; // 단일 상품(PLUS 미국S&P500)
+
   // 사용자 입력이 바뀌면 백엔드 로직 재실행
   useEffect(() => {
     let alive = true;
@@ -60,36 +69,59 @@ export function Accounts({ mydata, answers, monthly, finIncome, income, age, aut
   const applied = view === "proposed";
   const t = applied ? cmp.proposed : cmp.current;
 
-  /* 미연동 → 연동 플로우: 버튼 클릭 → GENIUS 로딩 → 하단에 연동 계좌내역 */
+  /* 미연동 → 연동 플로우: (온보딩 자동 진입 시) GENIUS 로딩 → 하단에 연동 계좌내역 */
   if (phase !== "table") {
     return (
       <Pad footer={<Button onClick={onNext} icon={ArrowRight}>이 전략으로 시뮬레이션</Button>}>
-        <Heading
-          sub={
-            phase === "done"
-              ? "연동이 완료됐어요. 불러온 계좌 현황을 확인해 보세요."
-              : "마이데이터를 연동하면 흩어진 계좌와 소득정보를 한 번에 불러와요."
-          }
-        >
-          내 계좌 전략
-        </Heading>
+        {/* 목표 요약 타일 — 온보딩 마지막 화면과 동일한 최상단 위치로, 전환 시 그대로 이어짐.
+         * 연동 완료 시 두 타일이 좌측으로 줄며 우측에 "내 자산"(연동 총 평가액) 타일이 열린다 */}
+        <GoalTiles
+          monthlyGoal={monthlyGoal}
+          requiredNestEgg={scenario.requiredNestEgg}
+          myAsset={phase === "done" ? mydataTotal : undefined}
+          pulse={phase === "done"}
+        />
 
-        {/* 마이데이터 연동하기 — 완료 후엔 상태 배지로 전환 */}
-        {phase === "done" ? (
-          <div className={styles.linkedBadge}>
-            <BadgeCheck size={16} />
-            마이데이터 연동 완료 · 총 평가 {fmtKRW(mydataTotal)}
-          </div>
-        ) : (
-          <button
-            type="button"
-            className={styles.linkBtn}
-            disabled={phase === "loading"}
-            onClick={() => setPhase("loading")}
-          >
-            <RefreshCw size={17} className={phase === "loading" ? styles.spin : undefined} />
-            {phase === "loading" ? "연동 중..." : "마이데이터 연동하기"}
+        {/* 직접 진입(idle)에서만 연동 버튼 노출 — 로딩 중에는 아래 GENIUS 로더가 상태를 대신한다 */}
+        {phase === "idle" && (
+          <button type="button" className={styles.linkBtn} onClick={() => setPhase("loading")}>
+            <RefreshCw size={17} />
+            마이데이터 연동하기
           </button>
+        )}
+
+        {/* 연동 완료 — 필요 자산 − 연동 자산 = 남은 금액 순차 등장(계산 과정이 읽히도록)
+         * 이어서 남은 금액을 20년간 모으기 위한 PLUS ETF 월 투자 시나리오 */}
+        {phase === "done" && (
+          <div className={styles.scenarioWrap}>
+            <div className={styles.gapCard}>
+              <div className={cx(styles.gapRow, styles.seq1)}>
+                <span>필요 자산</span>
+                <b className={styles.flashNeed}>{fmtKRW(scenario.requiredNestEgg)}</b>
+              </div>
+              <div className={cx(styles.gapRow, styles.seq2)}>
+                <span>내 총 자산 (마이데이터)</span>
+                <b className={cx(styles.gapMinus, styles.flashMine)}>− {fmtKRW(mydataTotal)}</b>
+              </div>
+              <div className={cx(styles.gapRow, styles.gapTotal, styles.seq3)}>
+                <span>더 모아야 할 금액</span>
+                <b className={styles.gapPop}>{fmtKRW(scenario.gap)}</b>
+              </div>
+            </div>
+
+            {/* 월 투자 시나리오 문구 — ETF명 옆 (i) 클릭 시 상세 모달 */}
+            {scenario.gap > 0 && (
+              <div className={cx(styles.scenarioHead, styles.seq4)}>
+                <span>
+                  남은 금액은 매달 <b className={styles.scenarioAmount}>{fmtKRW(requiredMonthly)}</b>을
+                  <br />
+                  <b className={styles.scenarioAmount}>{etf.name}</b>
+                  <EtfInfoButton etf={etf} />
+                  <br />에 투자하면 20년 안에 모을 수 있어요.
+                </span>
+              </div>
+            )}
+          </div>
         )}
 
         {/* 하단 영역 — 여력 안내 → GENIUS 로딩 → 연동완료 계좌내역 */}
@@ -97,7 +129,12 @@ export function Accounts({ mydata, answers, monthly, finIncome, income, age, aut
         {phase === "loading" && (
           <GeniusLoader msgs={["금융사 계좌 조회 중", "잔고·거래내역 취합 중", "전년도 소득정보 확인 중"]} />
         )}
-        {phase === "done" && <AccountRooms mydata income={income} />}
+        {phase === "done" && (
+          <div className={styles.seq5}>
+            {/* 월 투자금(requiredMonthly)을 절세 한도 waterfall 로 계좌별 배분해 표시 */}
+            <AccountRooms mydata income={income} monthlyContribution={scenario.gap > 0 ? requiredMonthly : 0} />
+          </div>
+        )}
       </Pad>
     );
   }

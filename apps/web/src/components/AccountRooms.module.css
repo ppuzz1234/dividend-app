@@ -1,30 +1,151 @@
-/* 세로 리스트 — 각 타일은 콘텐츠 높이만큼(밴드도 콘텐츠에 밀착, 여백 최소) */
-.list {
-  display: flex;
-  flex-direction: column;
-  gap: 11px;
+/* ── 월 납입 배분 스트립 — 매달 투자금의 계좌별 몫 ───────── */
+.allocCard {
+  margin-bottom: 10px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: var(--card);
+  border: 1px solid var(--line);
 }
-.acct {
+.allocHead {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text);
+}
+.allocHead b {
+  color: var(--jade);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+/* 계좌별 몫을 폭으로 보여주는 스택 막대 */
+.allocBar {
   display: flex;
-  flex-direction: column;
+  gap: 3px;
+  height: 10px;
+  margin-top: 10px;
+}
+.allocSeg {
+  border-radius: 5px;
+  min-width: 6px;
+}
+.seg_pensionSavings {
+  background: var(--jade);
+}
+.seg_irp {
+  background: var(--gold);
+}
+.seg_isa {
+  background: var(--green, #56c288);
+}
+.seg_general {
+  background: var(--sub);
+}
+.allocChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+/* 칩 클릭 시 해당 계좌 탭으로 이동 */
+.allocChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--bg2);
+  color: var(--sub);
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.allocChip:hover {
+  color: var(--text);
+}
+.allocChipOn {
+  border-color: var(--line2);
+  background: var(--card);
+  color: var(--text);
+}
+.allocDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* ── 계좌 탭바 — ISA · 연금저축 · IRP · 일반 ─────────────── */
+.tabs {
+  display: flex;
+  gap: 5px;
+  padding: 4px;
+  border-radius: 14px;
+  background: var(--bg2);
+  border: 1px solid var(--line);
+  margin-bottom: 10px;
+}
+.tab {
+  flex: 1;
+  height: 38px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--sub);
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  transition: color 0.15s, background 0.15s;
+}
+.tab:hover {
+  color: var(--text);
+}
+.tabOn {
+  background: var(--card);
+  border-color: var(--line2);
+  color: var(--text);
+}
+/* 미보유(개설 추천) 계좌 표시 — 탭 라벨 옆 + */
+.tabPlus {
+  color: var(--gold);
+}
+
+/* ── 선택 계좌 패널 — 탭 전환 시 페이드인 ─────────────────── */
+.panel {
   background: var(--card);
   border: 1px solid var(--line);
   border-radius: 16px;
-  padding: 14px 16px;
+  padding: 15px 16px;
   color: var(--text);
+  animation: panelIn 0.25s ease both;
 }
-.acctOpen {
-  border-color: var(--gold-deep);
-  background: linear-gradient(160deg, var(--gold-dim), var(--card));
+@keyframes panelIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
-.acctClickable {
-  cursor: pointer;
-  transition: border-color 0.16s, box-shadow 0.16s;
+@media (prefers-reduced-motion: reduce) {
+  .panel {
+    animation: none;
+  }
 }
-.acctClickable:hover {
-  border-color: var(--line2);
-}
-.acctTop {
+
+/* 패널 헤더 — 계좌명·금융사 / 우측 누적 평가액 */
+.panelTop {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -51,15 +172,22 @@
   color: var(--sub);
 }
 .instLogo {
-  width: 18px;
-  height: 18px;
+  width: 30px;
+  height: 30px;
   flex-shrink: 0;
   border-radius: 6px;
   display: grid;
   place-items: center;
-  background: var(--bg2);
+  background: #fff;
   border: 1px solid var(--line2);
   color: var(--jade);
+  overflow: hidden;
+  padding: 2px;
+}
+.instImg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 .desc {
   font-size: 12px;
@@ -101,7 +229,93 @@
   padding: 4px 9px;
 }
 
-/* 활용가능 room — 큰 숫자 강조 */
+/* ── 월 납입 추천 카드 — 이 계좌가 받을 몫 강조 ──────────── */
+.planCard {
+  margin-top: 13px;
+  padding: 13px 14px;
+  border-radius: 13px;
+  background: var(--jade-dim);
+  border: 1px solid var(--jade);
+}
+.planTop {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+.planK {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: var(--jade);
+}
+.planShare {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
+}
+.planV {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 6px;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.planYear {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--sub);
+}
+.planReason {
+  margin: 7px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--sub);
+  word-break: keep-all;
+}
+/* 비공제 추가납입 안내 — 공제분과 구분되는 보조 설명 */
+.planExtra {
+  margin: 9px 0 0;
+  padding-top: 9px;
+  border-top: 1px dashed var(--line2);
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--sub);
+  word-break: keep-all;
+}
+/* ISA 3년 롤오버 안내 — 골드 톤으로 추가 혜택 강조 */
+.planRollover {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 9px 0 0;
+  padding-top: 9px;
+  border-top: 1px dashed var(--line2);
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--gold);
+  font-weight: 600;
+  word-break: keep-all;
+}
+.planRollover svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+/* 배분 0원 계좌 — 이유만 낮은 톤으로 */
+.planCardEmpty {
+  background: var(--bg2);
+  border-color: var(--line);
+  color: var(--faint);
+  font-size: 12px;
+  line-height: 1.5;
+  word-break: keep-all;
+}
+
+/* ── 납입 여력 ────────────────────────────────────────────── */
 .roomBox {
   margin-top: 13px;
 }
@@ -121,7 +335,7 @@
   border-radius: 5px;
   padding: 1px 6px;
 }
-/* 연 한도 · 올해 납입 · 남은 여력 3분할 */
+/* 연 한도 · 당해 기납 · 남은 여력 3분할 */
 .roomGrid {
   display: grid;
   grid-template-columns: 1fr 1fr 1.2fr;
@@ -134,10 +348,6 @@
   background: var(--bg2);
   border-radius: 11px;
   padding: 9px 11px;
-}
-.roomCellAccent {
-  background: var(--bg2);
-  border: 1px solid var(--green);
 }
 .roomK {
   display: inline-flex;
@@ -157,15 +367,6 @@
 .roomVAccent {
   color: var(--jade);
   font-size: 16px;
-}
-.gaugeCaption {
-  display: flex;
-  justify-content: space-between;
-  font-size: 10.5px;
-  font-weight: 600;
-  color: var(--faint);
-  margin-top: 6px;
-  font-variant-numeric: tabular-nums;
 }
 .roomVal {
   display: flex;
@@ -194,265 +395,45 @@
   border-radius: 4px;
   background: linear-gradient(90deg, var(--jade-deep), var(--jade));
 }
+.gaugeCaption {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--faint);
+  margin-top: 6px;
+  font-variant-numeric: tabular-nums;
+}
 .roomRefund {
   font-size: 11.5px;
   font-weight: 700;
   color: var(--gold);
   margin-top: 8px;
 }
-.recommend {
-  display: flex;
-  align-items: flex-start;
-  gap: 7px;
-  font-size: 12px;
-  line-height: 1.45;
-  color: var(--text);
-  margin-top: 11px;
-  padding-top: 11px;
-  border-top: 1px dashed var(--gold-deep);
-}
-.recommend svg {
-  flex-shrink: 0;
-  margin-top: 1px;
-}
-/* 하단 상세 진입 힌트 — 콘텐츠에 밀착한 약간 밝은 풀블리드 밴드(여백 최소) */
-.tapHint {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  margin: 9px -16px -14px; /* 위 여백 최소 + 좌우·하단 타일 가장자리까지 */
-  padding: 8px 16px 9px;
-  border-top: 1px solid var(--line);
-  border-radius: 0 0 15px 15px;
-  background: var(--card-hi);
-  font-size: 11.5px;
-  font-weight: 600;
-  color: var(--sub);
-}
-.tapHint svg {
-  flex-shrink: 0;
-}
-/* 밴드가 있는 타일 hover 시 밴드도 살짝 강조 */
-.acctClickable:hover .tapHint {
-  background: var(--card-hi);
-  color: var(--text);
-}
 
-/* 요약 배너 */
-.summary {
-  margin-top: 14px;
-  padding: 14px 16px;
-  border-radius: 14px;
-  background: var(--bg2);
-  border: 1px solid var(--line);
-  display: flex;
-  flex-direction: column;
-  gap: 9px;
-}
-.sumItem {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-}
-.sumK {
-  font-size: 13px;
-  color: var(--sub);
-}
-.sumV {
-  font-size: 16px;
-  font-weight: 800;
-  color: var(--gold);
-  font-variant-numeric: tabular-nums;
-}
-.sumNote {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  color: var(--sub);
-  line-height: 1.45;
-}
-.sumNote svg {
-  flex-shrink: 0;
-}
-
-.goalHint {
-  font-size: 12px;
-  color: var(--sub);
-  margin: 9px 2px 0;
-  line-height: 1.5;
-}
-
-/* ── 계좌 상세 · 조정 추천 바텀시트 ─────────────────────── */
-.sheetBackdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 70;
-  background: rgba(0, 0, 0, 0.58);
-  backdrop-filter: blur(2px);
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  animation: arFade 0.2s ease;
-}
-.sheet {
-  position: relative;
-  width: 100%;
-  max-width: 480px;
-  max-height: 88vh;
-  overflow-y: auto;
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-bottom: none;
-  border-radius: 22px 22px 0 0;
-  padding: 12px 20px calc(24px + env(safe-area-inset-bottom));
-  box-shadow: 0 -18px 50px rgba(0, 0, 0, 0.5);
-  animation: arUp 0.28s cubic-bezier(0.22, 0.61, 0.36, 1);
-}
-@keyframes arFade {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-@keyframes arUp {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
-}
-/* 최상단 그랩 영역 — 여기서만 아래로 스와이프하면 닫힘(본문은 스크롤만).
-   touch-action:none 으로 세로 제스처가 스크롤 대신 포인터 이벤트로 잡히게 함 */
-.sheetGrab {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 0 -20px 12px; /* 시트 좌우 패딩만큼 확장해 전폭 그랩 */
-  padding: 8px 0 12px;
-  touch-action: none;
-  cursor: grab;
-}
-.sheetGrab:active {
-  cursor: grabbing;
-}
-.sheetHandle {
-  width: 40px;
-  height: 4px;
-  border-radius: 2px;
-  background: var(--line2);
-}
-.sheetGrab:active .sheetHandle {
-  background: var(--sub);
-}
-.sheetClose {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  width: 28px;
-  height: 28px;
-  padding: 0;
-  border: none;
-  border-radius: 50%;
-  background: var(--bg2);
-  color: var(--sub);
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-}
-.sheetClose:hover {
-  color: var(--text);
-}
-
-.shName {
-  font-size: 19px;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-}
-.shBal {
-  font-size: 30px;
-  font-weight: 800;
-  color: var(--jade);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.03em;
-  margin-top: 12px;
-}
-
-/* 진행률 바 */
-.shBar {
-  height: 8px;
-  border-radius: 5px;
-  background: var(--bg2);
-  overflow: hidden;
-  margin-top: 14px;
-}
-.shBarFill {
-  height: 100%;
-  border-radius: 5px;
-  background: linear-gradient(90deg, var(--jade-deep), var(--jade));
-}
-.shBarCap {
-  display: flex;
-  justify-content: space-between;
-  font-size: 11.5px;
-  font-weight: 600;
-  color: var(--faint);
-  margin-top: 8px;
-}
-.shBarCap span:last-child {
-  color: var(--jade);
-  font-weight: 800;
-}
-
-/* 3 스탯 */
-.shStats {
-  display: flex;
-  gap: 8px;
-  margin-top: 18px;
-}
-.shStat {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 5px;
-  padding: 14px 8px;
+/* ── 한줄 정리 / 섹션 ─────────────────────────────────────── */
+.oneLiner {
+  margin: 14px 0 0;
+  padding: 13px 14px;
   border-radius: 13px;
-  background: var(--bg2);
+  background: var(--jade-dim);
   border: 1px solid var(--line);
-  text-align: center;
-}
-.shStat b {
-  font-size: 16px;
-  font-weight: 800;
+  font-size: 13px;
+  line-height: 1.6;
   color: var(--text);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.02em;
   word-break: keep-all;
 }
-.shStat span {
-  font-size: 11px;
-  color: var(--faint);
+.panelSec {
+  margin-top: 16px;
 }
-
-.shSection {
-  margin-top: 20px;
-}
-.shSecTitle {
+.secTitle {
   font-size: 13px;
   font-weight: 800;
   color: var(--jade);
   margin-bottom: 8px;
 }
-.shOneLiner {
-  margin: 0;
-  padding: 14px 16px;
-  border-radius: 13px;
-  background: var(--jade-dim);
-  border: 1px solid var(--line);
-  font-size: 13.5px;
-  line-height: 1.6;
-  color: var(--text);
-  word-break: keep-all;
-}
 
-/* 보유 상품 · 조정 추천 */
+/* ── 보유 상품 · 조정 추천 ────────────────────────────────── */
 .prodList {
   display: flex;
   flex-direction: column;
@@ -515,33 +496,14 @@
   color: var(--faint);
 }
 .prodEmpty {
-  margin: 0;
+  margin: 14px 0 0;
   font-size: 12.5px;
   line-height: 1.6;
   color: var(--sub);
   word-break: keep-all;
 }
 
-/* ── 개설 추천 시트 (개념 설명 + 개설 링크) ─────────────── */
-.shOpenTag {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  margin-bottom: 10px;
-  padding: 3px 9px;
-  border-radius: 7px;
-  background: var(--gold);
-  color: var(--on-gold);
-  font-size: 11px;
-  font-weight: 800;
-}
-.shAbout {
-  margin: 10px 0 0;
-  font-size: 13.5px;
-  line-height: 1.65;
-  color: var(--text);
-  word-break: keep-all;
-}
+/* ── 개설 추천 (좋은 점 + 개설 링크) ──────────────────────── */
 .benefitList {
   margin: 0;
   padding: 0;
@@ -574,12 +536,12 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  margin-top: 22px;
-  height: 54px;
-  border-radius: 16px;
+  margin-top: 16px;
+  height: 50px;
+  border-radius: 14px;
   background: var(--jade);
   color: var(--on-jade);
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 800;
   letter-spacing: -0.02em;
   text-decoration: none;
@@ -590,7 +552,7 @@
   transform: scale(0.985);
 }
 .openNote {
-  margin: 12px 2px 0;
+  margin: 10px 2px 0;
   font-size: 11.5px;
   line-height: 1.55;
   color: var(--faint);
@@ -598,12 +560,40 @@
   word-break: keep-all;
 }
 
-/* 개설 추천 타일의 하단 밴드 — 골드 톤 */
-.tapHintOpen {
-  background: var(--gold-dim);
-  border-top-color: var(--gold-deep);
-  color: var(--gold);
+/* ── 요약 배너 ────────────────────────────────────────────── */
+.summary {
+  margin-top: 14px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: var(--bg2);
+  border: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
 }
-.acctClickable:hover .tapHintOpen {
+.sumItem {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.sumK {
+  font-size: 13px;
+  color: var(--sub);
+}
+.sumV {
+  font-size: 16px;
+  font-weight: 800;
   color: var(--gold);
+  font-variant-numeric: tabular-nums;
+}
+.sumNote {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--sub);
+  line-height: 1.45;
+}
+.sumNote svg {
+  flex-shrink: 0;
 }

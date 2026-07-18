@@ -1,6 +1,7 @@
-import { useState, useRef } from "react";
-import { Plus, Check, Info, Infinity as InfinityIcon, Landmark, ChevronRight, X, MoveRight, ExternalLink, Sparkles } from "lucide-react";
+import { useState } from "react";
+import { Plus, Check, Info, Infinity as InfinityIcon, Landmark, MoveRight, ExternalLink, Repeat } from "lucide-react";
 import { buildAccountRooms } from "@devidend/core";
+import { logoFor } from "../lib/institutionLogos.js";
 import { fmtKRW } from "../lib/format.js";
 import { cx } from "../lib/cx.js";
 import { C } from "../theme/tokens.js";
@@ -34,108 +35,249 @@ const ADVICE = {
 const adviceFor = (productType, accountId) =>
   ADVICE[productType]?.[accountId] || { tone: "keep", text: "현재 계좌에 적합하게 보유 중이에요." };
 
-/* 4계좌(일반·ISA·연금저축·IRP) 연 한도·올해 납입·남은 여력 카드
- * 연동(mydata)된 보유 계좌 타일은 탭하면 상세·조정 추천 시트를 연다. */
-export function AccountRooms({ mydata, income }) {
-  const { rooms, totalRefund, openable } = buildAccountRooms({ mydata, income });
-  const [sheetRoom, setSheetRoom] = useState(null);
+/* 금융사 로고 — 레지스트리 매칭 시 PNG, 미등록 기관은 Landmark 아이콘 폴백 */
+function InstLogo({ institution }) {
+  const src = logoFor(institution);
+  return (
+    <span className={styles.instLogo}>
+      {src ? <img src={src} alt="" className={styles.instImg} /> : <Landmark size={11} strokeWidth={2.4} />}
+    </span>
+  );
+}
+
+/* 탭 순서·라벨 — ISA · 연금저축 · IRP · 일반 (일반 위탁계좌는 짧게 "일반") */
+const TAB_ORDER = ["isa", "pensionSavings", "irp", "general"];
+const TAB_LABELS = { isa: "ISA", pensionSavings: "연금저축", irp: "IRP", general: "일반" };
+
+/* 월 불입 배분 표시 순서 — 배분 우선순위(연금저축→ISA→IRP→일반) 그대로 */
+const PLAN_VIEW_ORDER = ["pensionSavings", "isa", "irp", "general"];
+
+/* 4계좌(ISA·연금저축·IRP·일반) 탭 — 선택한 계좌 하나의 전략을 한 패널에 정리.
+ * 기존 계좌 타일(한도·납입·여력 게이지)과 상세 시트(한줄 정리·보유 상품 조정 추천·
+ * 개설 안내) 내용을 합쳐 간결하게 재구성했다.
+ * monthlyContribution 전달 시 — 절세 한도 waterfall 배분으로 "어느 계좌에 매달
+ * 얼마를 납입할지"를 상단 스트립과 각 탭의 추천 카드로 보여준다. */
+export function AccountRooms({ mydata, income, monthlyContribution = 0 }) {
+  const { rooms, totalRefund, openable } = buildAccountRooms({ mydata, income, monthlyContribution });
+  const ordered = TAB_ORDER.map((id) => rooms.find((r) => r.id === id)).filter(Boolean);
+  const [tab, setTab] = useState(ordered[0].id);
+  const room = ordered.find((r) => r.id === tab) || ordered[0];
+  const unlimited = room.roomType === "none";
+  const needsOpen = room.held === false; // 연동됐으나 미보유 → 개설 추천
+  const hasPlan = monthlyContribution > 0;
+  // 배분된(0원 초과) 계좌만 우선순위 순으로 — 스트립 막대·칩 공용
+  const planned = PLAN_VIEW_ORDER.map((id) => rooms.find((r) => r.id === id)).filter(
+    (r) => r && (r.planMonthly || 0) > 0
+  );
 
   return (
     <>
-      <div className={styles.list}>
-        {rooms.map((r) => {
-          const unlimited = r.roomType === "none";
-          const needsOpen = r.held === false; // 연동됐으나 미보유 → 개설 추천
-          const clickable = mydata; // 연동 시 보유(상세)·미보유(개설 안내) 모두 진입
-          const openProps = clickable
-            ? {
-                role: "button",
-                tabIndex: 0,
-                onClick: () => setSheetRoom(r),
-                onKeyDown: (e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), setSheetRoom(r)),
-              }
-            : {};
-          return (
-            <div key={r.id} className={cx(styles.acct, needsOpen && styles.acctOpen, clickable && styles.acctClickable)} {...openProps}>
-              {/* 상단 — 계좌명 + (개행) 금융사 로고·명칭 / 우측 누적 평가액(상하 분리) */}
-              <div className={styles.acctTop}>
-                <div className={styles.txt}>
-                  <span className={styles.name}>{r.name}</span>
-                  {r.institution ? (
-                    <span className={styles.inst}>
-                      <span className={styles.instLogo}>
-                        <Landmark size={11} strokeWidth={2.4} />
-                      </span>
-                      {r.institution}
-                    </span>
-                  ) : (
-                    <span className={styles.desc}>{r.benefit}</span>
-                  )}
-                </div>
-                {r.held === true ? (
-                  <div className={styles.balBox}>
-                    <span className={styles.balCap}>누적 평가액</span>
-                    <span className={styles.balVal}>{fmtKRW(r.balance)}</span>
-                  </div>
-                ) : needsOpen ? (
-                  <span className={styles.openTag}>
-                    <Plus size={12} strokeWidth={3} /> 개설 추천
-                  </span>
-                ) : null}
-              </div>
+      {/* 월 납입 배분 스트립 — 매달 투자금이 어느 계좌로 얼마씩 가는지 한눈에 */}
+      {hasPlan && planned.length > 0 && (
+        <div className={styles.allocCard}>
+          <div className={styles.allocHead}>
+            매달 <b>{fmtKRW(monthlyContribution)}</b>은 이렇게 나눠 담아요
+          </div>
+          <div className={styles.allocBar}>
+            {planned.map((r) => (
+              <div
+                key={r.id}
+                className={cx(styles.allocSeg, styles[`seg_${r.id}`])}
+                style={{ flexGrow: r.planShare }}
+              />
+            ))}
+          </div>
+          <div className={styles.allocChips}>
+            {planned.map((r) => (
+              <button
+                key={r.id}
+                type="button"
+                className={cx(styles.allocChip, tab === r.id && styles.allocChipOn)}
+                onClick={() => setTab(r.id)}
+              >
+                <i className={cx(styles.allocDot, styles[`seg_${r.id}`])} />
+                {TAB_LABELS[r.id]} 월 {fmtKRW(Math.round(r.planMonthly))}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
-              {/* 납입 여력 — 연간 총 한도 · 올해 납입 · 남은 여력 */}
-              <div className={styles.roomBox}>
-                {unlimited ? (
-                  <>
-                    <div className={styles.roomLead}>연 납입 한도</div>
-                    <div className={cx(styles.roomVal, styles.roomValMuted)}>
-                      <InfinityIcon size={22} strokeWidth={2.6} /> 무제한
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div className={styles.roomGrid}>
-                      <div className={styles.roomCell}>
-                        <span className={styles.roomK}>{r.roomType === "deduct" ? "연 공제 한도" : "연 납입 한도"}</span>
-                        <span className={styles.roomV}>{fmtKRW(r.limit)}</span>
-                      </div>
-                      <div className={styles.roomCell}>
-                        <span className={styles.roomK}>올해 납입</span>
-                        <span className={styles.roomV}>{fmtKRW(r.used)}</span>
-                      </div>
-                      <div className={cx(styles.roomCell, styles.roomCellAccent)}>
-                        <span className={styles.roomK}>
-                          남은 여력
-                          {needsOpen && <span className={styles.maxBadge}>최대</span>}
-                        </span>
-                        <span className={cx(styles.roomV, styles.roomVAccent)}>{fmtKRW(r.room)}</span>
-                      </div>
-                    </div>
-                    <div className={styles.gauge}>
-                      <div className={styles.gaugeFill} style={{ width: `${r.pct}%` }} />
-                    </div>
-                    <div className={styles.gaugeCaption}>
-                      <span>올해 한도 소진율</span>
-                      <span>{Math.round(r.pct)}%</span>
-                    </div>
-                  </>
-                )}
-                {r.estRefund > 0 && (
-                  <div className={styles.roomRefund}>여력을 다 채우면 예상 세액공제 환급 +{fmtKRW(r.estRefund)}</div>
-                )}
-              </div>
+      {/* 계좌 탭바 */}
+      <div className={styles.tabs} role="tablist" aria-label="계좌별 전략">
+        {ordered.map((r) => (
+          <button
+            key={r.id}
+            type="button"
+            role="tab"
+            aria-selected={tab === r.id}
+            className={cx(styles.tab, tab === r.id && styles.tabOn)}
+            onClick={() => setTab(r.id)}
+          >
+            {TAB_LABELS[r.id]}
+            {r.held === false && <Plus size={11} strokeWidth={3.2} className={styles.tabPlus} />}
+          </button>
+        ))}
+      </div>
 
-              {/* 하단 밴드 — 보유 계좌는 상세, 개설 추천 계좌는 개설 안내로 진입 */}
-              {clickable && (
-                <div className={cx(styles.tapHint, needsOpen && styles.tapHintOpen)}>
-                  {needsOpen ? "탭하면 계좌 소개와 개설 안내를 볼 수 있어요" : "탭하면 계좌 상세와 조정 추천을 볼 수 있어요"}
-                  <ChevronRight size={14} />
-                </div>
+      {/* 선택 계좌 패널 — key 교체로 탭 전환마다 페이드인 */}
+      <div key={room.id} className={styles.panel}>
+        {/* 헤더 — 계좌명·금융사 / 누적 평가액 또는 개설 추천 태그 */}
+        <div className={styles.panelTop}>
+          <div className={styles.txt}>
+            <span className={styles.name}>{room.name}</span>
+            {room.institution ? (
+              <span className={styles.inst}>
+                <InstLogo institution={room.institution} />
+                {room.institution}
+              </span>
+            ) : (
+              <span className={styles.desc}>{room.benefit}</span>
+            )}
+          </div>
+          {room.held === true ? (
+            <div className={styles.balBox}>
+              <span className={styles.balCap}>누적 평가액</span>
+              <span className={styles.balVal}>{fmtKRW(room.balance)}</span>
+            </div>
+          ) : needsOpen ? (
+            <span className={styles.openTag}>
+              <Plus size={12} strokeWidth={3} /> 개설 추천
+            </span>
+          ) : null}
+        </div>
+
+        {/* 월 납입 추천 — 남은 여력(연) 안에서 이 계좌가 받을 몫 */}
+        {hasPlan &&
+          ((room.planMonthly || 0) > 0 ? (
+            <div className={styles.planCard}>
+              <div className={styles.planTop}>
+                <span className={styles.planK}>{needsOpen ? "개설 후 월 납입 추천" : "월 납입 추천"}</span>
+                <span className={styles.planShare}>월 투자금의 {Math.round((room.planShare || 0) * 100)}%</span>
+              </div>
+              <div className={styles.planV}>
+                매달 {fmtKRW(Math.round(room.planMonthly))}
+                <span className={styles.planYear}>연 {fmtKRW(room.planTotalAnnual ?? room.planAnnual)}</span>
+              </div>
+              <p className={styles.planReason}>{room.planReason}</p>
+              {/* 비공제 추가납입 — 납입한도(1,800만)까지 래퍼를 더 채우는 몫 */}
+              {(room.planExtraAnnual || 0) > 0 && (
+                <p className={styles.planExtra}>
+                  이 중 월 {fmtKRW(Math.round(room.planExtraAnnual / 12))}은 비공제 추가납입 — {room.planExtraReason}
+                </p>
+              )}
+              {/* ISA 3년 롤오버 — 만기금 연금저축 대량 이전(납입한도 별개) + 추가 세액공제 */}
+              {room.rollover?.events.length > 0 && (
+                <p className={styles.planRollover}>
+                  <Repeat size={12} strokeWidth={2.6} />
+                  3년 만기마다 약 {fmtKRW(Math.round(room.rollover.events[0].transferred))}을 연금저축으로 한 번에
+                  이전(연금 납입한도와 별개)하고, 이전액 10% 추가 세액공제로 20년간 약 +
+                  {fmtKRW(Math.round(room.rollover.totalExtraRefund))}을 더 환급받아요.
+                </p>
               )}
             </div>
-          );
-        })}
+          ) : (
+            <div className={cx(styles.planCard, styles.planCardEmpty)}>
+              이번 배분에서는 납입하지 않아요 — {room.planReason}
+            </div>
+          ))}
+
+        {/* 납입 여력 — 연간 총 한도 · 당해 기납 · 남은 여력 */}
+        <div className={styles.roomBox}>
+          {unlimited ? (
+            <>
+              <div className={styles.roomLead}>연 납입 한도</div>
+              <div className={cx(styles.roomVal, styles.roomValMuted)}>
+                <InfinityIcon size={22} strokeWidth={2.6} /> 무제한
+              </div>
+            </>
+          ) : (
+            <>
+              <div className={styles.roomGrid}>
+                <div className={styles.roomCell}>
+                  <span className={styles.roomK}>{room.roomType === "deduct" ? "연 공제 한도" : "연 납입 한도"}</span>
+                  <span className={styles.roomV}>{fmtKRW(room.limit)}</span>
+                </div>
+                <div className={styles.roomCell}>
+                  <span className={styles.roomK}>당해 기납</span>
+                  <span className={styles.roomV}>{fmtKRW(room.used)}</span>
+                </div>
+                <div className={styles.roomCell}>
+                  <span className={styles.roomK}>
+                    남은 여력
+                    {needsOpen && <span className={styles.maxBadge}>최대</span>}
+                  </span>
+                  <span className={cx(styles.roomV, styles.roomVAccent)}>{fmtKRW(room.room)}</span>
+                </div>
+              </div>
+              <div className={styles.gauge}>
+                <div className={styles.gaugeFill} style={{ width: `${room.pct}%` }} />
+              </div>
+              <div className={styles.gaugeCaption}>
+                <span>올해 한도 소진율</span>
+                <span>{Math.round(room.pct)}%</span>
+              </div>
+            </>
+          )}
+          {room.estRefund > 0 && (
+            <div className={styles.roomRefund}>여력을 다 채우면 예상 세액공제 환급 +{fmtKRW(room.estRefund)}</div>
+          )}
+        </div>
+
+        {/* 한줄 정리 — 미보유(개설 추천) 계좌는 계좌 소개로 대체 */}
+        <p className={styles.oneLiner}>{needsOpen ? room.about : room.oneLiner}</p>
+
+        {/* 보유 계좌 — 보유 상품별 조정 추천 */}
+        {room.held === true &&
+          (room.holdings.length > 0 ? (
+            <div className={styles.panelSec}>
+              <div className={styles.secTitle}>보유 상품 · 조정 추천</div>
+              <div className={styles.prodList}>
+                {room.holdings.map((h) => {
+                  const adv = adviceFor(h.productType, room.id);
+                  return (
+                    <div key={h.name} className={styles.prodRow}>
+                      <div className={styles.prodTop}>
+                        <span className={styles.prodName}>{h.name}</span>
+                        <b className={styles.prodVal}>{fmtKRW(h.value)}</b>
+                      </div>
+                      <div className={cx(styles.prodAdvice, styles[`adv_${adv.tone}`])}>
+                        {adv.tone === "good" ? <Check size={13} strokeWidth={3} /> : adv.tone === "move" ? <MoveRight size={13} strokeWidth={2.6} /> : <Info size={13} strokeWidth={2.6} />}
+                        <span>{adv.text}</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ) : (
+            <p className={styles.prodEmpty}>아직 보유 상품이 없어요. 남은 여력만큼 새로 담으면 절세 혜택을 받을 수 있어요.</p>
+          ))}
+
+        {/* 개설 추천 계좌 — 좋은 점 + 개설 링크 */}
+        {needsOpen && (
+          <>
+            <div className={styles.panelSec}>
+              <div className={styles.secTitle}>이런 점이 좋아요</div>
+              <ul className={styles.benefitList}>
+                <li>{room.benefit}</li>
+                {room.recommend && <li>{room.recommend}</li>}
+                {room.roomType === "deduct" && room.room > 0 && (
+                  <li>
+                    지금 개설하면 올해 세액공제 여력 <b>{fmtKRW(room.room)}</b>을 새로 쓸 수 있어요.
+                  </li>
+                )}
+              </ul>
+            </div>
+            <a className={styles.openCta} href={OPEN_URL} target="_blank" rel="noopener noreferrer">
+              {OPEN_INSTITUTION}에서 {room.name} 개설하기
+              <ExternalLink size={17} strokeWidth={2.4} />
+            </a>
+            <p className={styles.openNote}>
+              {OPEN_INSTITUTION} 앱/웹으로 이동해요. 개설 후 마이데이터를 다시 연동하면 자동 반영돼요.
+            </p>
+          </>
+        )}
       </div>
 
       {/* 요약 배너 */}
@@ -153,216 +295,6 @@ export function AccountRooms({ mydata, income }) {
           </div>
         )}
       </div>
-
-      {/* 계좌 상세 · 조정 추천 바텀시트 */}
-      {sheetRoom && <AccountSheet room={sheetRoom} onClose={() => setSheetRoom(null)} />}
     </>
-  );
-}
-
-/* 계좌 상세 바텀시트 — 잔액·진행률·3스탯·한줄 정리·보유상품별 조정 추천 */
-function AccountSheet({ room, onClose }) {
-  const unlimited = room.roomType === "none";
-  const needsOpen = room.held === false; // 개설 추천 계좌
-  const sheetRef = useRef(null);
-  const startY = useRef(0);
-  const curY = useRef(0); // 현재 드래그 오프셋(px)
-  const dragActive = useRef(false);
-  const [offset, setOffset] = useState(0);
-  const [dragging, setDragging] = useState(false);
-  const [closing, setClosing] = useState(false);
-  const [sheetH, setSheetH] = useState(640); // 시트 높이 — 드래그/닫기 시작 시 측정 (렌더 중 ref 접근 금지)
-
-  const DISMISS_PX = 90; // 이 이상 내리면 닫힘, 아니면 스냅백
-
-  // 닫기 — 슬라이드 다운 + 페이드아웃 후 트랜지션 종료 시 실제 언마운트
-  const dismiss = () => {
-    const h = sheetRef.current?.offsetHeight || 640;
-    setSheetH(h);
-    setDragging(false);
-    setClosing(true);
-    curY.current = h;
-    setOffset(h);
-  };
-  const onTransEnd = (e) => {
-    if (closing && e.propertyName === "transform" && e.target === sheetRef.current) onClose();
-  };
-
-  // 최상단 핸들 그랩 영역에서만 스와이프 닫기 (본문 스와이프는 스크롤만)
-  const onPointerDown = (e) => {
-    dragActive.current = true;
-    startY.current = e.clientY;
-    curY.current = 0;
-    setSheetH(sheetRef.current?.offsetHeight || 640);
-    setDragging(true);
-    e.currentTarget.setPointerCapture?.(e.pointerId);
-  };
-  const onPointerMove = (e) => {
-    if (!dragActive.current) return;
-    const dy = Math.max(0, e.clientY - startY.current); // 아래로만
-    curY.current = dy;
-    setOffset(dy);
-  };
-  const endDrag = () => {
-    if (!dragActive.current) return;
-    dragActive.current = false;
-    setDragging(false);
-    if (curY.current > DISMISS_PX) dismiss();
-    else {
-      curY.current = 0;
-      setOffset(0); // 스냅백
-    }
-  };
-
-  const progress = Math.min(1, offset / (sheetH * 0.7));
-  const sheetOpacity = offset ? Math.max(0, 1 - progress) : undefined;
-  const springTransition = "transform 0.3s cubic-bezier(0.33, 0, 0.2, 1), opacity 0.3s ease";
-
-  return (
-    <div
-      className={styles.sheetBackdrop}
-      style={{
-        opacity: dragging ? Math.max(0, 1 - progress) : closing ? 0 : undefined,
-        transition: dragging ? "none" : "opacity 0.3s ease",
-      }}
-      onClick={dismiss}
-    >
-      <div
-        ref={sheetRef}
-        className={styles.sheet}
-        style={{
-          transform: offset ? `translateY(${offset}px)` : undefined,
-          opacity: sheetOpacity,
-          transition: dragging ? "none" : springTransition,
-        }}
-        onTransitionEnd={onTransEnd}
-        role="dialog"
-        aria-modal="true"
-        aria-label={`${room.name} 계좌 ${needsOpen ? "개설 안내" : "상세"}`}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* 최상단 그랩 바 — 여기서만 아래로 스와이프하면 닫힘 */}
-        <div
-          className={styles.sheetGrab}
-          onPointerDown={onPointerDown}
-          onPointerMove={onPointerMove}
-          onPointerUp={endDrag}
-          onPointerCancel={endDrag}
-        >
-          <div className={styles.sheetHandle} aria-hidden="true" />
-        </div>
-        <button type="button" className={styles.sheetClose} aria-label="닫기" onClick={dismiss}>
-          <X size={16} />
-        </button>
-
-        {needsOpen ? (
-          /* 개설 추천 계좌 — 개념 설명 + 한화투자증권 개설 링크 */
-          <>
-            <div className={styles.shOpenTag}>
-              <Sparkles size={13} strokeWidth={2.6} /> 개설 추천
-            </div>
-            <div className={styles.shName}>{room.name} 계좌란?</div>
-            <p className={styles.shAbout}>{room.about}</p>
-
-            <div className={styles.shSection}>
-              <div className={styles.shSecTitle}>이런 점이 좋아요</div>
-              <ul className={styles.benefitList}>
-                <li>{room.benefit}</li>
-                {room.recommend && <li>{room.recommend}</li>}
-                {room.roomType === "deduct" && room.room > 0 && (
-                  <li>
-                    지금 개설하면 올해 세액공제 여력 <b>{fmtKRW(room.room)}</b>을 새로 쓸 수 있어요.
-                  </li>
-                )}
-              </ul>
-            </div>
-
-            <a className={styles.openCta} href={OPEN_URL} target="_blank" rel="noopener noreferrer">
-              {OPEN_INSTITUTION}에서 {room.name} 개설하기
-              <ExternalLink size={17} strokeWidth={2.4} />
-            </a>
-            <p className={styles.openNote}>
-              {OPEN_INSTITUTION} 앱/웹으로 이동해요. 개설 후 마이데이터를 다시 연동하면 자동 반영돼요.
-            </p>
-          </>
-        ) : (
-          /* 보유 계좌 — 상세 + 조정 추천 */
-          <>
-            {/* 헤더 — 계좌명 + 금융사 · 누적 평가액 */}
-            <div className={styles.shName}>{room.name} 계좌</div>
-            {room.institution && (
-              <span className={styles.inst}>
-                <span className={styles.instLogo}>
-                  <Landmark size={11} strokeWidth={2.4} />
-                </span>
-                {room.institution}
-              </span>
-            )}
-            <div className={styles.shBal}>{fmtKRW(room.balance)}</div>
-
-            {/* 진행률 바 */}
-            {!unlimited && (
-              <>
-                <div className={styles.shBar}>
-                  <div className={styles.shBarFill} style={{ width: `${room.pct}%` }} />
-                </div>
-                <div className={styles.shBarCap}>
-                  <span>{room.name} {room.roomType === "deduct" ? "세액공제 한도" : "납입 한도"}</span>
-                  <span>추가납입 가능 {fmtKRW(room.room)}</span>
-                </div>
-              </>
-            )}
-
-            {/* 3 스탯 */}
-            <div className={styles.shStats}>
-              <div className={styles.shStat}>
-                <b>{unlimited ? "무제한" : fmtKRW(room.room)}</b>
-                <span>남은 여력</span>
-              </div>
-              <div className={styles.shStat}>
-                <b>{room.estSaving > 0 ? fmtKRW(room.estSaving) : "—"}</b>
-                <span>예상 절세효과</span>
-              </div>
-              <div className={styles.shStat}>
-                <b>{room.holdings.length}개</b>
-                <span>보유 상품</span>
-              </div>
-            </div>
-
-            {/* 한줄 정리 */}
-            <div className={styles.shSection}>
-              <div className={styles.shSecTitle}>한줄 정리</div>
-              <p className={styles.shOneLiner}>{room.oneLiner}</p>
-            </div>
-
-            {/* 보유 상품 · 조정 추천 */}
-            <div className={styles.shSection}>
-              <div className={styles.shSecTitle}>보유 상품 · 조정 추천</div>
-              {room.holdings.length > 0 ? (
-                <div className={styles.prodList}>
-                  {room.holdings.map((h) => {
-                    const adv = adviceFor(h.productType, room.id);
-                    return (
-                      <div key={h.name} className={styles.prodRow}>
-                        <div className={styles.prodTop}>
-                          <span className={styles.prodName}>{h.name}</span>
-                          <b className={styles.prodVal}>{fmtKRW(h.value)}</b>
-                        </div>
-                        <div className={cx(styles.prodAdvice, styles[`adv_${adv.tone}`])}>
-                          {adv.tone === "good" ? <Check size={13} strokeWidth={3} /> : adv.tone === "move" ? <MoveRight size={13} strokeWidth={2.6} /> : <Info size={13} strokeWidth={2.6} />}
-                          <span>{adv.text}</span>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <p className={styles.prodEmpty}>아직 보유 상품이 없어요. 남은 여력만큼 새로 담으면 절세 혜택을 받을 수 있어요.</p>
-              )}
-            </div>
-          </>
-        )}
-      </div>
-    </div>
   );
 }

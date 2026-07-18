@@ -20,28 +20,147 @@
   opacity: 0.7;
   cursor: default;
 }
-.spin {
-  animation: linkSpin 1s linear infinite;
+/* 은퇴 필요 자산 차액 → 월 투자금 시나리오 (연동 완료 후 상단) */
+.scenarioWrap {
+  margin-bottom: 16px;
 }
-@keyframes linkSpin {
-  to {
-    transform: rotate(360deg);
+/* 필요 자산 − 내 총 자산 = 남은 금액 계산 카드 */
+.gapCard {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 15px 16px;
+  margin-bottom: 14px;
+  border-radius: 16px;
+  background: var(--card);
+  border: 1px solid var(--line);
+}
+.gapRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13.5px;
+  color: var(--sub);
+}
+.gapRow b {
+  font-weight: 700;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.2px;
+}
+.gapMinus {
+  color: var(--sub) !important;
+}
+.gapTotal {
+  padding-top: 10px;
+  border-top: 1px dashed var(--line2);
+  font-weight: 700;
+  color: var(--text);
+}
+.gapTotal b {
+  font-size: 19px;
+  font-weight: 800;
+  color: var(--jade);
+}
+
+/* 연동 완료 순차 등장 — 필요 자산 → 자산 차감 → 남은 금액 → 시나리오 → 계좌 탭
+ * 계산 과정(필요 − 보유 = 남은)이 한 줄씩 읽히도록 시차를 둔다 */
+.seq1 {
+  animation: accFadeUp 0.45s ease 0.1s both;
+}
+.seq2 {
+  animation: accFadeUp 0.45s ease 0.5s both;
+}
+.seq3 {
+  animation: accFadeUp 0.5s ease 0.9s both;
+}
+.seq4 {
+  animation: accFadeUp 0.55s ease 1.55s both;
+}
+.seq5 {
+  animation: accFadeUp 0.55s ease 1.8s both;
+}
+/* 남은 금액 숫자 — 마지막에 탄력 있게 커지며 시선을 고정 */
+.gapPop {
+  display: inline-block;
+  animation: accPop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) 1.05s both;
+}
+/* 계산식 반영 강조 — 순차 등장이 끝난 뒤 필요 자산(2.5s) → 내 자산(3.4s) 순으로
+ * 상단 타일의 같은 숫자와 동시에 한 번 반짝여 "이 두 값의 차"임을 표현 */
+.flashNeed {
+  display: inline-block;
+  animation: numFlash 0.9s cubic-bezier(0.3, 0, 0.3, 1) 2.5s;
+}
+.flashMine {
+  display: inline-block;
+  animation: numFlash 0.9s cubic-bezier(0.3, 0, 0.3, 1) 3.4s;
+}
+@keyframes numFlash {
+  0%,
+  100% {
+    transform: scale(1);
+    filter: none;
+    text-shadow: none;
+  }
+  35% {
+    transform: scale(1.15);
+    filter: brightness(1.4);
+    text-shadow: 0 0 16px currentColor;
   }
 }
-/* 연동 완료 배지 */
-.linkedBadge {
+@keyframes accFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes accPop {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .seq1,
+  .seq2,
+  .seq3,
+  .seq4,
+  .seq5,
+  .gapPop,
+  .flashNeed,
+  .flashMine {
+    animation: none;
+  }
+}
+/* 월 투자 시나리오 문구 — 상품 카드를 없앤 자리까지 채우도록 크게 */
+.scenarioHead {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-  margin-bottom: 16px;
-  padding: 13px 14px;
-  border-radius: 13px;
-  background: var(--jade-dim, var(--bg2));
-  border: 1px solid var(--jade);
-  color: var(--jade);
-  font-size: 13.5px;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 23px;
   font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  line-height: 1.55;
+  margin-bottom: 12px;
+  word-break: keep-all;
+}
+.scenarioHead svg {
+  flex-shrink: 0;
+  margin-top: 7px;
+}
+.scenarioAmount {
+  font-weight: 800;
+  color: var(--jade);
 }
 
 /* 엔진 연결 상태 */

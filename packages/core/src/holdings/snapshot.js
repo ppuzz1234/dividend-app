@@ -8,10 +8,9 @@
 export const MYDATA_ACCOUNTS = {
   general: {
     institution: "한화투자증권",
-    // 해외ETF에서 연 배당 3,000만 발생 가정 → 평가액 = 3,000만 ÷ 3.5%(배당수익률 가정) 역산
-    balance: 857_142_857,
+    balance: 255_000_000,
     contributedThisYear: 0,
-    holdings: [{ name: "QQQ 나스닥100", productType: "foreignEtf", value: 857_142_857 }],
+    holdings: [{ name: "QQQ 나스닥100", productType: "foreignEtf", value: 255_000_000 }],
   },
   isa: {
     institution: "미래에셋증권",
@@ -34,7 +33,7 @@ export const MYDATA_ACCOUNTS = {
  * 금융소득·총소득은 화면에서 사용자가 직접 수정할 수 있는 초기값이다. */
 export const MYDATA_PROFILE = {
   age: 45,
-  financialIncomePrevYear: 30_000_000, // 전년도 금융소득 — 일반계좌 해외ETF 배당 3,000만과 일관
+  financialIncomePrevYear: 30_000_000, // 전년도 금융소득
   totalIncomePrevYear: 90_000_000, // 전년도 총소득
 };
 

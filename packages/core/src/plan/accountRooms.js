@@ -9,6 +9,11 @@
  * ------------------------------------------------------------------ */
 import { MYDATA_ACCOUNTS } from "../holdings/snapshot.js";
 import { deductionRate } from "../knowledge/accounts.js";
+import { ETF_BENCHMARKS } from "../knowledge/etfBenchmarks.js";
+import { projectIsaRollover } from "./isaRollover.js";
+
+// 롤오버 전망 수익률 — 시나리오와 동일한 벤치마크(PLUS 미국S&P500) 가정치 사용
+const PLAN_CAGR = ETF_BENCHMARKS[0]?.cagrRef ?? 0.07;
 
 /* 계좌별 "한줄 정리" — 시트 상단에 노출할 계좌 성격·추천 한 문장 */
 const ONE_LINERS = {
@@ -20,15 +25,6 @@ const ONE_LINERS = {
 
 /* 4계좌 정의 — 연금계좌 세액공제 합산 한도(900만)를 연금저축600 + IRP300 으로 분해 */
 const ROOM_DEFS = [
-  {
-    id: "general",
-    engineId: "general",
-    name: "일반 위탁계좌",
-    roomType: "none",
-    benefit: "배당세 15.4% · 한도·상품 제약 없음",
-    about:
-      "증권사에서 국내외 주식·ETF를 자유롭게 매매하는 기본 계좌예요. 한도·상품 제약은 없지만 배당(15.4%)·해외 매매차익(양도세 22%)에 세금이 그대로 부과돼요.",
-  },
   {
     id: "isa",
     engineId: "isa",
@@ -64,15 +60,47 @@ const ROOM_DEFS = [
     about:
       "개인형 퇴직연금(IRP)은 스스로 적립하는 퇴직연금 계좌예요. 연금저축과 합산해 연 900만원까지 세액공제(최대 16.5%)를 받고, 과세이연·저율 연금소득세 혜택이 있어요. 예금 등 원리금보장상품으로 안전자산 30% 요건을 채울 수 있는 유일한 계좌이며, 위험자산은 70%로 제한돼요.",
   },
+  {
+    id: "general",
+    engineId: "general",
+    name: "일반 위탁계좌",
+    roomType: "none",
+    benefit: "배당세 15.4% · 한도·상품 제약 없음",
+    about:
+      "증권사에서 국내외 주식·ETF를 자유롭게 매매하는 기본 계좌예요. 한도·상품 제약은 없지만 배당(15.4%)·해외 매매차익(양도세 22%)에 세금이 그대로 부과돼요.",
+  },
 ];
+
+/* 월 불입 배분 우선순위 — 20년 세후 시뮬레이션 검증 결과
+ * (연금저축 공제분 → ISA → IRP → 연금저축 비공제 추가납입 → 일반):
+ * · 연금저축 공제분(600만): 원금의 16.5% 즉시 환급 + 100% 주식 가능 → 압도적 1순위
+ * · ISA(2,000만): 3년 만기마다 연금저축으로 대량 이전(+이전액 10% 추가공제),
+ *   전액 주식 투자 가능 — IRP의 안전자산 30% 의무로 인한 수익률 드래그(장기 복리)가
+ *   세액공제 300만의 이점을 상쇄하므로, 주식 기대수익 연 9%+ 가정에선 ISA가 IRP보다 앞선다
+ * · IRP(300만): 세액공제는 받되 위험자산 70% 제한 → ISA 다음
+ * · 연금저축 비공제 추가납입: 연금계좌 합산 납입한도(연 1,800만)의 잔여분 —
+ *   세액공제는 없지만 과세이연·저율과세·건보료 차단은 동일하고 원금은 인출 시 비과세.
+ *   은퇴 후 연금계좌 안에서 고배당 ETF 배당을 받는 전략의 래퍼 유입을 최대화한다
+ * 각 계좌의 "올해 남은 여력(연)"을 한도로 흘려 담는다. */
+const PLAN_ORDER = ["pensionSavings", "isa", "irp"];
+const PENSION_DEPOSIT_LIMIT = 18_000_000; // 연금계좌(연금저축+IRP) 합산 연 납입한도
+const PLAN_REASONS = {
+  pensionSavings: "세액공제 환급률이 가장 높아 1순위로 채워요.",
+  isa: "전액 주식 투자가 가능하고, 3년 만기마다 연금저축으로 이전하며 추가 세액공제(이전액 10%)까지 받아 IRP보다 유리해요.",
+  irp: "안전자산 30% 의무로 장기 기대수익이 낮아져, 세액공제 한도(300만)는 ISA 다음에 채워요.",
+  pensionExtra: "세액공제는 없지만 연금계좌 납입한도(연 1,800만)까지 더 채우면 과세이연·건보료 차단 혜택을 받고, 원금은 인출 시 비과세예요.",
+  general: "절세계좌·연금 납입한도를 모두 채우고 남는 금액만 담아요.",
+};
 
 /**
  * @param {object} p
  * @param {boolean} [p.mydata=false]  마이데이터 연동 여부(미연동이면 여력=한도 최대)
  * @param {number} [p.income]  전년도 총소득 — 세액공제 환급률(16.5%/13.2%) 분기
+ * @param {number} [p.monthlyContribution=0]  매달 투자할 금액(원) — 전달 시 계좌별
+ *   월 납입 추천(planMonthly/planAnnual/planShare/planReason)을 함께 산출
  * @returns 4계좌 room 목록 + 요약
  */
-export function buildAccountRooms({ mydata = false, income = 50_000_000 } = {}) {
+export function buildAccountRooms({ mydata = false, income = 50_000_000, monthlyContribution = 0 } = {}) {
   const DEDUCT_RATE = deductionRate(income); // 총급여 5,500만 이하 16.5%, 초과 13.2%
   // 연금계좌 납입액을 연금저축(600 우선) → IRP 순으로 배분
   const pensionContributed = mydata ? MYDATA_ACCOUNTS.pension?.contributedThisYear || 0 : 0;
@@ -119,11 +147,60 @@ export function buildAccountRooms({ mydata = false, income = 50_000_000 } = {}) 
     };
   });
 
+  // 월 불입 배분 — 우선순위대로 남은 여력(연)까지 waterfall 로 흘려 담는다
+  if (monthlyContribution > 0) {
+    const annual = monthlyContribution * 12;
+    const get = (id) => rooms.find((x) => x.id === id);
+    let rem = annual;
+
+    // 1~3단계: 연금저축 공제분 → ISA → IRP (각 남은 여력까지)
+    for (const id of PLAN_ORDER) {
+      const r = get(id);
+      if (!r) continue;
+      const put = Math.max(0, Math.min(rem, r.room));
+      r.planAnnual = put;
+      r.planReason = PLAN_REASONS[id];
+      // ISA 배분이 있으면 3년 만기 롤오버(연금저축 대량 이전 + 추가 세액공제) 전망 첨부
+      if (id === "isa" && put > 0) {
+        r.rollover = projectIsaRollover({ isaAnnual: put, deductRate: DEDUCT_RATE, cagr: PLAN_CAGR });
+      }
+      rem -= put;
+    }
+
+    // 4단계: 연금저축 비공제 추가납입 — 연금계좌 합산 납입한도(1,800만)의 잔여분까지
+    const ps = get("pensionSavings");
+    const irp = get("irp");
+    const depositUsed = pensionContributed + (ps?.planAnnual || 0) + (irp?.planAnnual || 0);
+    const extraRoom = Math.max(0, PENSION_DEPOSIT_LIMIT - depositUsed);
+    const extra = Math.max(0, Math.min(rem, extraRoom));
+    if (ps && extra > 0) {
+      ps.planExtraAnnual = extra;
+      ps.planExtraReason = PLAN_REASONS.pensionExtra;
+    }
+    rem -= extra;
+
+    // 5단계: 일반 — 남는 전액
+    const gen = get("general");
+    if (gen) {
+      gen.planAnnual = rem;
+      gen.planReason = PLAN_REASONS.general;
+    }
+
+    // 월·비중 확정 — 연금저축은 공제분 + 비공제 추가납입 합산
+    for (const r of rooms) {
+      const total = (r.planAnnual || 0) + (r.planExtraAnnual || 0);
+      r.planTotalAnnual = total;
+      r.planMonthly = total / 12;
+      r.planShare = total / annual;
+      if (!r.planReason) r.planReason = PLAN_REASONS[r.id];
+    }
+  }
+
   const totalRefund = rooms.reduce((s, r) => s + (r.estRefund || 0), 0);
   // 개설 추천 대상 — 연동됐으나 미보유(held===false)인 절세계좌 (일반계좌는 제외)
   const openable = rooms.filter((r) => r.held === false && r.recommend).map((r) => r.name);
 
-  return { rooms, totalRefund, openable, mydata };
+  return { rooms, totalRefund, openable, mydata, monthlyContribution };
 }
 
 export default buildAccountRooms;

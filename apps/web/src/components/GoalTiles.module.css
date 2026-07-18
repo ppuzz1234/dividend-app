@@ -1,0 +1,93 @@
+.grid {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.tile {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 18px 12px;
+  border-radius: 20px;
+  background: linear-gradient(160deg, var(--card-hi), var(--card));
+  border: 1px solid var(--line);
+  text-align: center;
+}
+.k {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--sub);
+}
+.v {
+  font-size: 19px;
+  font-weight: 800;
+  color: var(--jade);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+/* 3열 모드 — 타일 폭이 좁아지므로 여백·폰트를 줄이고 금액 개행을 허용 */
+.grid3 .tile {
+  padding: 16px 8px;
+}
+.grid3 .k {
+  font-size: 12px;
+}
+.grid3 .v {
+  font-size: 15px;
+  line-height: 1.3;
+  white-space: normal;
+  word-break: keep-all;
+}
+/* 내 자산 타일 — 자리가 0에서 늘어나며 기존 두 타일이 좌측으로 줄어드는 등장 전환 */
+.assetTile {
+  overflow: hidden;
+  animation: assetIn 0.55s cubic-bezier(0.22, 0.61, 0.36, 1) 0.2s both;
+}
+@keyframes assetIn {
+  from {
+    flex-grow: 0.001;
+    opacity: 0;
+    padding-left: 0;
+    padding-right: 0;
+  }
+  to {
+    flex-grow: 1;
+    opacity: 1;
+  }
+}
+/* 계산식 반영 강조 — 화면 구성이 끝난 뒤 필요 자산(2.5s) → 내 자산(3.4s) 순으로
+ * 한 번씩 반짝. 아래 계산 카드의 같은 숫자와 지연을 맞춰 동시에 빛난다. */
+.flashNeed {
+  animation: numFlash 0.9s cubic-bezier(0.3, 0, 0.3, 1) 2.5s;
+}
+.flashMine {
+  animation: numFlash 0.9s cubic-bezier(0.3, 0, 0.3, 1) 3.4s;
+}
+.flashNeed,
+.flashMine {
+  display: inline-block;
+}
+@keyframes numFlash {
+  0%,
+  100% {
+    transform: scale(1);
+    filter: none;
+    text-shadow: none;
+  }
+  35% {
+    transform: scale(1.15);
+    filter: brightness(1.4);
+    text-shadow: 0 0 16px currentColor;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .assetTile,
+  .flashNeed,
+  .flashMine {
+    animation: none;
+  }
+}
