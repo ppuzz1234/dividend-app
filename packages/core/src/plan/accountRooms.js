@@ -95,34 +95,48 @@ const PLAN_REASONS = {
 /**
  * @param {object} p
  * @param {boolean} [p.mydata=false]  마이데이터 연동 여부(미연동이면 여력=한도 최대)
+ * @param {object} [p.manual]  수기 입력 계좌 — { isa, pensionSavings, irp, general }
+ *   각 값은 { contributedThisYear, balance } 또는 숫자(당해 기납=평가액). 전달 시
+ *   mydata 목데이터 대신 이 값으로 여력을 계산한다(0/미입력 = 계좌 없음).
  * @param {number} [p.income]  전년도 총소득 — 세액공제 환급률(16.5%/13.2%) 분기
  * @param {number} [p.monthlyContribution=0]  매달 투자할 금액(원) — 전달 시 계좌별
  *   월 납입 추천(planMonthly/planAnnual/planShare/planReason)을 함께 산출
  * @returns 4계좌 room 목록 + 요약
  */
-export function buildAccountRooms({ mydata = false, income = 50_000_000, monthlyContribution = 0 } = {}) {
+export function buildAccountRooms({ mydata = false, manual = null, income = 50_000_000, monthlyContribution = 0 } = {}) {
   const DEDUCT_RATE = deductionRate(income); // 총급여 5,500만 이하 16.5%, 초과 13.2%
-  // 연금계좌 납입액을 연금저축(600 우선) → IRP 순으로 배분
+  // 수기 입력값 정규화 — 숫자면 {당해 기납 = 평가액} 으로 간주
+  const norm = (v) =>
+    v == null ? null : typeof v === "number"
+      ? { contributedThisYear: v, balance: v }
+      : { contributedThisYear: v.contributedThisYear ?? 0, balance: v.balance ?? v.contributedThisYear ?? 0 };
+  const M = manual
+    ? Object.fromEntries(["isa", "pensionSavings", "irp", "general"].map((k) => [k, norm(manual[k])]))
+    : null;
+
+  // 연금계좌 납입액을 연금저축(600 우선) → IRP 순으로 배분 (수기 모드에선 계좌별 입력값을 그대로 사용)
   const pensionContributed = mydata ? MYDATA_ACCOUNTS.pension?.contributedThisYear || 0 : 0;
   const pensionUsed = { pensionSavings: Math.min(pensionContributed, 6_000_000), irp: Math.max(0, pensionContributed - 6_000_000) };
 
   const rooms = ROOM_DEFS.map((d) => {
-    const snap = mydata ? MYDATA_ACCOUNTS[d.engineId] : null;
-    // held: true(보유) | false(연동됐으나 미보유) | null(미연동 — 보유 여부 미상)
-    // engine 'pension' 잔고는 두 계좌가 공유 — 연금저축을 대표 보유로 표기
-    const held = !mydata ? null : d.id === "irp" ? false : !!snap;
-    const balance = held ? snap?.balance ?? 0 : 0;
-    const institution = held ? snap?.institution || null : null; // 보유 금융사
-    // 보유 상품 — engine 'pension' 잔고는 연금저축을 대표로 표기(IRP는 mock 미보유)
-    const holdings = held && d.id !== "irp" ? snap?.holdings ?? [] : [];
+    const man = M?.[d.id];
+    const snap = mydata && !M ? MYDATA_ACCOUNTS[d.engineId] : null;
+    /* held: true(보유) | false(확인됐으나 미보유) | null(미확인)
+     * · 수기 모드: 입력값 > 0 이면 보유, 0/미입력이면 "계좌 없음"
+     * · 마이데이터: engine 'pension' 잔고는 두 계좌가 공유 — 연금저축을 대표 보유로 표기 */
+    const held = M ? (man?.balance || man?.contributedThisYear || 0) > 0 : !mydata ? null : d.id === "irp" ? false : !!snap;
+    const balance = held ? (M ? man.balance : snap?.balance ?? 0) : 0;
+    const institution = held && !M ? snap?.institution || null : null; // 수기 입력은 금융사 미상
+    const holdings = held && !M && d.id !== "irp" ? snap?.holdings ?? [] : [];
     const oneLiner = ONE_LINERS[d.id];
 
     if (d.roomType === "none") {
       return { ...d, held, balance, institution, holdings, oneLiner, used: 0, room: Infinity, roomText: "한도 없음", pct: 0, estSaving: 0 };
     }
 
-    const used =
-      d.id === "isa"
+    const used = M
+      ? Math.min(man?.contributedThisYear ?? 0, d.limit)
+      : d.id === "isa"
         ? (mydata ? MYDATA_ACCOUNTS.isa?.contributedThisYear || 0 : 0)
         : pensionUsed[d.id] || 0;
     const room = Math.max(0, d.limit - used);

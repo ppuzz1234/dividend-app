@@ -122,8 +122,18 @@ const zero = (year) => ({ year, value: 0, principal: 0, gain: 0, income: 0 });
  * @param {object} args  { plan, years, holdings, reinvest }
  *   plan: [{ accountId, seed, monthly }, ...] (allocate() 결과의 plan)
  */
-export function simulatePortfolio({ plan, years, holdings, reinvest }) {
-  const blended = blend(holdings);
+/**
+ * @param {object} p
+ * @param {Array}  p.plan      계좌별 배분안
+ * @param {number} p.years
+ * @param {Array}  [p.holdings] 보유 종목 — blended 미전달 시 이 종목들로 가정치를 블렌딩
+ * @param {boolean} p.reinvest
+ * @param {{y0:number,g:number,p:number}} [p.blended]
+ *   수익률 가정 직접 지정. 온보딩·전략 화면이 ETF 벤치마크(연 10%)로 역산하므로,
+ *   최종 시뮬레이션도 같은 가정을 받아 두 화면의 숫자가 어긋나지 않게 한다.
+ */
+export function simulatePortfolio({ plan, years, holdings, reinvest, blended: blendedOverride }) {
+  const blended = blendedOverride ?? blend(holdings);
 
   const perAccount = plan
     .filter((p) => p.seed > 0 || p.monthly > 0)

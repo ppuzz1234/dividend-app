@@ -52,13 +52,24 @@ const TAB_LABELS = { isa: "ISA", pensionSavings: "연금저축", irp: "IRP", gen
 /* 월 불입 배분 표시 순서 — 탭과 동일하게 ISA → 연금저축 → IRP → 일반 */
 const PLAN_VIEW_ORDER = TAB_ORDER;
 
+/* 매수 주기 — DB(plan_orders.cycle)의 buy_cycle enum 과 값이 일치해야 한다 */
+const CYCLES = [
+  { id: "weekly", label: "매주" },
+  { id: "monthly", label: "매월" },
+  { id: "yearly", label: "매년" },
+];
+const CYCLE_LABEL = { weekly: "매주", monthly: "매월", yearly: "매년" };
+// 월 납입액 → 주기별 회당 매수금 (주 = 연 52회, 연 = 12개월치 일시)
+const perOrder = (monthly, cycle) =>
+  Math.round(cycle === "weekly" ? (monthly * 12) / 52 : cycle === "yearly" ? monthly * 12 : monthly);
+
 /* 4계좌(ISA·연금저축·IRP·일반) 탭 — 선택한 계좌 하나의 전략을 한 패널에 정리.
  * 기존 계좌 타일(한도·납입·여력 게이지)과 상세 시트(한줄 정리·보유 상품 조정 추천·
  * 개설 안내) 내용을 합쳐 간결하게 재구성했다.
  * monthlyContribution 전달 시 — 절세 한도 waterfall 배분으로 "어느 계좌에 매달
  * 얼마를 납입할지"를 상단 스트립과 각 탭의 추천 카드로 보여준다. */
-export function AccountRooms({ mydata, income, monthlyContribution = 0 }) {
-  const { rooms, totalRefund, openable } = buildAccountRooms({ mydata, income, monthlyContribution });
+export function AccountRooms({ mydata, manual, income, monthlyContribution = 0, etf, cycles, onCycleChange }) {
+  const { rooms, totalRefund, openable } = buildAccountRooms({ mydata, manual, income, monthlyContribution });
   const ordered = TAB_ORDER.map((id) => rooms.find((r) => r.id === id)).filter(Boolean);
   const [tab, setTab] = useState(ordered[0].id);
   const room = ordered.find((r) => r.id === tab) || ordered[0];
@@ -192,6 +203,31 @@ export function AccountRooms({ mydata, income, monthlyContribution = 0 }) {
               이번 배분에서는 납입하지 않아요 — {room.planReason}
             </div>
           ))}
+
+        {/* 매수 설정 — 이 계좌에서 무엇을 어떤 주기로 살지. 주기를 바꾸면 회당 금액이 즉시 재계산된다 */}
+        {hasPlan && (room.planMonthly || 0) > 0 && etf && (
+          <div className={styles.buyCard}>
+            <div className={styles.buyTop}>
+              <span className={styles.buyK}>매수 설정</span>
+              <span className={styles.buyProduct}>{etf.name}</span>
+            </div>
+            <div className={styles.cycleRow} role="group" aria-label="매수 주기">
+              {CYCLES.map((c) => (
+                <button
+                  key={c.id}
+                  type="button"
+                  className={cx(styles.cycleBtn, (cycles?.[room.id] ?? "monthly") === c.id && styles.cycleOn)}
+                  onClick={() => onCycleChange?.(room.id, c.id)}
+                >
+                  {c.label}
+                </button>
+              ))}
+            </div>
+            <div className={styles.buyAmount}>
+              {CYCLE_LABEL[cycles?.[room.id] ?? "monthly"]} <b>{fmtKRW(perOrder(room.planMonthly, cycles?.[room.id]))}</b>씩 자동 매수
+            </div>
+          </div>
+        )}
 
         {/* 납입 여력 — 연간 총 한도 · 당해 기납 · 남은 여력 */}
         <div className={styles.roomBox}>

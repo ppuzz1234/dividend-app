@@ -1,15 +1,16 @@
-import { useEffect, useMemo, useState } from "react";
-import { ArrowRight, ChevronDown, Sparkles, MoveRight, Server, ServerOff, RefreshCw } from "lucide-react";
-import { buildStrategyComparison, projectRetirementScenario, MYDATA_ACCOUNTS } from "@devidend/core";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { ArrowRight, ChevronDown, Sparkles, MoveRight, Server, ServerOff, RefreshCw, History } from "lucide-react";
+import { buildStrategyComparison, projectRetirementScenario, buildAccountRooms, MYDATA_ACCOUNTS } from "@devidend/core";
 import { fetchStrategy } from "../lib/strategyApi.js";
 import { Pad } from "../components/layout/Pad.jsx";
 import { Heading } from "../components/layout/Heading.jsx";
 import { Button } from "../components/ui/Button.jsx";
 import { Segmented } from "../components/ui/Segmented.jsx";
-import { GeniusLoader } from "../components/ui/GeniusLoader.jsx";
+import { BrandLoader } from "../components/ui/BrandLoader.jsx";
 import { AccountRooms } from "../components/AccountRooms.jsx";
 import { EtfInfoButton } from "../components/EtfProductCard.jsx";
 import { GoalTiles } from "../components/GoalTiles.jsx";
+import { PlanHistory } from "../components/PlanHistory.jsx";
 import { fmtKRW } from "../lib/format.js";
 import { cx } from "../lib/cx.js";
 import styles from "./Accounts.module.css";
@@ -19,20 +20,34 @@ const VIEWS = [
   { v: "proposed", l: "전략 적용" },
 ];
 
+/* 마이데이터 목데이터 → 계좌 원장 저장 형태 (engine id 'pension' → 'pensionSavings') */
+const MYDATA_LIST = Object.entries(MYDATA_ACCOUNTS).map(([engineId, a]) => ({
+  kind: engineId === "pension" ? "pensionSavings" : engineId,
+  institution: a.institution,
+  balance: a.balance,
+  contributedThisYear: a.contributedThisYear,
+  holdings: a.holdings,
+}));
+
 /* ③ 계좌 전략 — 마이데이터 취합("현재") vs 앱 제안 리밸런싱("제안") 비교표
  * 사용자 변수(성향·월 불입·나이·전년도 금융/총소득)를 백엔드 전략 엔진
  * (POST /api/strategy, 파일 DB 기반 HPR)에 태워 결과를 렌더링한다.
  * 엔진 미기동 시에는 로컬(@devidend/core) 추정으로 폴백. */
-export function Accounts({ mydata, answers, monthly, monthlyGoal, finIncome, income, age, onLinked, onNext }) {
+export function Accounts({ mydata, manualAccounts, answers, monthly, monthlyGoal, finIncome, income, age, store, onLinked, onNext }) {
   const [view, setView] = useState("current");
   const [remote, setRemote] = useState(null);
-  // 마이데이터 연동 플로우 — idle(미연동) → loading(GENIUS) → done(연동 계좌내역)
+  // 마이데이터 연동 플로우 — idle(미연동) → loading(브랜드 로더) → done(연동 계좌내역)
   // · 온보딩에서 로딩·확인까지 마치고 진입(mydata=true): 곧바로 done 으로 시작
   // · 전략 비교표(table)는 현재 플로우에서 사용하지 않음(현재/전략적용 화면 비활성)
-  const [phase, setPhase] = useState(mydata ? "done" : "idle");
+  // 수기 입력으로 진입한 경우도 연동 완료(done)와 동일하게 취급한다
+  const [phase, setPhase] = useState(mydata || manualAccounts ? "done" : "idle");
   // 연동 완료 후 단계 공개 — 1단계(계산+멘트+▼) → ▼ 클릭 → 2단계(투자금 타일+계좌 배분)
   const [expanded, setExpanded] = useState(false);
   const [leaving, setLeaving] = useState(false); // 멘트·▼ 가 위로 사라지는 전환 중
+  // 계좌별 매수 주기 (weekly|monthly|yearly) — 저장 시 plan_orders.cycle 로 봉인
+  const [cycles, setCycles] = useState({});
+  const [histOpen, setHistOpen] = useState(false);
+  const setCycle = (kind, cycle) => setCycles((c) => ({ ...c, [kind]: cycle }));
   const toDetail = () => {
     setLeaving(true);
     setTimeout(() => {
@@ -41,7 +56,7 @@ export function Accounts({ mydata, answers, monthly, monthlyGoal, finIncome, inc
     }, 320);
   };
 
-  // GENIUS 로딩 후 연동 완료 처리 (앱 상태에도 반영)
+  // 로딩 후 연동 완료 처리 (앱 상태 반영)
   useEffect(() => {
     if (phase !== "loading") return;
     const t = setTimeout(() => {
@@ -51,9 +66,26 @@ export function Accounts({ mydata, answers, monthly, monthlyGoal, finIncome, inc
     return () => clearTimeout(t);
   }, [phase, onLinked]);
 
+  /* 마이데이터 결과 → 스냅샷(불변 이력) + 계좌 원장 동기화.
+   * 이 화면에서 연동한 경우(loading→done)와 온보딩에서 연동을 마치고
+   * 곧바로 done 으로 진입한 경우를 모두 처리한다. 원장 id 가 있어야
+   * 플랜 저장 시 계좌별 배분을 기록할 수 있으므로 누락되면 안 된다. */
+  const syncedRef = useRef(false);
+  useEffect(() => {
+    if (phase !== "done" || !store?.enabled || syncedRef.current) return;
+    if (manualAccounts) return; // 수기 입력은 입력 화면에서 이미 원장에 반영됨
+    syncedRef.current = true;
+    if (store.accounts?.length) return; // 이미 동기화된 세션
+    store.syncMydata(MYDATA_LIST);
+  }, [phase, store, manualAccounts]);
+
+  /* 보유 총자산 — 수기 입력이 있으면 그 합계, 없으면 마이데이터 목데이터 합계 */
   const mydataTotal = useMemo(
-    () => Object.values(MYDATA_ACCOUNTS).reduce((s, a) => s + (a.balance || 0), 0),
-    []
+    () =>
+      manualAccounts
+        ? Object.values(manualAccounts).reduce((s, v) => s + (v || 0), 0)
+        : Object.values(MYDATA_ACCOUNTS).reduce((s, a) => s + (a.balance || 0), 0),
+    [manualAccounts]
   );
 
   /* 온보딩에서 정한 목표 생활비 기준 은퇴 필요 자산에서 연동된 총 금융자산을 뺀
@@ -79,14 +111,47 @@ export function Accounts({ mydata, answers, monthly, monthlyGoal, finIncome, inc
   const applied = view === "proposed";
   const t = applied ? cmp.proposed : cmp.current;
 
-  /* 미연동 → 연동 플로우: (온보딩 자동 진입 시) GENIUS 로딩 → 하단에 연동 계좌내역 */
+  /* 계획 저장 — 계좌별 월 납입액과 매수 규칙(상품·주기·회당 금액)을 새 리비전으로 봉인.
+   * 화면의 배분 결과와 같은 입력으로 계산해 저장값이 화면과 어긋나지 않게 한다.
+   * Supabase 미설정이면 store.save 가 no-op 이라 기존 흐름 그대로 다음 단계로 넘어간다. */
+  const saveAndNext = async () => {
+    const contribution = scenario.gap > 0 ? requiredMonthly : 0;
+    if (store?.enabled && contribution > 0) {
+      const { rooms } = buildAccountRooms({ mydata: true, manual: manualAccounts, income, monthlyContribution: contribution });
+      const byKind = rooms
+        .filter((r) => (r.planMonthly || 0) > 0)
+        .map((r) => {
+          const cycle = cycles[r.id] ?? "monthly";
+          const perOrder =
+            cycle === "weekly" ? (r.planMonthly * 12) / 52 : cycle === "yearly" ? r.planMonthly * 12 : r.planMonthly;
+          return {
+            kind: r.id,
+            monthlyAmount: r.planMonthly,
+            orders: [
+              { productCode: etf.ticker, productName: etf.name, cycle, amountPerOrder: perOrder },
+            ],
+          };
+        });
+      await store.save({
+        goalManwon: monthlyGoal,
+        monthlyContribution: contribution,
+        byKind,
+        note: "계좌 전략 화면에서 저장",
+      });
+    }
+    onNext?.();
+  };
+
+  /* 미연동 → 연동 플로우: (온보딩 자동 진입 시) 브랜드 로딩 → 하단에 연동 계좌내역 */
   if (phase !== "table") {
     return (
       <Pad
         footer={
           /* 1단계(멘트+▼)에서는 하단 버튼도 숨긴다 — ▼로 상세를 연 뒤에만 노출 */
           phase === "done" && !expanded ? null : (
-            <Button onClick={onNext} icon={ArrowRight}>이 전략으로 시뮬레이션</Button>
+            <Button onClick={saveAndNext} icon={ArrowRight} disabled={store?.busy}>
+              {store?.busy ? "저장 중…" : "이 전략으로 시뮬레이션"}
+            </Button>
           )
         }
       >
@@ -99,7 +164,7 @@ export function Accounts({ mydata, answers, monthly, monthlyGoal, finIncome, inc
           pulse={phase === "done"}
         />
 
-        {/* 직접 진입(idle)에서만 연동 버튼 노출 — 로딩 중에는 아래 GENIUS 로더가 상태를 대신한다 */}
+        {/* 직접 진입(idle)에서만 연동 버튼 노출 — 로딩 중에는 아래 브랜드 로더가 상태를 대신한다 */}
         {phase === "idle" && (
           <button type="button" className={styles.linkBtn} onClick={() => setPhase("loading")}>
             <RefreshCw size={17} />
@@ -179,16 +244,46 @@ export function Accounts({ mydata, answers, monthly, monthlyGoal, finIncome, inc
           </button>
         )}
 
-        {/* 하단 영역 — 여력 안내 → GENIUS 로딩 → (▼ 이후) 연동완료 계좌 배분 */}
+        {/* 하단 영역 — 여력 안내 → 브랜드 로딩 → (▼ 이후) 연동완료 계좌 배분 */}
         {phase === "idle" && <AccountRooms mydata={false} income={income} />}
         {phase === "loading" && (
-          <GeniusLoader msgs={["금융사 계좌 조회 중", "잔고·거래내역 취합 중", "전년도 소득정보 확인 중"]} />
+          <BrandLoader msgs={["금융사 계좌 조회 중", "잔고·거래내역 취합 중", "전년도 소득정보 확인 중"]} />
         )}
         {phase === "done" && expanded && (
           <div className={styles.revealBlock}>
-            {/* 월 투자금(requiredMonthly)을 절세 한도 waterfall 로 계좌별 배분해 표시 */}
-            <AccountRooms mydata income={income} monthlyContribution={scenario.gap > 0 ? requiredMonthly : 0} />
+            {/* 월 투자금(requiredMonthly)을 절세 한도 waterfall 로 계좌별 배분해 표시.
+             * 계좌별 매수 주기(주/월/연)는 여기서 조정해 저장 시 함께 봉인된다 */}
+            <AccountRooms
+              mydata
+              manual={manualAccounts}
+              income={income}
+              monthlyContribution={scenario.gap > 0 ? requiredMonthly : 0}
+              etf={etf}
+              cycles={cycles}
+              onCycleChange={setCycle}
+            />
+
+            {/* 변경 이력 — 저장된 리비전이 있을 때만(=Supabase 연동 시) 노출 */}
+            {store?.enabled && store.revisions?.length > 0 && (
+              <button type="button" className={styles.histBtn} onClick={() => setHistOpen(true)}>
+                <History size={14} />
+                변경 이력 {store.revisions.length}건 · 지난 계획으로 되돌리기
+              </button>
+            )}
+            {store?.error && <p className={styles.saveErr}>저장에 실패했어요 — {store.error}</p>}
           </div>
+        )}
+
+        {histOpen && (
+          <PlanHistory
+            revisions={store.revisions}
+            busy={store.busy}
+            onRestore={async (id) => {
+              await store.restore(id);
+              setHistOpen(false);
+            }}
+            onClose={() => setHistOpen(false)}
+          />
         )}
       </Pad>
     );

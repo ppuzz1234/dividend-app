@@ -3,7 +3,7 @@ import BrandMark from "../components/ui/BrandMark.jsx";
 import styles from "./Splash.module.css";
 
 /* 스플래시 — hpr과 동일한 구조(시세 그리드 배경 · 발광 · 브랜드마크 · 아이브로우
-   · 타이틀 · 슬로건 · 하단 진행바)를 따르되, GENIUS 브랜딩과 노란 달러 심볼로 구성.
+   · 타이틀 · 슬로건 · 하단 진행바)를 따르되, PLUS CUBE 브랜딩으로 구성.
    약 2.6초 후 로그인으로 자동 전환하고, 화면을 탭하면 즉시 스킵한다. */
 export function Splash({ onStart }) {
   const [exiting, setExiting] = useState(false);
@@ -39,7 +39,7 @@ export function Splash({ onStart }) {
           <BrandMark size={92} glow />
         </div>
         <div className={styles.eyebrow}>SMART DIVIDEND · TAX SAVING</div>
-        <h1 className={styles.title}>PLUS GENIUS</h1>
+        <h1 className={styles.title}>PLUS CUBE</h1>
         <p className={styles.slogan}>절세 최적화 기반 ETF 은퇴 자산 확보 노하우</p>
       </div>
 

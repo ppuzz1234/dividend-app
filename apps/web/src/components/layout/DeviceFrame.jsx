@@ -39,7 +39,7 @@ export function DeviceFrame() {
         <div className={styles.device}>
           <div className={styles.screen}>
             <div className={styles.island} />
-            <iframe className={styles.frameEmbed} src="/?device=1" title="PLUS GENIUS" />
+            <iframe className={styles.frameEmbed} src="/?device=1" title="PLUS CUBE" />
           </div>
           <span className={`${styles.btn} ${styles.bAction}`} />
           <span className={`${styles.btn} ${styles.bVolup}`} />
@@ -50,7 +50,7 @@ export function DeviceFrame() {
       </div>
       <div className={styles.caption}>
         <div className={styles.captionText}>
-          <b>iPhone 17 Pro</b> · PLUS GENIUS Simulator
+          <b>iPhone 17 Pro</b> · PLUS CUBE Simulator
         </div>
         <a href="/">전체 화면(브라우저)으로 열기 →</a>
       </div>

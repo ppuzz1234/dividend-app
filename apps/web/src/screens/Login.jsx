@@ -1,18 +1,39 @@
 import { useState } from "react";
 import BrandMark from "../components/ui/BrandMark.jsx";
+import { loginWithGoogle } from "../auth/google.js";
 import styles from "./Login.module.css";
 
 /* 로그인 — hpr Login과 동일한 구조(브랜드 헤더 · SSO 목록 · "또는" 구분 ·
-   휴대폰 로그인 · 하단 링크). GENIUS는 별도 인증 백엔드가 없는 데모 플로우라,
-   어떤 로그인 수단을 눌러도 기존 온보딩(회원가입)으로 진입한다. */
+   휴대폰 로그인 · 하단 링크).
+   Google 은 Supabase Auth 실연동 전용 — 데모 폴백 없이 항상 구글 인증을 거친다.
+   (네이버·카카오는 아직 데모 — Supabase 프로바이더 추가 시 동일 패턴으로 연결) */
 export function Login({ onNext }) {
   const [phoneMode, setPhoneMode] = useState(false);
   const [phone, setPhone] = useState("");
+  const [busy, setBusy] = useState(null); // 진행 중인 provider
+  const [err, setErr] = useState("");
+  const [fallbackUrl, setFallbackUrl] = useState(""); // 자동 이동이 막혔을 때의 수동 링크
 
   const onPhone = (e) => {
     e.preventDefault();
     if (!phone.trim()) return;
     onNext?.();
+  };
+
+  const onGoogle = async () => {
+    setErr("");
+    setFallbackUrl("");
+    setBusy("google");
+    try {
+      const profile = await loginWithGoogle();
+      // 실연동이면 구글로 이동되어 여기 도달하지 않는다(데모만 통과)
+      onNext?.(profile);
+    } catch (e) {
+      setErr(e.message || "구글 로그인에 실패했습니다.");
+      if (e.url) setFallbackUrl(e.url); // 이동이 차단된 경우 수동 링크 제공
+    } finally {
+      setBusy(null);
+    }
   };
 
   return (
@@ -23,7 +44,7 @@ export function Login({ onNext }) {
             <BrandMark size={44} />
           </div>
           <div className={styles.titles}>
-            <strong>GENIUS</strong>
+            <strong>PLUS CUBE</strong>
             <span>절세와 투자를 현명하게</span>
           </div>
         </header>
@@ -31,19 +52,28 @@ export function Login({ onNext }) {
         <h2 className={styles.h}>로그인 또는 회원가입</h2>
 
         <div className={styles.ssoList}>
-          <button className={styles.ssoBtn} onClick={onNext}>
+          <button className={styles.ssoBtn} onClick={onGoogle} disabled={!!busy}>
             <span className={styles.ssoIc}>{GOOGLE}</span>
-            Google로 계속하기
+            {busy === "google" ? "구글 인증 중…" : "Google로 계속하기"}
           </button>
-          <button className={styles.ssoBtn} onClick={onNext}>
+          <button className={styles.ssoBtn} onClick={onNext} disabled={!!busy}>
             <span className={`${styles.ssoIc} ${styles.naverIc}`}>N</span>
             네이버로 계속하기
+            <span className={styles.demoTag}>데모</span>
           </button>
-          <button className={styles.ssoBtn} onClick={onNext}>
+          <button className={styles.ssoBtn} onClick={onNext} disabled={!!busy}>
             <span className={`${styles.ssoIc} ${styles.kakaoIc}`}>{KAKAO}</span>
             카카오로 계속하기
+            <span className={styles.demoTag}>데모</span>
           </button>
         </div>
+
+        {err && <p className={styles.err}>{err}</p>}
+        {fallbackUrl && (
+          <a className={styles.fallbackLink} href={fallbackUrl}>
+            구글 로그인 페이지로 이동하기
+          </a>
+        )}
 
         <div className={styles.or}>
           <span>또는</span>
@@ -71,7 +101,7 @@ export function Login({ onNext }) {
         )}
 
         <button className={styles.footLink} onClick={onNext}>
-          이미 GENIUS 회원이신가요? <b>로그인하세요</b>
+          이미 PLUS CUBE 회원이신가요? <b>로그인하세요</b>
         </button>
       </div>
     </div>

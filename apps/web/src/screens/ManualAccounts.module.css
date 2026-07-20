@@ -1,0 +1,104 @@
+.head {
+  margin-bottom: 20px;
+}
+.title {
+  margin: 0;
+  font-size: 27px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.35;
+  word-break: keep-all;
+}
+.sub {
+  margin: 10px 0 0;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--sub);
+  word-break: keep-all;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+/* 계좌 카드 — 값이 0(계좌 없음)이면 낮은 톤, 입력되면 강조 */
+.card {
+  padding: 16px 16px 12px;
+  border-radius: 18px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  transition: border-color 0.18s, background 0.18s;
+}
+.cardOn {
+  border-color: var(--jade);
+  background: linear-gradient(160deg, var(--card-hi), var(--card));
+}
+.top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.name {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.value {
+  font-size: 19px;
+  font-weight: 800;
+  color: var(--jade);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+.valueNone {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--faint);
+}
+
+/* 슬라이더 아래 눈금 — 좌(계좌 없음) · 설명 · 우(상한) */
+.scale {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 8px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
+}
+.hint {
+  flex: 1;
+  text-align: center;
+  font-weight: 500;
+  color: var(--faint);
+  word-break: keep-all;
+}
+
+.summary {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: var(--bg2);
+  border: 1px solid var(--line);
+}
+.sumK {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--sub);
+}
+.sumV {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--jade);
+  font-variant-numeric: tabular-nums;
+}

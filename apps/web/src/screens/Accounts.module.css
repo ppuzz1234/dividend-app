@@ -145,6 +145,36 @@
 .revealBlock {
   animation: accFadeUp 0.5s ease 0.25s both;
 }
+/* 변경 이력 진입 — 저장된 리비전이 있을 때만 노출 */
+.histBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 100%;
+  margin-top: 14px;
+  padding: 12px 14px;
+  border: 1px dashed var(--line2);
+  border-radius: 13px;
+  background: transparent;
+  color: var(--sub);
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+.histBtn:hover {
+  color: var(--text);
+  border-color: var(--sub);
+}
+.saveErr {
+  margin: 10px 2px 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--danger, #e5484d);
+  word-break: keep-all;
+}
 /* 필요 자산 − 내 총 자산 = 남은 금액 계산 카드 */
 .gapCard {
   display: flex;

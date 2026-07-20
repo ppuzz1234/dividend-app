@@ -13,7 +13,7 @@ const SLIDES = [
   },
   {
     Icon: null, // BrandMark 로 대체
-    title: "PLUS GENIUS가\n똑똑한 해결책을 제안합니다",
+    title: "PLUS CUBE가\n똑똑한 해결책을 제안합니다",
     desc: "절세 계좌 최적화,\n 시기에 맞는 ETF 선택 \n 그리고 은퇴 이후의 똑똑한 배당 전략까지, 당신의 20년을 설계해드려요.",
   },
   {

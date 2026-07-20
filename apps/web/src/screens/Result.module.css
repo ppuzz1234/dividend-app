@@ -289,6 +289,33 @@
   color: var(--jade);
   font-variant-numeric: tabular-nums;
 }
+/* 목표 대비 달성률 — 온보딩에서 정한 필요 자산과 비교 */
+.goalRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--line2);
+  font-size: 12.5px;
+  color: var(--sub);
+  word-break: keep-all;
+}
+.goalRow b {
+  color: var(--text);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.goalOk {
+  color: var(--jade) !important;
+  white-space: nowrap;
+}
+.goalShort {
+  color: var(--gold) !important;
+  white-space: nowrap;
+}
+
 .miniRow {
   display: flex;
   gap: 14px;

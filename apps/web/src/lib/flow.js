@@ -10,6 +10,7 @@ export const STEPS = [
   "intro", // 서비스 콘셉트 3장 안내(진짜 온보딩)
   "login",
   "onboarding", // ① 목표 — 목표 생활비 × 20년 ETF 시나리오
+  "manual", // ①-b 계좌 현황 직접 입력 (마이데이터 대신 슬라이더로 입력)
   "accounts", // ② 계좌 현황(4계좌 여력) + 목표 + 운용 전략
   "simulate", // ③ 일반 수익률 기준 연산
   "result", // ③ 시뮬레이션/분석 결과 (배당세·건보료 비교 포함)
@@ -21,6 +22,7 @@ export const STEPS = [
 /* 각 단계가 스텝퍼의 몇 번째 스테이지에 속하는지 */
 export const STAGE = {
   onboarding: 0,
+  manual: 0, // 목표 단계의 연장 — 계좌 현황 입력
   accounts: 1,
   simulate: 2,
   result: 2,
@@ -31,5 +33,6 @@ export const STAGE = {
 
 export const STAGE_LABELS = ["목표", "전략", "분석", "종목", "매수"];
 
-/* 헤더(스텝퍼)를 숨기는 단계 */
-export const NO_HEADER = ["splash", "login", "intro", "simulate", "done"];
+/* 헤더(스텝퍼)를 숨기는 단계
+ * authWait: 구글 인증 복귀 직후 세션을 기다리는 짧은 대기 화면(STEPS 밖의 임시 상태) */
+export const NO_HEADER = ["splash", "login", "intro", "simulate", "done", "authWait"];

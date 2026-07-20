@@ -1,9 +1,8 @@
 import { useState } from "react";
-import { RefreshCw, ChevronDown, BadgeCheck } from "lucide-react";
-import { projectRetirementScenario, MYDATA_ACCOUNTS } from "@devidend/core";
+import { ArrowRight, ChevronDown } from "lucide-react";
+import { projectRetirementScenario } from "@devidend/core";
 import { Pad } from "../components/layout/Pad.jsx";
 import { Button } from "../components/ui/Button.jsx";
-import { GeniusLoader } from "../components/ui/GeniusLoader.jsx";
 import { GoalTiles } from "../components/GoalTiles.jsx";
 import { RollingNumber } from "../components/ui/RollingNumber.jsx";
 import { fmtKRW } from "../lib/format.js";
@@ -15,8 +14,6 @@ const GOAL_STOPS = [100, 300, 500, 1000, 2000]; // 목표 생활비 슬라이더
 
 const digits = (v) => Number(String(v).replace(/\D/g, "")) || 0;
 
-// 마이데이터로 연동될 총 평가액 — 로딩 후 확인 문구에 표시
-const MYDATA_TOTAL = Object.values(MYDATA_ACCOUNTS).reduce((s, a) => s + (a.balance || 0), 0);
 
 /* 서베이 진입 전 훅 화면 — "20년 뒤 매달 목표 생활비를 받으려면?"
  * 목표 생활비(연 4% 인출 가정)로 필요한 은퇴 시드를 역산해 보여주고,
@@ -25,10 +22,9 @@ const MYDATA_TOTAL = Object.values(MYDATA_ACCOUNTS).reduce((s, a) => s + (a.bala
  * 스토리텔링 순차 노출 — 정보 부담을 줄이기 위해 동화책 넘기듯 단계별 공개.
  * 각 단락 끝의 깜빡이는 ▼ 버튼을 눌러 다음 단계로 진행한다:
  *   stage 0  히어로 문구 페이드인(제목 → 부제 순)
- *   stage 1  (▼ 클릭) 히어로는 사라지고 목표 문장·슬라이더 등장
- *   stage 2  (▼ 클릭 또는 슬라이더 조작) 필요 자산 문구 등장
+ *   stage 2  (▼ 클릭) 히어로가 사라지고 목표 문장·슬라이더 + 필요 자산 문구가 함께 등장
  *   stage 3  (▼ 클릭) 위 내용이 위로 페이드아웃 → 선택 요약 타일 2개 +
- *            화면 중앙의 마이데이터 안내·연동 버튼으로 전환 */
+ *            계좌 현황 입력 안내로 전환 */
 export function Onboarding({ monthlyGoal, setMonthlyGoal, onNext }) {
   const { requiredNestEgg } = projectRetirementScenario({
     monthlyLivingCost: monthlyGoal * 10_000,
@@ -37,17 +33,9 @@ export function Onboarding({ monthlyGoal, setMonthlyGoal, onNext }) {
   const [stage, setStage] = useState(0);
   // 마지막 전환 — 목표·시나리오 단락이 위로 떠오르며 사라지는 동안 true
   const [leaving, setLeaving] = useState(false);
-  // 마이데이터 연동 진행 — idle(버튼) → loading(불러오는 중) → confirm(총 평가액 확인) → onNext
-  const [linkPhase, setLinkPhase] = useState("idle");
 
-  const startLink = () => {
-    setLinkPhase("loading");
-    setTimeout(() => setLinkPhase("confirm"), 2400);
-    setTimeout(onNext, 4000);
-  };
-
-  // ▼ 클릭으로 다음 단락 공개 (뒤로는 되돌리지 않음)
-  const next = () => setStage((s) => Math.min(s + 1, 2));
+  // 히어로 ▼ 클릭 → 목표 문장·슬라이더와 필요 자산 문구를 한 번에 공개
+  const next = () => setStage(2);
   // 금액을 조정해도 시나리오 단락이 열리도록
   const reachFinal = () => setStage((s) => Math.max(s, 2));
   // stage 2 → 3: 페이드아웃 애니메이션이 끝난 뒤 요약 화면으로 교체
@@ -85,7 +73,7 @@ export function Onboarding({ monthlyGoal, setMonthlyGoal, onNext }) {
       )}
 
       {/* 목표·시나리오 단락 — 마지막 전환(leaving) 시 통째로 위로 페이드아웃 */}
-      {(stage === 1 || stage === 2) && (
+      {stage === 2 && (
       <div className={cx(styles.goalStage, leaving && styles.leave)}>
       {/* 목표 문장 — 타일 밖에서 화면의 주인공으로 크게 노출 */}
       <div className={cx(styles.goalRow, styles.reveal)}>
@@ -146,40 +134,29 @@ export function Onboarding({ monthlyGoal, setMonthlyGoal, onNext }) {
 
       {/* 슬라이더 아래 고정 높이 존 — stage 2에서 은퇴 시점 멘트가 나타나도
        * 전체 높이가 변하지 않아 위쪽(목표 문장·슬라이더)이 밀려 올라가지 않는다. */}
+      {/* 필요 자산 문구 + 요약 화면으로 넘어가는 ▼ */}
       <div className={styles.scenarioZone}>
-        {/* 단락 진행 ▼ — 금액을 정한 뒤 누르면(또는 슬라이더 조작 시) 결과 단계로 */}
-        {stage === 1 && (
-          <button type="button" className={styles.stepNext} aria-label="다음 단계" onClick={next}>
-            <ChevronDown size={26} strokeWidth={2.6} />
-          </button>
-        )}
+        <div className={cx(styles.scenarioHead, styles.revealSoft)}>
+          <span>
+            은퇴 시점에는 최소
+            <br />
+            {/* 계산 금액은 항상 단독 행 — 값이 바뀌어도 중간 개행되지 않도록 고정 */}
+            <span className={styles.scenarioNumLine}>
+              <RollingNumber className={styles.scenarioAmount} value={fmtKRW(requiredNestEgg)} />의
+            </span>
+            <br />금융 자산이 필요해요.
+          </span>
+        </div>
 
-        {/* 필요 자산 문구 + 요약 화면으로 넘어가는 ▼ */}
-        {stage === 2 && (
-          <>
-            <div className={cx(styles.scenarioHead, styles.revealSoft)}>
-              <span>
-                은퇴 시점에는 최소
-                <br />
-                {/* 계산 금액은 항상 단독 행 — 값이 바뀌어도 중간 개행되지 않도록 고정 */}
-                <span className={styles.scenarioNumLine}>
-                  <RollingNumber className={styles.scenarioAmount} value={fmtKRW(requiredNestEgg)} />의
-                </span>
-                <br />금융 자산이 필요해요.
-              </span>
-            </div>
-
-            <button type="button" className={styles.stepNext} aria-label="다음 단계" onClick={toSummary}>
-              <ChevronDown size={26} strokeWidth={2.6} />
-            </button>
-          </>
-        )}
+        <button type="button" className={styles.stepNext} aria-label="다음 단계" onClick={toSummary}>
+          <ChevronDown size={26} strokeWidth={2.6} />
+        </button>
       </div>
       </div>
       )}
 
       {/* 최종 단락 — 상단 요약 타일 + 화면 중앙의 마이데이터 안내·연동 버튼.
-       * 버튼 클릭 시 시트 없이 곧바로 다음 프로세스(계좌 화면 GENIUS 로딩)로 진행 —
+       * 버튼 클릭 시 곧바로 다음 프로세스(계좌 현황 입력)로 진행 —
        * 다음 화면도 같은 요약 타일을 상단에 유지해 자연스럽게 이어진다. */}
       {stage === 3 && (
         <div className={styles.finalWrap}>
@@ -188,35 +165,15 @@ export function Onboarding({ monthlyGoal, setMonthlyGoal, onNext }) {
           </div>
 
           <div className={styles.mydataCenter}>
-            {linkPhase === "idle" && (
-              <>
-                <div className={cx(styles.mydataMsg, styles.revealMid)}>
-                  고객님의 금융 정보를 연동해서,
-                  <br />맞춤형 투자 전략을 추천해드릴게요.
-                </div>
-                <div className={styles.revealLate}>
-                  <Button onClick={startLink} icon={RefreshCw}>
-                    마이데이터 연동하기
-                  </Button>
-                </div>
-              </>
-            )}
-
-            {/* 연동 로딩 — 같은 화면 중앙에서 곧바로 진행 */}
-            {linkPhase === "loading" && (
-              <GeniusLoader msgs={["금융 자산을 불러옵니다"]} />
-            )}
-
-            {/* 로딩 완료 — 화면 전환 전에 확인 문구를 잠시 보여준다 */}
-            {linkPhase === "confirm" && (
-              <div className={styles.linkConfirm}>
-                <BadgeCheck size={36} />
-                <span>
-                  총 평가액 <b>{fmtKRW(MYDATA_TOTAL)}</b>을
-                  <br />확인했어요
-                </span>
-              </div>
-            )}
+            <div className={cx(styles.mydataMsg, styles.revealMid)}>
+              지금 가지고 있는 계좌를 알려주시면,
+              <br />맞춤형 투자 전략을 추천해드릴게요.
+            </div>
+            <div className={styles.revealLate}>
+              <Button onClick={onNext} icon={ArrowRight}>
+                내 계좌 입력하기
+              </Button>
+            </div>
           </div>
 
           <p className={cx(styles.disclaimer, styles.revealLate)}>

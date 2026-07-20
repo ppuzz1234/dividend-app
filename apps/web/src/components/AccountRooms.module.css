@@ -362,6 +362,77 @@
   word-break: keep-all;
 }
 
+/* ── 매수 설정 — 상품 · 주기(주/월/연) · 회당 금액 ────────── */
+.buyCard {
+  margin-top: 10px;
+  padding: 13px 14px;
+  border-radius: 13px;
+  background: var(--bg2);
+  border: 1px solid var(--line);
+}
+.buyTop {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+.buyK {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: var(--sub);
+}
+.buyProduct {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* 주기 세그먼트 — 선택 시 jade 로 채움 */
+.cycleRow {
+  display: flex;
+  gap: 5px;
+  margin-top: 10px;
+  padding: 3px;
+  border-radius: 11px;
+  background: var(--card);
+  border: 1px solid var(--line);
+}
+.cycleBtn {
+  flex: 1;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--sub);
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.cycleBtn:hover {
+  color: var(--text);
+}
+.cycleOn {
+  background: var(--jade);
+  color: var(--on-jade);
+}
+.buyAmount {
+  margin-top: 9px;
+  font-size: 12.5px;
+  color: var(--sub);
+}
+.buyAmount b {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--jade);
+  font-variant-numeric: tabular-nums;
+}
+
 /* ── 납입 여력 ────────────────────────────────────────────── */
 .roomBox {
   margin-top: 13px;

@@ -40,3 +40,9 @@
   margin-top: 26px;
   font-weight: 600;
 }
+
+/* 단어 사이 여백 — PLUS · CUBE 구분 */
+.space {
+  width: 10px;
+  flex-shrink: 0;
+}

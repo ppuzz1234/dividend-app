@@ -42,7 +42,7 @@ const MINT = {
   sub: "#34d399", // = --gold
 };
 
-export function Result({ sim, allocation, chosen, years, reinvest, age = 65, onNext }) {
+export function Result({ sim, allocation, chosen, years, reinvest, age = 65, goalNestEgg, monthlyGoal, onNext }) {
   const val = useCountUp(sim.finalValue, 1100);
   const returnPct = (sim.finalValue / sim.contributed - 1) * 100;
   // 은퇴 후 이 배당을 어느 계좌에서 받느냐 — 소득세·건보료 비교 인사이트
@@ -57,10 +57,21 @@ export function Result({ sim, allocation, chosen, years, reinvest, age = 65, onN
       <TaxInsight cmp={cmp} />
 
 
-      {/* 히어로: 최종 평가금액 */}
+      {/* 히어로: 최종 평가금액 + 온보딩에서 정한 목표 대비 달성률 */}
       <div className={styles.hero}>
         <div className={styles.heroLabel}>최종 예상 평가금액</div>
         <div className={styles.heroValue}>{fmtKRW(val)}</div>
+        {goalNestEgg > 0 && (
+          <div className={styles.goalRow}>
+            <span>
+              목표 <b>{fmtKRW(goalNestEgg)}</b>
+              {monthlyGoal ? ` (월 ${monthlyGoal.toLocaleString()}만원 생활비)` : ""}
+            </span>
+            <b className={sim.finalValue >= goalNestEgg ? styles.goalOk : styles.goalShort}>
+              달성률 {Math.round((sim.finalValue / goalNestEgg) * 100)}%
+            </b>
+          </div>
+        )}
         <div className={styles.miniRow}>
           <Mini label="총 납입금" v={fmtKRW(sim.contributed)} />
           <Mini label="투자 수익" v={`+${returnPct.toFixed(0)}%`} tone="gold" />
@@ -222,7 +233,7 @@ function TaxInsight({ cmp }) {
       <div className={styles.diffBar}>
         <PiggyBank size={18} strokeWidth={2.4} />
         <span className={styles.diffText}>
-          <span>GENIUS를 통해서 매년</span>
+          <span>PLUS CUBE를 통해서 매년</span>
           <span>
             <strong>{fmtKRW(diff.netGain)}</strong> 절세할 수 있습니다
           </span>

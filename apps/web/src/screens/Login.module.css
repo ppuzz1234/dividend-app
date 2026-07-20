@@ -78,6 +78,42 @@
 .ssoBtn:active {
   transform: scale(0.99);
 }
+.ssoBtn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+/* 실연동 전(데모 폴백) 표시 — 설정되면 Google 배지는 사라진다 */
+.demoTag {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--faint);
+  background: var(--bg2);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 1px 5px;
+}
+.err {
+  margin: 10px 2px 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--danger, #e5484d);
+  word-break: keep-all;
+}
+/* 자동 이동이 차단됐을 때의 수동 진행 링크 */
+.fallbackLink {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
+  padding: 13px 16px;
+  border-radius: 14px;
+  background: var(--jade);
+  color: var(--on-jade);
+  font-size: 14.5px;
+  font-weight: 800;
+  text-decoration: none;
+}
 .ssoIc {
   width: 22px;
   height: 22px;

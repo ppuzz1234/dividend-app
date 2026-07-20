@@ -12,6 +12,11 @@
     "build": "npm run build --workspace apps/web",
     "preview": "npm run preview --workspace apps/web",
     "lint": "npm run lint --workspace apps/web",
-    "dev:api": "npm run dev --workspace apps/api"
+    "dev:api": "npm run dev --workspace apps/api",
+    "db:setup": "node --env-file-if-exists=.env supabase/setup.mjs"
+  },
+  "devDependencies": {
+    "pg": "^8.13.0",
+    "playwright": "^1.61.1"
   }
 }

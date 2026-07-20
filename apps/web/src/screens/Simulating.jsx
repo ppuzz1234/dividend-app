@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import styles from "./Simulating.module.css";
 import { cx } from "../lib/cx.js";
 
-const LETTERS = ["G", "E", "N", "I", "U", "S"];
+const LETTERS = ["P", "L", "U", "S", " ", "C", "U", "B", "E"];
 const MSGS = ["계좌별 배분 계산 중", "배당 재투자 복리 적용 중", "세금·건강보험 효과 분석 중"];
 
 const STEP = 300; // 글자 간 등장 간격(ms)
@@ -14,7 +14,7 @@ export function Simulating() {
   const [fading, setFading] = useState(false); // 전체 사라지는 중
   const [msg, setMsg] = useState(0);
 
-  // GENIUS 글자별 fade-in → 완성 → 사라짐 → 반복
+  // 브랜드 글자별 fade-in → 완성 → 사라짐 → 반복
   useEffect(() => {
     let cancelled = false;
     const timers = [];
@@ -45,7 +45,7 @@ export function Simulating() {
   return (
     <div className={styles.wrap}>
       <div className={styles.center}>
-        <div className={styles.word} aria-label="GENIUS">
+        <div className={styles.word} aria-label="PLUS CUBE">
           {LETTERS.map((ch, i) => (
             <span key={i} className={cx(styles.letter, i < visible && !fading && styles.on)}>
               {ch}
