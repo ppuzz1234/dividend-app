@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 import {
   AreaChart,
   Area,
@@ -16,14 +16,10 @@ import {
   TrendingUp,
   AlertTriangle,
   Sparkles,
-  ReceiptText,
-  HeartPulse,
   RefreshCw,
-  ChevronRight,
-  X,
-  ShieldCheck,
 } from "lucide-react";
-import { compareDividendTax } from "@devidend/core";
+import { buildAccountRooms, deductionRate } from "@devidend/core";
+import { OrderConfirmSheet } from "./OrderConfirmSheet.jsx";
 import { Pad } from "../components/layout/Pad.jsx";
 import { Heading } from "../components/layout/Heading.jsx";
 import { Button } from "../components/ui/Button.jsx";
@@ -42,22 +38,36 @@ const MINT = {
   sub: "#34d399", // = --gold
 };
 
-export function Result({ sim, allocation, chosen, years, reinvest, age = 65, goalNestEgg, monthlyGoal, onNext }) {
+export function Result({ sim, allocation, chosen, years, reinvest, goalNestEgg, monthlyGoal, manualAccounts, income = 50_000_000, monthlyContribution = 0, productAlloc = {}, onNext }) {
   const val = useCountUp(sim.finalValue, 1100);
   const returnPct = (sim.finalValue / sim.contributed - 1) * 100;
-  // 은퇴 후 이 배당을 어느 계좌에서 받느냐 — 소득세·건보료 비교 인사이트
-  const cmp = useMemo(() => compareDividendTax({ annualDividend: sim.annualIncome, age }), [sim.annualIncome, age]);
+  const [confirmOpen, setConfirmOpen] = useState(false); // 배분·투자 확인 시트
+
+  /* 계좌별 절세·세액공제 — 배분(buildAccountRooms)의 계좌별 월 납입과
+   * 세제 혜택(연금·IRP 세액공제 / ISA 비과세 절세)을 계좌별로 정리하고 합계(절세 총액)를 낸다. */
+  const deductRate = deductionRate(income);
+  const taxSaving = useMemo(() => {
+    const { rooms } = buildAccountRooms({ mydata: true, manual: manualAccounts, income, monthlyContribution });
+    const rows = rooms
+      .filter((r) => (r.planTotalAnnual || 0) > 0)
+      .map((r) => {
+        // 세액공제(연금저축·IRP)는 공제분(planAnnual)에만, ISA는 비과세 절세 상당(estSaving).
+        // 만원 단위로 반올림 — 계좌별 표시값의 합이 절세 총액과 정확히 일치하도록.
+        const raw = r.roomType === "deduct" ? (r.planAnnual || 0) * deductRate : r.id === "isa" ? r.estSaving || 0 : 0;
+        const benefit = Math.round(raw / 10000) * 10000;
+        const label = r.roomType === "deduct" ? "세액공제" : r.id === "isa" ? "비과세 절세" : null;
+        return { id: r.id, name: r.name, monthly: Math.round(r.planMonthly || 0), benefit, label };
+      });
+    const total = rows.reduce((s, r) => s + r.benefit, 0);
+    return { rows, total };
+  }, [manualAccounts, income, monthlyContribution, deductRate]);
 
   return (
-    <Pad footer={<Button onClick={onNext} variant="primary" icon={ArrowRight}>종목 고르러 가기</Button>}>
+    <Pad footer={<Button onClick={() => setConfirmOpen(true)} variant="primary" icon={ArrowRight}>배분 · 투자하기</Button>}>
       <div className={styles.mintScope}>
       <Heading>{years}년 뒤 예상 결과</Heading>
 
-      {/* 핵심 인사이트: 배당 수령 계좌별 세금·건강보험료 비교 */}
-      <TaxInsight cmp={cmp} />
-
-
-      {/* 히어로: 최종 평가금액 + 온보딩에서 정한 목표 대비 달성률 */}
+      {/* 히어로: 최종 평가금액 + 온보딩에서 정한 목표 대비 달성률 (최상단) */}
       <div className={styles.hero}>
         <div className={styles.heroLabel}>최종 예상 평가금액</div>
         <div className={styles.heroValue}>{fmtKRW(val)}</div>
@@ -77,6 +87,9 @@ export function Result({ sim, allocation, chosen, years, reinvest, age = 65, goa
           <Mini label="투자 수익" v={`+${returnPct.toFixed(0)}%`} tone="gold" />
         </div>
       </div>
+
+      {/* 핵심 인사이트: 계좌별 절세·세액공제 (절세 총액 + 계좌별 내역) */}
+      <TaxSaving rows={taxSaving.rows} total={taxSaving.total} deductRate={deductRate} />
 
       {/* 눈덩이 차트 */}
       <div className={styles.chartCard}>
@@ -188,154 +201,67 @@ export function Result({ sim, allocation, chosen, years, reinvest, age = 65, goa
         예시 가정치를 적용한 추정 결과로, 실제 수익률·배당은 시장 상황에 따라 달라지며 손실이 발생할 수 있습니다. 투자 권유가 아닙니다.
       </p>
       </div>
+
+      {/* 배분·투자 확인 시트 — 필수 확인 2건 모두 체크 시 최종 진행(→ 자산 탭) */}
+      {confirmOpen && (
+        <OrderConfirmSheet
+          alloc={productAlloc}
+          onConfirm={() => {
+            setConfirmOpen(false);
+            onNext?.();
+          }}
+          onClose={() => setConfirmOpen(false)}
+        />
+      )}
     </Pad>
   );
 }
 
-/* 배당 수령 계좌별 소득세·건강보험료 비교 인사이트 */
-function TaxInsight({ cmp }) {
-  const { annual, general, pension, diff, mechanisms, assumptions } = cmp;
-  const [infoAcct, setInfoAcct] = useState(null); // 상세보기 팝업(계좌 데이터 | null)
 
-  useEffect(() => {
-    if (!infoAcct) return;
-    const onKey = (e) => e.key === "Escape" && setInfoAcct(null);
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [infoAcct]);
-
+/* 계좌별 절세·세액공제 — 절세 총액(상단) + 계좌별 월 납입 → 연 절세/세액공제(하단) */
+function TaxSaving({ rows, total, deductRate }) {
+  if (!rows.length) return null;
   return (
     <section className={styles.insight}>
       <div className={styles.insHead}>
         <span className={styles.insBadge}>
           <Sparkles size={13} strokeWidth={2.6} /> 핵심 인사이트
         </span>
-        <h2 className={styles.insTitle}>이 배당, 어느 계좌에서 받느냐가 현금흐름을 가릅니다</h2>
-        <p className={styles.insSub}>은퇴 후 수령 기준 · 계좌별 소득세·건강보험료 비교</p>
+        <h2 className={styles.insTitle}>계좌 배분만으로 매년 이만큼 절세돼요</h2>
+        <p className={styles.insSub}>계좌별 납입액 기준 · 연간 절세·세액공제 혜택</p>
       </div>
 
-      {/* 세전 연 배당액 — 크게 (두 계좌 공통) */}
-      <div className={styles.grossBox}>
-        <span className={styles.grossCap}>세전 연 배당액</span>
-        <strong className={styles.grossVal}>{fmtKRW(annual)}</strong>
+      {/* 절세 총액 (상단) — 계좌별 혜택의 합계 */}
+      <div className={styles.saveTotal}>
+        <PiggyBank size={20} strokeWidth={2.4} />
+        <span className={styles.saveTotalCap}>연간 절세 총액</span>
+        <strong className={styles.saveTotalVal}>{fmtKRW(total)}</strong>
       </div>
 
-      <div className={styles.cmpGrid}>
-        <CmpCol data={general} tone="danger" title="기존" onDetail={() => setInfoAcct(general)} />
-        <div className={styles.flowArrow} aria-hidden="true">
-          <ChevronRight size={15} strokeWidth={3} />
-          <ChevronRight size={15} strokeWidth={3} />
-          <ChevronRight size={15} strokeWidth={3} />
-        </div>
-        <CmpCol data={pension} tone="jade" title="향후" onDetail={() => setInfoAcct(pension)} />
-      </div>
-
-      <div className={styles.diffBar}>
-        <PiggyBank size={18} strokeWidth={2.4} />
-        <span className={styles.diffText}>
-          <span>PLUS CUBE를 통해서 매년</span>
-          <span>
-            <strong>{fmtKRW(diff.netGain)}</strong> 절세할 수 있습니다
-          </span>
-        </span>
-      </div>
-
-      <ul className={styles.mech}>
-        {mechanisms.map((m, i) => (
-          <li key={i}>
-            <span className={styles.mechNum}>{i + 1}</span>
-            {m}
-          </li>
+      {/* 계좌별 내역 (하단) — 월 납입 → 연 절세/세액공제 */}
+      <div className={styles.saveList}>
+        {rows.map((r) => (
+          <div key={r.id} className={styles.saveRow}>
+            <div className={styles.saveAcct}>
+              <span className={styles.saveName}>{r.name}</span>
+              <span className={styles.saveMonthly}>월 {fmtKRW(r.monthly)} 납입</span>
+            </div>
+            {r.benefit > 0 ? (
+              <div className={styles.saveBenefit}>
+                <b className={styles.saveAmt}>+{fmtKRW(r.benefit)}</b>
+                <span className={styles.saveLabel}>연 {r.label}</span>
+              </div>
+            ) : (
+              <span className={styles.saveNone}>절세 혜택 없음</span>
+            )}
+          </div>
         ))}
-      </ul>
-
-      <p className={styles.insNote}>※ {assumptions.join(" · ")}. 단순화 추정치이며 세무 자문이 아닙니다.</p>
-
-      {infoAcct && <TaxDetailPopup data={infoAcct} annual={annual} onClose={() => setInfoAcct(null)} />}
-    </section>
-  );
-}
-
-/* 계좌 타일 — 세후 연 수령액(크게) + 실효 요율 + 상세보기 진입 */
-function CmpCol({ data, tone, title, onDetail }) {
-  const isGood = tone === "jade";
-  return (
-    <div className={cx(styles.cmpCol, isGood ? styles.cmpGood : styles.cmpBad)}>
-      <div className={styles.cmpLabel}>{title}</div>
-      <div className={styles.cmpCaption}>{data.caption}</div>
-
-      <div className={styles.cmpNetCap}>세후 연 수령액</div>
-      <strong className={styles.cmpNetVal}>{fmtKRW(data.net)}</strong>
-      <div className={styles.cmpRate}>실효 부담 {(data.effectiveRate * 100).toFixed(1)}%</div>
-
-      <button type="button" className={styles.detailBtn} onClick={onDetail}>
-        상세보기 <ChevronRight size={13} strokeWidth={2.6} />
-      </button>
-    </div>
-  );
-}
-
-/* 상세보기 팝업 — 소득세·건강보험료·절세 세법 상세 */
-function TaxDetailPopup({ data, annual, onClose }) {
-  return (
-    <div className={styles.overlay} onClick={onClose}>
-      <div
-        className={styles.popup}
-        role="dialog"
-        aria-modal="true"
-        aria-label={`${data.label} 과세 상세`}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <button type="button" className={styles.popupClose} aria-label="닫기" onClick={onClose}>
-          <X size={16} />
-        </button>
-
-        <div className={styles.popTitle}>{data.label}</div>
-        <div className={styles.popCaption}>{data.caption}</div>
-
-        <div className={styles.popGross}>
-          <span>세전 연 배당액</span>
-          <b>{fmtKRW(annual)}</b>
-        </div>
-
-        <div className={styles.popSection}>
-          <div className={styles.popSecHead}>
-            <span className={styles.popSecTitle}>
-              <ReceiptText size={14} /> 소득세
-            </span>
-            <span className={styles.popSecAmt}>{data.incomeTax > 0 ? fmtKRW(data.incomeTax) : "0원"}</span>
-          </div>
-          <div className={styles.popSecTag}>{data.incomeTaxNote}</div>
-          <p className={styles.popDesc}>{data.taxLaw}</p>
-        </div>
-
-        <div className={styles.popSection}>
-          <div className={styles.popSecHead}>
-            <span className={styles.popSecTitle}>
-              <HeartPulse size={14} /> 건강보험료
-            </span>
-            <span className={styles.popSecAmt}>{data.health > 0 ? fmtKRW(data.health) : "0원"}</span>
-          </div>
-          <div className={styles.popSecTag}>{data.healthNote}</div>
-          <p className={styles.popDesc}>{data.healthLaw}</p>
-        </div>
-
-        <div className={styles.popNet}>
-          <div className={styles.popNetRow}>
-            <span>세후 연 수령액</span>
-            <strong>{fmtKRW(data.net)}</strong>
-          </div>
-          <div className={styles.popNetRate}>실효 부담 {(data.effectiveRate * 100).toFixed(1)}%</div>
-        </div>
-
-        <div className={styles.popSection}>
-          <div className={styles.popSecTitle}>
-            <ShieldCheck size={14} /> 절세 포인트
-          </div>
-          <p className={styles.popDesc}>{data.savingPoint}</p>
-        </div>
       </div>
-    </div>
+
+      <p className={styles.insNote}>
+        ※ 세액공제율 {(deductRate * 100).toFixed(1)}%(총급여 기준) 적용 · ISA는 순이익 200만 비과세 상당. 단순화 추정치이며 세무 자문이 아닙니다.
+      </p>
+    </section>
   );
 }
 

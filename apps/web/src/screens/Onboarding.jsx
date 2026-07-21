@@ -22,10 +22,11 @@ const digits = (v) => Number(String(v).replace(/\D/g, "")) || 0;
  * 스토리텔링 순차 노출 — 정보 부담을 줄이기 위해 동화책 넘기듯 단계별 공개.
  * 각 단락 끝의 깜빡이는 ▼ 버튼을 눌러 다음 단계로 진행한다:
  *   stage 0  히어로 문구 페이드인(제목 → 부제 순)
- *   stage 2  (▼ 클릭) 히어로가 사라지고 목표 문장·슬라이더 + 필요 자산 문구가 함께 등장
+ *   stage 2  (▼ 클릭) 히어로가 사라지고 목표 문장·슬라이더 노출 →
+ *            슬라이더를 조작하면(moved) 하단 "필요 자산" 문구와 ▼ 가 이어서 등장
  *   stage 3  (▼ 클릭) 위 내용이 위로 페이드아웃 → 선택 요약 타일 2개 +
  *            계좌 현황 입력 안내로 전환 */
-export function Onboarding({ monthlyGoal, setMonthlyGoal, onNext }) {
+export function Onboarding({ userName, monthlyGoal, setMonthlyGoal, onNext }) {
   const { requiredNestEgg } = projectRetirementScenario({
     monthlyLivingCost: monthlyGoal * 10_000,
     years: YEARS,
@@ -33,11 +34,16 @@ export function Onboarding({ monthlyGoal, setMonthlyGoal, onNext }) {
   const [stage, setStage] = useState(0);
   // 마지막 전환 — 목표·시나리오 단락이 위로 떠오르며 사라지는 동안 true
   const [leaving, setLeaving] = useState(false);
+  // 슬라이더(또는 금액)를 처음 조작했는지 — 조작 전에는 하단 시나리오 문구·▼를 숨긴다
+  const [moved, setMoved] = useState(false);
 
-  // 히어로 ▼ 클릭 → 목표 문장·슬라이더와 필요 자산 문구를 한 번에 공개
+  // 히어로 ▼ 클릭 → 목표 문장·슬라이더까지만 노출 (하단 시나리오는 슬라이더 조작 시)
   const next = () => setStage(2);
-  // 금액을 조정해도 시나리오 단락이 열리도록
-  const reachFinal = () => setStage((s) => Math.max(s, 2));
+  // 금액을 조정하면 시나리오 단락이 열리도록
+  const reachFinal = () => {
+    setStage((s) => Math.max(s, 2));
+    setMoved(true);
+  };
   // stage 2 → 3: 페이드아웃 애니메이션이 끝난 뒤 요약 화면으로 교체
   const toSummary = () => {
     setLeaving(true);
@@ -53,6 +59,7 @@ export function Onboarding({ monthlyGoal, setMonthlyGoal, onNext }) {
       {stage === 0 && (
         <div className={styles.heroStage}>
           <div className={styles.hero}>
+            {userName && <p className={styles.heroGreeting}>{userName}님.</p>}
             <h1 className={styles.heroTitle}>
               ETF투자를 통해,
               <br />
@@ -135,22 +142,27 @@ export function Onboarding({ monthlyGoal, setMonthlyGoal, onNext }) {
       {/* 슬라이더 아래 고정 높이 존 — stage 2에서 은퇴 시점 멘트가 나타나도
        * 전체 높이가 변하지 않아 위쪽(목표 문장·슬라이더)이 밀려 올라가지 않는다. */}
       {/* 필요 자산 문구 + 요약 화면으로 넘어가는 ▼ */}
+      {/* 슬라이더 조작 전에는 숨김 — 고정 높이 존은 유지해 위쪽 레이아웃이 밀리지 않는다 */}
       <div className={styles.scenarioZone}>
-        <div className={cx(styles.scenarioHead, styles.revealSoft)}>
-          <span>
-            은퇴 시점에는 최소
-            <br />
-            {/* 계산 금액은 항상 단독 행 — 값이 바뀌어도 중간 개행되지 않도록 고정 */}
-            <span className={styles.scenarioNumLine}>
-              <RollingNumber className={styles.scenarioAmount} value={fmtKRW(requiredNestEgg)} />의
-            </span>
-            <br />금융 자산이 필요해요.
-          </span>
-        </div>
+        {moved && (
+          <>
+            <div className={cx(styles.scenarioHead, styles.revealSoft)}>
+              <span>
+                은퇴 시점에는 최소
+                <br />
+                {/* 계산 금액은 항상 단독 행 — 값이 바뀌어도 중간 개행되지 않도록 고정 */}
+                <span className={styles.scenarioNumLine}>
+                  <RollingNumber className={styles.scenarioAmount} value={fmtKRW(requiredNestEgg)} />의
+                </span>
+                <br />금융 자산이 필요해요.
+              </span>
+            </div>
 
-        <button type="button" className={styles.stepNext} aria-label="다음 단계" onClick={toSummary}>
-          <ChevronDown size={26} strokeWidth={2.6} />
-        </button>
+            <button type="button" className={styles.stepNext} aria-label="다음 단계" onClick={toSummary}>
+              <ChevronDown size={26} strokeWidth={2.6} />
+            </button>
+          </>
+        )}
       </div>
       </div>
       )}

@@ -150,7 +150,7 @@ export function Accounts({ mydata, manualAccounts, answers, monthly, monthlyGoal
           /* 1단계(멘트+▼)에서는 하단 버튼도 숨긴다 — ▼로 상세를 연 뒤에만 노출 */
           phase === "done" && !expanded ? null : (
             <Button onClick={saveAndNext} icon={ArrowRight} disabled={store?.busy}>
-              {store?.busy ? "저장 중…" : "이 전략으로 시뮬레이션"}
+              {store?.busy ? "저장 중…" : "계좌 별 투자 상품 설정"}
             </Button>
           )
         }

@@ -75,6 +75,95 @@
   letter-spacing: -0.03em;
 }
 
+/* ── 계좌별 절세·세액공제 ── */
+/* 절세 총액 — 상단 히어로 박스 */
+.saveTotal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 14px;
+  padding: 18px 14px;
+  border-radius: 16px;
+  background: linear-gradient(160deg, var(--gold-dim), var(--card));
+  border: 1px solid var(--gold-deep);
+}
+.saveTotal svg {
+  color: var(--gold);
+}
+.saveTotalCap {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--sub);
+}
+.saveTotalVal {
+  font-size: 34px;
+  font-weight: 800;
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--gold) 35%, transparent));
+}
+/* 계좌별 내역 — 월 납입 → 연 절세/세액공제 */
+.saveList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.saveRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--bg2);
+  border: 1px solid var(--line);
+}
+.saveAcct {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.saveName {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+.saveMonthly {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--sub);
+  font-variant-numeric: tabular-nums;
+}
+.saveBenefit {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex-shrink: 0;
+}
+.saveAmt {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+.saveLabel {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--sub);
+}
+.saveNone {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--faint);
+  flex-shrink: 0;
+}
+
 .cmpGrid {
   display: grid;
   grid-template-columns: 1fr auto 1fr;

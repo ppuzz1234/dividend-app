@@ -44,7 +44,7 @@
   border-radius: 0;
 }
 .title {
-  font-size: 21px;
+  font-size: 32px;
   font-weight: 800;
   line-height: 1.4;
   letter-spacing: -0.02em;
@@ -52,11 +52,11 @@
   margin: 0 0 14px;
 }
 .desc {
-  font-size: 14.5px;
+  font-size: 22px;
   line-height: 1.65;
   color: var(--sub);
   word-break: keep-all;
-  max-width: 300px;
+  max-width: 360px;
 }
 
 .dots {

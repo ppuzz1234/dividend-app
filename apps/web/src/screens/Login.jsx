@@ -70,7 +70,7 @@ export function Login({ onNext }) {
 
         {err && <p className={styles.err}>{err}</p>}
         {fallbackUrl && (
-          <a className={styles.fallbackLink} href={fallbackUrl}>
+          <a className={styles.fallbackLink} href={fallbackUrl} target="_top">
             구글 로그인 페이지로 이동하기
           </a>
         )}

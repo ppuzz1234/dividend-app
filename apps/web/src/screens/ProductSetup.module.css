@@ -1,0 +1,364 @@
+/* 전환 시 탭 영역이 최상단으로 끌어올라오는 등장.
+   ※ fill(both) 을 쓰지 않는다 — 끝난 뒤 transform 이 남으면 자식 .frozen 의
+   position:sticky 가 이 요소 기준으로 잡혀 상단 고정이 깨지기 때문. */
+.riseWrap {
+  animation: psRise 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+@keyframes psRise {
+  from {
+    opacity: 0;
+    transform: translateY(48px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .riseWrap {
+    animation: none;
+  }
+}
+
+/* ── 계좌 탭바 (AccountRooms 와 동일 룩) ─────────────────────────────── */
+.tabs {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  padding: 0;
+}
+.tab {
+  flex: 1;
+  min-width: 0;
+  height: 48px;
+  padding: 0 2px;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: 13px 13px 0 0;
+  background: transparent;
+  color: var(--sub);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  position: relative;
+  transition: color 0.15s, background 0.15s;
+}
+.tab:hover {
+  color: var(--text);
+}
+.tabAmt {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
+}
+.tabOn {
+  background: var(--card);
+  border-color: var(--line);
+  color: var(--text);
+  margin-bottom: -1px;
+  padding-bottom: 1px;
+  z-index: 1;
+}
+.tabOn .tabAmt {
+  color: var(--jade);
+}
+.tabOn::before,
+.tabOn::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  width: 12px;
+  height: 12px;
+  pointer-events: none;
+}
+.tabOn::before {
+  left: -12px;
+  border-bottom-right-radius: 12px;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  box-shadow: 6px 6px 0 6px var(--card);
+}
+.tabOn::after {
+  right: -12px;
+  border-bottom-left-radius: 12px;
+  border-left: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  box-shadow: -6px 6px 0 6px var(--card);
+}
+.tab:first-child.tabOn::before {
+  display: none;
+}
+.tab:last-child.tabOn::after {
+  display: none;
+}
+
+/* ── 상단 틀고정 — 탭 + 계좌 헤더까지 화면에 고정, 아래 리스트만 스크롤 ── */
+.frozen {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  /* 아래로 스크롤되는 리스트가 탭 사이 투명한 틈으로 비치지 않도록 페이지 배경으로 덮는다 */
+  background: var(--bg);
+  padding-bottom: 12px;
+  /* 스크롤 중 리스트가 밑으로 지나갈 때 sticky 영역이 매 프레임 repaint 되며 덜그덕거리는 것을
+     막기 위해 별도 컴포지팅 레이어로 승격(will-change) — 실제 transform 은 주지 않아 sticky 유지 */
+  will-change: transform;
+}
+/* 계좌 헤더 카드 (예산·헤드라인·주석·남은 배분).
+   상단은 탭과 같은 13px 라운드로 마감, 끝 탭이 선택된 쪽만 각지게(headFirst/Last) 탭과 직선으로 잇는다 */
+.headCard {
+  border: 1px solid var(--line);
+  border-radius: 13px 13px 16px 16px;
+  background: var(--card);
+  padding: 15px 15px 15px;
+  animation: psFade 0.3s ease both;
+}
+.headFirst {
+  border-top-left-radius: 0;
+}
+.headLast {
+  border-top-right-radius: 0;
+}
+/* 스크롤 영역 — 매수 주기 + 상품 리스트 */
+.scrollArea {
+  animation: psFade 0.3s ease both;
+}
+@keyframes psFade {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.head {
+  margin-bottom: 14px;
+}
+.headTop {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+.acctName {
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.budget {
+  font-size: 13px;
+  color: var(--sub);
+}
+.budget b {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--jade);
+  font-variant-numeric: tabular-nums;
+}
+.headline {
+  margin: 8px 0 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+.note {
+  display: flex;
+  gap: 5px;
+  margin: 8px 0 0;
+  font-size: 11.5px;
+  line-height: 1.55;
+  color: var(--sub);
+  word-break: keep-all;
+}
+.note svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--jade);
+}
+.empty {
+  font-size: 13px;
+  color: var(--sub);
+  text-align: center;
+  padding: 22px 8px;
+  word-break: keep-all;
+}
+
+/* 남은 배분 + 게이지 */
+.remainRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.remainK {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--sub);
+}
+.remainV {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--jade);
+  font-variant-numeric: tabular-nums;
+}
+.remainDone {
+  color: var(--faint);
+}
+.gauge {
+  height: 6px;
+  border-radius: 4px;
+  background: var(--bg2);
+  overflow: hidden;
+}
+.gaugeFill {
+  height: 100%;
+  border-radius: 4px;
+  background: var(--jade);
+  transition: width 0.25s ease;
+}
+
+/* 매수 주기 */
+.cycleRow {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+.cycleBtn {
+  flex: 1;
+  height: 34px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--bg2);
+  color: var(--sub);
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.cycleBtn:hover {
+  color: var(--text);
+}
+.cycleOn {
+  border-color: var(--jade);
+  background: var(--card-hi, var(--card));
+  color: var(--jade);
+}
+
+/* 상품 리스트 */
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.card {
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: var(--bg2);
+  overflow: hidden;
+  transition: border-color 0.16s, background 0.16s;
+}
+.cardOn {
+  border-color: var(--line2);
+  background: linear-gradient(160deg, var(--card-hi, var(--card)), var(--card));
+}
+.cardHead {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 13px 13px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+.pinfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.pname {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+.pyield {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--jade);
+}
+.pdesc {
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--sub);
+  word-break: keep-all;
+}
+/* 선택 체크박스 */
+.check {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
+  border: 2px solid var(--line2);
+  background: var(--bg2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--on-jade, #0a0f0d);
+}
+.checkOn {
+  border-color: var(--jade);
+  background: var(--jade);
+}
+
+/* 금액 슬라이더 */
+.sliderRow {
+  padding: 4px 13px 14px;
+  animation: psFade 0.22s ease both;
+}
+.sliderTop {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.sliderCap {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--sub);
+}
+.sliderVal {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--jade);
+  font-variant-numeric: tabular-nums;
+}
+.sliderScale {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
+}

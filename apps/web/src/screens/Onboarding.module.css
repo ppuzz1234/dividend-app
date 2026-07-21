@@ -13,6 +13,15 @@
   margin-bottom: 22px;
   text-align: center;
 }
+.heroGreeting {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--jade);
+  letter-spacing: -0.02em;
+  margin: 0 0 10px;
+  word-break: keep-all;
+  animation: obFadeUp 0.8s ease both;
+}
 .heroTitle {
   font-size: 34px;
   font-weight: 800;

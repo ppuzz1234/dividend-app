@@ -1,0 +1,217 @@
+/* 메인 앱 — 콘텐츠(스크롤) + 하단 고정 탭바 */
+.wrap {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.body {
+  flex: 1;
+  padding: 18px 20px 8px;
+}
+
+/* ── 하단 탭바 (뉴스 · 분석 · 자산) ── */
+.tabBar {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  background: var(--bg);
+  border-top: 1px solid var(--line);
+  padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
+  box-shadow: 0 -8px 16px -12px rgba(0, 0, 0, 0.5);
+}
+.tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 0;
+  border: none;
+  background: transparent;
+  color: var(--faint);
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.tab:hover {
+  color: var(--sub);
+}
+.tabOn {
+  color: var(--jade);
+}
+
+/* ── 자산 탭 ── */
+.assets {
+  display: flex;
+  flex-direction: column;
+}
+.started {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 11px;
+  margin-bottom: 16px;
+  border-radius: 12px;
+  background: var(--jade-dim, #0b2b26);
+  border: 1px solid color-mix(in srgb, var(--jade) 40%, var(--line));
+  color: var(--jade);
+  font-size: 13.5px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.totalCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 22px 16px;
+  margin-bottom: 20px;
+  border-radius: 18px;
+  background: linear-gradient(160deg, var(--card-hi, var(--card)), var(--card));
+  border: 1px solid var(--line);
+}
+.totalCap {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--sub);
+}
+.totalVal {
+  font-size: 34px;
+  font-weight: 800;
+  color: var(--jade);
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+.secTitle {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 10px;
+}
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.acct {
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: var(--bg2);
+  overflow: hidden;
+}
+.acctHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 11px 14px;
+  background: linear-gradient(160deg, var(--card-hi, var(--card)), var(--card));
+  border-bottom: 1px solid var(--line);
+}
+.acctName {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.acctSum {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--jade);
+  font-variant-numeric: tabular-nums;
+}
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+}
+.item + .item {
+  border-top: 1px solid var(--line);
+}
+.itemName {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  word-break: keep-all;
+}
+.itemAmt {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--sub);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+.empty {
+  font-size: 13px;
+  color: var(--sub);
+  text-align: center;
+  padding: 22px 8px;
+}
+.restart {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 20px auto 4px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--sub);
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.restart:hover {
+  color: var(--text);
+  border-color: var(--line2);
+}
+
+/* ── 뉴스·분석 placeholder ── */
+.placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 64px 24px;
+}
+.phIcon {
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+  border-radius: 20px;
+  background: var(--bg2);
+  border: 1px solid var(--line);
+  color: var(--sub);
+  margin-bottom: 16px;
+}
+.phTitle {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+}
+.phDesc {
+  font-size: 13px;
+  color: var(--sub);
+  line-height: 1.6;
+  word-break: keep-all;
+  max-width: 260px;
+  margin: 0 0 14px;
+}
+.phSoon {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--jade);
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--jade-dim, #0b2b26);
+  border: 1px solid color-mix(in srgb, var(--jade) 35%, var(--line));
+}

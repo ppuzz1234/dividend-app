@@ -45,7 +45,15 @@ export async function loginWithGoogle() {
   if (error) throw new Error(error.message || "구글 로그인에 실패했습니다.");
   if (!data?.url) throw new Error("인증 주소를 받지 못했습니다. 잠시 후 다시 시도해 주세요.");
 
-  window.location.assign(data.url);
+  // iframe(예: /device 폰 시뮬레이터) 안에서는 구글이 로그인 페이지의 프레임 내 실행을
+  // 막아 계정 선택 전에 403 이 난다. 최상위 창을 직접 이동시켜(같은 오리진이라 접근 가능)
+  // 프레임 밖에서 인증을 진행한다. top 접근이 막힌 경우엔 현재 창으로 폴백한다.
+  const framed = window.self !== window.top;
+  try {
+    (framed && window.top ? window.top : window).location.assign(data.url);
+  } catch {
+    window.location.assign(data.url);
+  }
   // 이동이 시작되므로 이 Promise 는 완료되지 않는다. 다만 이동이 차단된 경우를 대비해
   // 3초 뒤에도 페이지가 그대로면 수동 이동용 링크를 띄우도록 에러를 던진다.
   return new Promise((_, reject) => {

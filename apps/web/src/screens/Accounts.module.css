@@ -297,7 +297,7 @@
   display: flex;
   align-items: flex-start;
   gap: 8px;
-  font-size: 23px;
+  font-size: 27px;
   font-weight: 700;
   letter-spacing: -0.02em;
   color: var(--text);
@@ -307,7 +307,7 @@
 }
 .scenarioHead svg {
   flex-shrink: 0;
-  margin-top: 7px;
+  margin-top: 9px;
 }
 .scenarioAmount {
   font-weight: 800;

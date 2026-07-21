@@ -10,6 +10,7 @@ export { ACCOUNTS, PENSION_WITHDRAWAL, COMP_TAX, deductionRate } from "./knowled
 export { ACCOUNT_PROFILES, CONTRIBUTION_PRIORITY, ENGINE_ACCOUNT_MAP, profilesForEngineId, PROFILE_VERSION } from "./knowledge/accountProfiles.js";
 export { PRODUCT_ELIGIBILITY, ELIGIBILITY_ACCOUNTS, eligibleAccountsFor, productsForAccount, ELIGIBILITY_VERSION } from "./knowledge/productEligibility.js";
 export { STOCKS, CATEGORIES } from "./knowledge/stocks.js";
+export { ACCOUNT_PRODUCTS, recommendedProducts, accountStrategy, findProduct, ACCOUNT_PRODUCTS_VERSION } from "./knowledge/accountProducts.js";
 export { ETF_BENCHMARKS } from "./knowledge/etfBenchmarks.js";
 
 /* ① 고객 정보·성향 (profile) */

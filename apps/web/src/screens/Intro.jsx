@@ -8,7 +8,7 @@ import styles from "./Intro.module.css";
 const SLIDES = [
   {
     Icon: ShieldCheck,
-    title: "우리는 100세 시대의 절반을,\n근로 소득 없이 살아야 할 운명",
+    title: "당신은 은퇴 이후를 위해\n얼마나 대비하고 있나요?",
     desc: "근로소득이 사라진 뒤에도 생활비를 지탱할 안정적인 현금흐름이 반드시 있어야 해요.",
   },
   {

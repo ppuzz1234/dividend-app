@@ -1,5 +1,84 @@
+/* ── 바텀시트(포털) — 딤 + 슬라이드업. 화면 전환 대신 현재 화면 위로 떠오른다 ── */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: rgba(0, 0, 0, 0.58);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: maFade 0.2s ease;
+}
+.sheet {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 480px;
+  max-height: 92vh;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-bottom: none;
+  border-radius: 22px 22px 0 0;
+  box-shadow: 0 -18px 50px rgba(0, 0, 0, 0.5);
+  animation: maUp 0.28s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+@keyframes maFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes maUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .overlay,
+  .sheet {
+    animation: none;
+  }
+}
+/* 상단 드래그 핸들(그래버) */
+.grabber {
+  flex-shrink: 0;
+  width: 40px;
+  height: 4px;
+  margin: 10px auto 2px;
+  border-radius: 999px;
+  background: var(--line2);
+}
+/* 스크롤 영역 — 헤더/푸터는 고정, 계좌 목록만 스크롤 */
+.scrollBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 20px;
+}
+/* 하단 고정 CTA */
+.footer {
+  flex-shrink: 0;
+  padding: 12px 20px calc(16px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--line);
+  background: var(--card);
+}
+.close {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: var(--bg2);
+  color: var(--sub);
+  cursor: pointer;
+}
+
 .head {
-  margin-bottom: 20px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 2px 20px 14px;
 }
 .title {
   margin: 0;
@@ -30,13 +109,16 @@
   border: 1px solid var(--line);
   transition: border-color 0.18s, background 0.18s;
 }
+/* 값 입력된(보유) 카드 — 노란 테두리 없이 배경 그러데이션으로만 구분한다 */
 .cardOn {
-  border-color: var(--jade);
+  border-color: var(--line2);
   background: linear-gradient(160deg, var(--card-hi), var(--card));
 }
 .top {
   display: flex;
-  align-items: baseline;
+  /* center 정렬 — 값 폰트가 14px↔19px 로 바뀌어도 베이스라인이 흔들려 이름이 따라
+     움직이지 않도록(baseline 대신 세로 중앙 고정). value 의 line-height(24px)가 행 높이를 고정 */
+  align-items: center;
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 12px;
@@ -46,8 +128,11 @@
   font-weight: 800;
   letter-spacing: -0.02em;
 }
+/* 값 폰트가 14px(계좌 없음) ↔ 19px(금액)로 바뀌어도 행 높이가 변하지 않도록
+   두 상태의 line-height 를 큰 쪽(19px) 기준으로 동일하게 고정한다 → 타일 높이 불변 */
 .value {
   font-size: 19px;
+  line-height: 24px;
   font-weight: 800;
   color: var(--jade);
   font-variant-numeric: tabular-nums;
@@ -56,6 +141,7 @@
 }
 .valueNone {
   font-size: 14px;
+  line-height: 24px;
   font-weight: 700;
   color: var(--faint);
 }

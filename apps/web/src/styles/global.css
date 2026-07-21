@@ -111,6 +111,13 @@ input.rng::-moz-range-thumb {
 input.rng.gold::-moz-range-thumb {
   border-color: var(--gold);
 }
+/* 슬라이더 포커스 — 전역 *:focus-visible 의 노란 outline(offset 때문에 위·아래로 링이 그려져
+   타일이 커 보임)을 슬라이더에서는 완전히 제거한다. 별도의 포커스 링도 두지 않는다.
+   (마우스 클릭 :focus, 키보드 :focus-visible 모두 차단) */
+input.rng:focus,
+input.rng:focus-visible {
+  outline: none;
+}
 
 *:focus-visible {
   outline: 2px solid var(--jade);

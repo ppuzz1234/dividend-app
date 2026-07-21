@@ -7,8 +7,6 @@ import {
   STOCKS,
   simulatePortfolio,
   allocate,
-  buildStrategy,
-  buildOrderPlan,
   projectRetirementScenario,
   ETF_BENCHMARKS,
   MYDATA_ACCOUNTS,
@@ -22,11 +20,10 @@ import { Intro } from "./screens/Intro.jsx";
 import { Onboarding } from "./screens/Onboarding.jsx";
 import { ManualAccounts } from "./screens/ManualAccounts.jsx";
 import { Accounts } from "./screens/Accounts.jsx";
-import { Picker } from "./screens/Picker.jsx";
+import { ProductSetup } from "./screens/ProductSetup.jsx";
 import { Simulating } from "./screens/Simulating.jsx";
 import { Result } from "./screens/Result.jsx";
-import { Order } from "./screens/Order.jsx";
-import { Done } from "./screens/Done.jsx";
+import { MainApp } from "./screens/MainApp.jsx";
 
 /* ------------------------------------------------------------------ *
  *  PLUS CUBE — 상장 배당주 투자·절세 시뮬레이터
@@ -42,8 +39,6 @@ export default function App() {
   const deviceInset = params.has("device");
   // 구글 인증에서 막 돌아온 경우엔 스플래시·인트로를 건너뛰고 대기 화면에서 세션을 기다린다
   const [step, setStep] = useState(isReturningFromOAuth() ? "authWait" : "splash");
-  const [region, setRegion] = useState("ALL");
-  const [query, setQuery] = useState("");
   const [selected, setSelected] = useState([]);
   const [seed] = useState(10000000); // 미연동 시 기본 시드
   const [years] = useState(20);
@@ -60,6 +55,10 @@ export default function App() {
   const [user, setUser] = useState(null); // 로그인 프로필 (Supabase 세션 or 데모)
   // 수기 입력 계좌 현황 — { isa, pensionSavings, irp, general } (원 단위, 0=계좌 없음)
   const [manualAccounts, setManualAccounts] = useState(null);
+  // 계좌 현황 입력 — 화면 전환이 아니라 온보딩 위로 뜨는 바텀시트
+  const [manualOpen, setManualOpen] = useState(false);
+  // 계좌 별 투자 상품 설정 결과 — { [accountId]: { [productCode]: 월배분액(원) } }
+  const [productAlloc, setProductAlloc] = useState({});
   /* 계좌·플랜 저장소 — Supabase 미설정이거나 로그인 전이면 no-op.
    * (로그인 전 조회는 RLS·권한에 막혀 401 만 발생시키므로 아예 호출하지 않는다) */
   const store = usePlanStore({ enabled: !!user?.userId });
@@ -136,24 +135,18 @@ export default function App() {
   const benchmark = ETF_BENCHMARKS[0]; // PLUS 미국S&P500 — 전 화면 공통 수익률 가정(연 10%)
   const effectiveSeed = currentAssets;
 
-  // 시뮬레이션 단계 → 자동 진행
+  // 로딩(simulate) 단계 → 자동으로 자산 탭(portfolio)으로 진행 ("최종 진행하기" 직후 대기 화면)
   useEffect(() => {
     if (step === "simulate") {
-      const t = setTimeout(() => go("result"), 2600);
+      const t = setTimeout(() => go("portfolio"), 2600);
       return () => clearTimeout(t);
     }
   }, [step]);
-
-  const toggle = (id) =>
-    setSelected((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
 
   const chosen = useMemo(
     () => (selected.length ? STOCKS.filter((s) => selected.includes(s.id)) : STOCKS.filter((s) => s.elite)),
     [selected]
   );
-  // ③ 계좌 운용 전략 (현황 여력 × 목표 → 상세 방안 + 종목 유형)
-  const strategy = useMemo(() => buildStrategy({ goal, income, mydata }), [goal, income, mydata]);
-  const chosenCats = strategy.chosenCats;
   // ⑤ 배분 설계 엔진 → 계좌별 배분안
   const allocation = useMemo(
     () => allocate({ seed: effectiveSeed, monthly: requiredMonthly, age, income, goal }),
@@ -173,8 +166,6 @@ export default function App() {
       }),
     [allocation, years, chosen, reinvest, benchmark]
   );
-  // ⑥ 배분안 × 선택 종목 → 주문 계획
-  const orderPlan = useMemo(() => buildOrderPlan({ plan: allocation.plan, stocks: chosen }), [allocation, chosen]);
 
   const stage = NO_HEADER.includes(step) ? null : STAGE[step] ?? 0;
 
@@ -195,22 +186,25 @@ export default function App() {
           }}
         />
       )}
-      {/* 목표 설정 후 → 계좌 현황 직접 입력 화면으로 */}
+      {/* 목표 설정 후 → 계좌 현황 입력 바텀시트를 띄운다(화면 전환 대신 시트) */}
       {step === "onboarding" && (
-        <Onboarding monthlyGoal={monthlyGoal} setMonthlyGoal={setMonthlyGoal} onNext={() => go("manual")} />
-      )}
-      {/* 수기 입력 — 마이데이터 대신 4계좌 슬라이더로 현황을 받아 전략 화면으로 넘긴다 */}
-      {step === "manual" && (
-        <ManualAccounts
-          onNext={(values) => {
-            setManualAccounts(values);
-            saveManualAccounts(values); // DB(user_accounts, source='manual') 반영
-            go("accounts");
-          }}
-        />
+        <Onboarding userName={user?.name} monthlyGoal={monthlyGoal} setMonthlyGoal={setMonthlyGoal} onNext={() => setManualOpen(true)} />
       )}
       {step === "accounts" && (
-        <Accounts {...{ mydata, manualAccounts, answers, monthly, monthlyGoal, finIncome, income, age, store, onLinked: linkMydata, onNext: () => go("simulate") }} />
+        <Accounts {...{ mydata, manualAccounts, answers, monthly, monthlyGoal, finIncome, income, age, store, onLinked: linkMydata, onNext: () => go("productSetup") }} />
+      )}
+      {/* 계좌 별 투자 상품 설정 — 계좌별 월 투자금 내에서 추천 상품 선택 + 금액 배분 */}
+      {step === "productSetup" && (
+        <ProductSetup
+          manualAccounts={manualAccounts}
+          income={income}
+          monthlyContribution={scenario.gap > 0 ? requiredMonthly : 0}
+          initialAlloc={productAlloc}
+          onNext={(alloc) => {
+            setProductAlloc(alloc);
+            go("result");
+          }}
+        />
       )}
       {step === "simulate" && <Simulating />}
       {step === "result" && (
@@ -223,18 +217,17 @@ export default function App() {
           age={age}
           goalNestEgg={scenario.requiredNestEgg}
           monthlyGoal={monthlyGoal}
-          onNext={() => go("picker")}
+          manualAccounts={manualAccounts}
+          income={income}
+          monthlyContribution={scenario.gap > 0 ? requiredMonthly : 0}
+          productAlloc={productAlloc}
+          onNext={() => go("simulate")}
         />
       )}
-      {step === "picker" && (
-        <Picker
-          {...{ chosenCats, region, setRegion, query, setQuery, selected, toggle, onNext: () => go("order") }}
-        />
-      )}
-      {step === "order" && <Order orderPlan={orderPlan} onNext={() => go("done")} />}
-      {step === "done" && (
-        <Done
-          sim={sim}
+      {/* 최종 진행 이후 — 뉴스·분석·자산 3탭 메인 앱 (자산 탭에서 투자 현황 관리) */}
+      {step === "portfolio" && (
+        <MainApp
+          alloc={productAlloc}
           onRestart={() => {
             setSelected([]);
             go("splash");
@@ -244,5 +237,21 @@ export default function App() {
     </ChromeBody>
   );
 
-  return framed ? <PhoneShell>{body}</PhoneShell> : <PlainShell inset={deviceInset}>{body}</PlainShell>;
+  return (
+    <>
+      {framed ? <PhoneShell>{body}</PhoneShell> : <PlainShell inset={deviceInset}>{body}</PlainShell>}
+      {/* 계좌 현황 입력 시트 — 온보딩 위로 슬라이드업, 제출 시 전략(accounts)으로 진행 */}
+      {manualOpen && (
+        <ManualAccounts
+          onNext={(values) => {
+            setManualAccounts(values);
+            saveManualAccounts(values); // DB(user_accounts, source='manual') 반영
+            setManualOpen(false);
+            go("accounts");
+          }}
+          onClose={() => setManualOpen(false)}
+        />
+      )}
+    </>
+  );
 }

@@ -1,0 +1,238 @@
+/* ── 배분·투자 확인 바텀시트 — 딤 + 슬라이드업 ── */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: rgba(0, 0, 0, 0.58);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: ocFade 0.2s ease;
+}
+.sheet {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 480px;
+  max-height: 92vh;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-bottom: none;
+  border-radius: 22px 22px 0 0;
+  box-shadow: 0 -18px 50px rgba(0, 0, 0, 0.5);
+  animation: ocUp 0.28s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+@keyframes ocFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes ocUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .overlay,
+  .sheet {
+    animation: none;
+  }
+}
+.grabber {
+  flex-shrink: 0;
+  width: 40px;
+  height: 4px;
+  margin: 10px auto 2px;
+  border-radius: 999px;
+  background: var(--line2);
+}
+.head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 20px 12px;
+}
+.title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+.sub {
+  margin: 6px 0 0;
+  font-size: 12.5px;
+  color: var(--sub);
+  line-height: 1.5;
+  word-break: keep-all;
+}
+.close {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: var(--bg2);
+  color: var(--sub);
+  cursor: pointer;
+}
+.scrollBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 20px;
+  scrollbar-width: none;
+}
+.scrollBody::-webkit-scrollbar {
+  display: none;
+}
+
+/* 계좌별 매수 종합 표 */
+.table {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.acct {
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: var(--bg2);
+  overflow: hidden;
+}
+.acctHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 11px 14px;
+  background: linear-gradient(160deg, var(--card-hi, var(--card)), var(--card));
+  border-bottom: 1px solid var(--line);
+}
+.acctName {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.acctSum {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--jade);
+  font-variant-numeric: tabular-nums;
+}
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+}
+.item + .item {
+  border-top: 1px solid var(--line);
+}
+.itemName {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  word-break: keep-all;
+}
+.itemAmt {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--sub);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+.empty {
+  font-size: 13px;
+  color: var(--sub);
+  text-align: center;
+  padding: 22px 8px;
+  word-break: keep-all;
+}
+
+/* 총 매수금 */
+.total {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: var(--bg2);
+  border: 1px solid var(--line);
+}
+.totalK {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--sub);
+}
+.totalV {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--jade);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 필수 확인 */
+.agreeWrap {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.agreeTitle {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+.agreeRow {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 13px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--bg2);
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+}
+.check {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
+  border: 2px solid var(--line2);
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--on-jade, #0a0f0d);
+}
+.checkOn {
+  border-color: var(--jade);
+  background: var(--jade);
+}
+.agreeLabel {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  word-break: keep-all;
+}
+
+/* 하단 고정 CTA */
+.footer {
+  flex-shrink: 0;
+  padding: 12px 20px calc(14px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--line);
+  background: var(--card);
+}
+.footNote {
+  margin: 8px 0 0;
+  text-align: center;
+  font-size: 11.5px;
+  color: var(--faint);
+}
