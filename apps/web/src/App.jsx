@@ -17,10 +17,11 @@ import { usePlanStore } from "./lib/usePlanStore.js";
 import { Splash } from "./screens/Splash.jsx";
 import { Login } from "./screens/Login.jsx";
 import { Intro } from "./screens/Intro.jsx";
-import { Onboarding } from "./screens/Onboarding.jsx";
-import { ManualAccounts } from "./screens/ManualAccounts.jsx";
+import { MydataStep } from "./screens/MydataStep.jsx";
+import { AccountsAnalysis } from "./screens/AccountsAnalysis.jsx";
 import { Accounts } from "./screens/Accounts.jsx";
-import { ProductSetup } from "./screens/ProductSetup.jsx";
+import { PassiveGoal } from "./screens/PassiveGoal.jsx";
+import { AllocationPlan } from "./screens/AllocationPlan.jsx";
 import { Simulating } from "./screens/Simulating.jsx";
 import { Result } from "./screens/Result.jsx";
 import { MainApp } from "./screens/MainApp.jsx";
@@ -41,9 +42,8 @@ export default function App() {
   const [step, setStep] = useState(isReturningFromOAuth() ? "authWait" : "splash");
   const [selected, setSelected] = useState([]);
   const [seed] = useState(10000000); // 미연동 시 기본 시드
-  const [years] = useState(20);
   const [monthly] = useState(500000);
-  const [monthlyGoal, setMonthlyGoal] = useState(300); // 온보딩 훅: 목표 생활비(만원)
+  const [monthlyGoal, setMonthlyGoal] = useState(300); // 목표 passive income(만원, 은퇴 후 월)
   const [reinvest] = useState(true);
   // 프로필 단계 제거 — 기본 프로파일로 시작, 전략 화면에서 마이데이터 연동 시 갱신
   const [mydata, setMydata] = useState(false);
@@ -55,8 +55,6 @@ export default function App() {
   const [user, setUser] = useState(null); // 로그인 프로필 (Supabase 세션 or 데모)
   // 수기 입력 계좌 현황 — { isa, pensionSavings, irp, general } (원 단위, 0=계좌 없음)
   const [manualAccounts, setManualAccounts] = useState(null);
-  // 계좌 현황 입력 — 화면 전환이 아니라 온보딩 위로 뜨는 바텀시트
-  const [manualOpen, setManualOpen] = useState(false);
   // 계좌 별 투자 상품 설정 결과 — { [accountId]: { [productCode]: 월배분액(원) } }
   const [productAlloc, setProductAlloc] = useState({});
   /* 계좌·플랜 저장소 — Supabase 미설정이거나 로그인 전이면 no-op.
@@ -70,8 +68,8 @@ export default function App() {
     logAuthDiagnostics(); // 콘솔에 복귀 상태 요약 (설정 점검용)
     const off = onAuthChange((profile) => {
       setUser(profile);
-      // 인증 완료 → 대기/스플래시/인트로/로그인 어디에 있든 온보딩으로 진입
-      if (profile) setStep((s) => (["authWait", "splash", "intro", "login"].includes(s) ? "onboarding" : s));
+      // 인증 완료 → 대기/스플래시/인트로/로그인 어디에 있든 마이데이터 단계로 진입
+      if (profile) setStep((s) => (["authWait", "splash", "intro", "login"].includes(s) ? "mydata" : s));
       // 세션이 없는데 복귀 대기 중이면(인증 취소·실패) 로그인 화면으로
       else setStep((s) => (s === "authWait" ? "login" : s));
     });
@@ -134,7 +132,11 @@ export default function App() {
     return mydata ? mydataTotal : seed;
   }, [manualAccounts, mydata, mydataTotal, seed]);
 
-  /* 목표 생활비 → 필요 자산 → 월 투자금 역산.
+  /* 투자기간 = 은퇴 정년(60세) − 현재 나이. 하한 5년(나이가 높아도 최소 기간 확보).
+   * 나이는 마이데이터 연동(데모) 또는 수기입력(구글)에서 확정된다. */
+  const years = Math.max(5, 60 - age);
+
+  /* 목표 passive income → 필요 자산(4% 룰) → 월 투자금 역산.
    * 전략 화면과 같은 계산을 여기서도 수행해, 최종 시뮬레이션이
    * 하드코딩된 값이 아니라 사용자가 정한 목표를 그대로 따르게 한다. */
   const scenario = useMemo(
@@ -189,47 +191,75 @@ export default function App() {
       {step === "authWait" && <Simulating />}
       {step === "splash" && <Splash onStart={() => go("intro")} />}
       {/* 이미 로그인된 세션이면 로그인 화면을 건너뛴다 */}
-      {step === "intro" && <Intro onNext={() => go(user ? "onboarding" : "login")} />}
+      {step === "intro" && <Intro onNext={() => go(user ? "mydata" : "login")} />}
       {/* 서비스 콘셉트 안내 후 로그인 → 회원가입은 건너뛰고 온보딩 훅 화면으로 진입 */}
       {/* 로그인 — 구글은 Supabase Auth 실연동(설정 시), 그 외/미설정은 데모 프로필 */}
       {step === "login" && (
         <Login
           onNext={(profile) => {
             // 데모 provider(네이버·카카오 등)는 프로필이 없다 → user 를 초기화해야
-            // 이전 구글 로그인이 남긴 user 때문에 데모 분기(마이데이터 연동)가 막히지 않는다.
+            // 이전 구글 로그인이 남긴 user 때문에 데모 분기(마이데이터 목업 연동)가 막히지 않는다.
             setUser(profile ?? null);
-            go("onboarding");
+            go("mydata");
           }}
         />
       )}
-      {/* 목표 설정 후 다음 단계 —
-       *  · 데모 로그인(네이버·카카오 등, user 없음): 목표 화면 본문에 마이데이터 연동을
-       *    임베드(동의 시트 → 로딩 → 불러온 계좌). 완료 시 프로필·시드를 반영(linkMydata)하고
-       *    전략(accounts)으로 진입 — accounts 는 mydata=true 라 곧바로 '전략(done)' 단계를 연다.
-       *    참조데이터는 기존과 동일하게 파일(MYDATA_ACCOUNTS)에서 가져온다.
-       *  · 구글 실계정(user 있음): 지금처럼 계좌 현황 입력 바텀시트를 띄운다. */}
-      {step === "onboarding" && (
-        <Onboarding
-          userName={user?.name}
-          monthlyGoal={monthlyGoal}
-          setMonthlyGoal={setMonthlyGoal}
-          demoMydata={!user}
-          onNext={() =>
-            user
-              ? setManualOpen(true)
-              : (linkMydata(), go("accounts"))
-          }
+      {/* ② 마이데이터 동의 — 최적 솔루션을 위해 마이데이터를 연동한다는 안내.
+       *  · 데모(네이버·카카오, user 없음): 목업 마이데이터 연동(동의 시트 → 로딩 → 불러온 계좌).
+       *    완료 시 프로필·시드 반영(linkMydata) 후 계좌 분석으로 진입.
+       *  · 구글 실계정(user 있음): 실제 데이터이므로 수기입력(계좌 + 나이 + 연소득). */}
+      {step === "mydata" && (
+        <MydataStep
+          isDemo={!user}
+          onDemoLink={() => {
+            linkMydata();
+            go("accountsAnalysis");
+          }}
+          onManualNext={({ accounts, age: inAge, income: inIncome }) => {
+            setManualAccounts(accounts);
+            saveManualAccounts(accounts); // DB(user_accounts, source='manual') 반영
+            setAge(inAge);
+            setIncome(inIncome);
+            go("accountsAnalysis");
+          }}
         />
       )}
-      {step === "accounts" && (
-        <Accounts {...{ mydata, manualAccounts, answers, monthly, monthlyGoal, finIncome, income, age, store, onLinked: linkMydata, onNext: () => go("productSetup") }} />
+      {/* ③ 3종계좌 최적화 분석 — 납입 우선순위 + 신호등 상태(양호/개선/조치) + 짧은 설명 */}
+      {step === "accountsAnalysis" && (
+        <AccountsAnalysis
+          mydata={mydata}
+          manualAccounts={manualAccounts}
+          income={income}
+          onNext={() => go("passiveGoal")}
+        />
       )}
-      {/* 계좌 별 투자 상품 설정 — 계좌별 월 투자금 내에서 추천 상품 선택 + 금액 배분 */}
-      {step === "productSetup" && (
-        <ProductSetup
+      {/* ⑤ 목표 Passive Income — 전환 히어로 + 목표 슬라이더(기간=60−나이) */}
+      {step === "passiveGoal" && (
+        <PassiveGoal
+          monthlyGoal={monthlyGoal}
+          setMonthlyGoal={setMonthlyGoal}
+          requiredNestEgg={scenario.requiredNestEgg}
+          requiredMonthly={requiredMonthly}
+          years={years}
+          gap={scenario.gap}
+          onNext={() => go("strategy")}
+        />
+      )}
+      {/* ⑥ 최적 솔루션 도출 — 목표 반영 계좌별 월 투자금 배분(done 뷰) */}
+      {step === "strategy" && (
+        <Accounts
+          mode="allocation"
+          nextLabel="배분 방식 정하기"
+          {...{ years, mydata, manualAccounts, answers, monthly, monthlyGoal, finIncome, income, age, store, onLinked: linkMydata, onNext: () => go("allocate") }}
+        />
+      )}
+      {/* ⑦ 정기적 투자금 배분 방식 — 추천 상품 자동배정 + 매수 주기(일/주/월) 게이미피케이션 */}
+      {step === "allocate" && (
+        <AllocationPlan
           manualAccounts={manualAccounts}
           income={income}
           monthlyContribution={scenario.gap > 0 ? requiredMonthly : 0}
+          years={years}
           initialAlloc={productAlloc}
           onNext={(alloc) => {
             setProductAlloc(alloc);
@@ -269,21 +299,5 @@ export default function App() {
     </ChromeBody>
   );
 
-  return (
-    <>
-      {framed ? <PhoneShell>{body}</PhoneShell> : <PlainShell inset={deviceInset}>{body}</PlainShell>}
-      {/* 계좌 현황 입력 시트 — 온보딩 위로 슬라이드업, 제출 시 전략(accounts)으로 진행 */}
-      {manualOpen && (
-        <ManualAccounts
-          onNext={(values) => {
-            setManualAccounts(values);
-            saveManualAccounts(values); // DB(user_accounts, source='manual') 반영
-            setManualOpen(false);
-            go("accounts");
-          }}
-          onClose={() => setManualOpen(false)}
-        />
-      )}
-    </>
-  );
+  return framed ? <PhoneShell>{body}</PhoneShell> : <PlainShell inset={deviceInset}>{body}</PlainShell>;
 }

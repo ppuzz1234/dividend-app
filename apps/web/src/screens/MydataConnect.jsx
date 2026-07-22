@@ -120,7 +120,7 @@ export function MydataConnect({ onNext }) {
 
           <div className={styles.cta}>
             <Button onClick={onNext} icon={ArrowRight}>
-              이 계좌로 전략 만들기
+              이 계좌로 분석 시작하기
             </Button>
           </div>
         </div>

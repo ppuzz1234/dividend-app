@@ -1,0 +1,257 @@
+/* 신호등 색 — 테마 --jade(노랑)와 무관하게 명시 색상 사용 */
+:root {
+  --tl-good: #22c55e;
+  --tl-warn: #f59e0b;
+  --tl-act: #ef4444;
+}
+
+/* 범례 */
+.legend {
+  display: flex;
+  gap: 16px;
+  margin: 2px 2px 16px;
+}
+.legendItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--sub);
+}
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.35);
+}
+.good {
+  background: var(--tl-good);
+}
+.warn {
+  background: var(--tl-warn);
+}
+.act {
+  background: var(--tl-act);
+}
+
+/* 우선순위 흐름 */
+.flow {
+  display: flex;
+  flex-direction: column;
+}
+.row {
+  display: flex;
+  gap: 14px;
+  /* 위→아래 순서로 하나씩 떠오르는 등장(우선순위가 읽히도록) — delay는 인라인 */
+  animation: aaRise 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+@keyframes aaRise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .row,
+  .ring_act,
+  .ring_warn {
+    animation: none;
+  }
+  .connector::before {
+    animation: none;
+  }
+}
+
+/* 노드 열 — 진행 링 + 원형 신호등 + 연결 화살표 */
+.nodeCol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  width: 68px;
+}
+/* 진행 링 — 계좌 한도 소진율(pct)을 conic 게이지로. 채워진 부분=밝은 흰색, 트랙=옅은 흰색 */
+.ring {
+  position: relative;
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: conic-gradient(rgba(255, 255, 255, 0.92) var(--deg, 0deg), rgba(255, 255, 255, 0.16) 0);
+  display: grid;
+  place-items: center;
+}
+/* 상태 강조 맥동 — 링 바깥으로 색 링이 번진다 ('조치 필요' 강, '개선 여지' 약, '양호' 없음) */
+.ring_act {
+  --pulse: var(--tl-act);
+  animation: aaPulse 1.9s ease-in-out infinite;
+}
+.ring_warn {
+  --pulse: var(--tl-warn);
+  animation: aaPulse 2.6s ease-in-out infinite;
+}
+@keyframes aaPulse {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--pulse) 55%, transparent); }
+  50% { box-shadow: 0 0 0 8px color-mix(in srgb, var(--pulse) 0%, transparent); }
+}
+.node {
+  position: relative;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  /* 3px bg 링으로 진행 링과 분리 + 상단 하이라이트로만 입체감(범례 점과 같은 색조) */
+  box-shadow: 0 0 0 3px var(--bg), inset 0 2px 6px rgba(255, 255, 255, 0.3),
+    inset 0 -3px 8px rgba(0, 0, 0, 0.16), 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+.node.good {
+  background: var(--tl-good);
+}
+.node.warn {
+  background: var(--tl-warn);
+}
+.node.act {
+  background: var(--tl-act);
+}
+.nodeLabel {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+/* 연결 화살표 — 시인성 강화: 굵은 점선 라인 + 배경 원에 얹힌 또렷한 화살표 */
+.connector {
+  position: relative;
+  flex: 1;
+  min-height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.connector::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: -3px;
+  bottom: -3px;
+  width: 3px;
+  border-radius: 3px;
+  /* 점선이 아래로 흐르며 '우선순위 에너지'가 다음 계좌로 전달되는 느낌 */
+  background-image: repeating-linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--jade) 62%, transparent) 0 6px,
+    transparent 6px 12px
+  );
+  background-size: 3px 12px;
+  animation: aaFlow 0.7s linear infinite;
+}
+@keyframes aaFlow {
+  to {
+    background-position-y: 12px;
+  }
+}
+.connArrow {
+  position: relative;
+  z-index: 1;
+  color: var(--jade);
+  background: var(--bg);
+  border-radius: 50%;
+  padding: 2px;
+  box-sizing: content-box;
+}
+
+/* 오른쪽 설명 */
+.content {
+  flex: 1;
+  min-width: 0;
+  padding-bottom: 18px;
+}
+.contentHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+.rank {
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--on-jade, #0a0f0d);
+  background: var(--jade);
+  border-radius: 6px;
+  padding: 2px 7px;
+}
+.name {
+  font-size: 15.5px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tag {
+  flex-shrink: 0;
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 800;
+  border-radius: 999px;
+  padding: 3px 9px;
+  white-space: nowrap;
+}
+.tag_good {
+  color: var(--tl-good);
+  background: color-mix(in srgb, var(--tl-good) 16%, transparent);
+}
+.tag_warn {
+  color: var(--tl-warn);
+  background: color-mix(in srgb, var(--tl-warn) 16%, transparent);
+}
+.tag_act {
+  color: var(--tl-act);
+  background: color-mix(in srgb, var(--tl-act) 18%, transparent);
+}
+.why {
+  margin: 5px 0 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--sub);
+}
+.note {
+  margin: 5px 0 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text);
+  word-break: keep-all;
+}
+
+/* 일반계좌 이동 인사이트 */
+.insight {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin-top: 6px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--jade) 32%, transparent);
+  background: color-mix(in srgb, var(--jade) 9%, transparent);
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text);
+  word-break: keep-all;
+}
+.insight svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--jade);
+}
+.insight b {
+  font-weight: 800;
+}

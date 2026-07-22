@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowRight, ChevronDown, Sparkles, MoveRight, Server, ServerOff, RefreshCw, History } from "lucide-react";
+import { ArrowRight, ChevronDown, Sparkles, MoveRight, Server, ServerOff, RefreshCw, History, Wallet, TrendingUp, BadgeCheck } from "lucide-react";
 import { buildStrategyComparison, projectRetirementScenario, buildAccountRooms, MYDATA_ACCOUNTS } from "@devidend/core";
 import { fetchStrategy } from "../lib/strategyApi.js";
 import { Pad } from "../components/layout/Pad.jsx";
@@ -14,6 +14,7 @@ import { PlanHistory } from "../components/PlanHistory.jsx";
 import { fmtKRW } from "../lib/format.js";
 import { cx } from "../lib/cx.js";
 import styles from "./Accounts.module.css";
+import card from "./PassiveGoal.module.css";
 
 const VIEWS = [
   { v: "current", l: "현재 상황" },
@@ -33,14 +34,16 @@ const MYDATA_LIST = Object.entries(MYDATA_ACCOUNTS).map(([engineId, a]) => ({
  * 사용자 변수(성향·월 불입·나이·전년도 금융/총소득)를 백엔드 전략 엔진
  * (POST /api/strategy, 파일 DB 기반 HPR)에 태워 결과를 렌더링한다.
  * 엔진 미기동 시에는 로컬(@devidend/core) 추정으로 폴백. */
-export function Accounts({ mydata, manualAccounts, answers, monthly, monthlyGoal, finIncome, income, age, store, onLinked, onNext }) {
+export function Accounts({ mode, nextLabel, years = 20, mydata, manualAccounts, answers, monthly, monthlyGoal, finIncome, income, age, store, onLinked, onNext }) {
   const [view, setView] = useState("current");
   const [remote, setRemote] = useState(null);
-  // 마이데이터 연동 플로우 — idle(미연동) → loading(브랜드 로더) → done(연동 계좌내역)
-  // · 온보딩에서 로딩·확인까지 마치고 진입(mydata=true): 곧바로 done 으로 시작
-  // · 전략 비교표(table)는 현재 플로우에서 사용하지 않음(현재/전략적용 화면 비활성)
-  // 수기 입력으로 진입한 경우도 연동 완료(done)와 동일하게 취급한다
-  const [phase, setPhase] = useState(mydata || manualAccounts ? "done" : "idle");
+  /* 마이데이터 연동은 이제 앞 단계(mydata)에서 끝나므로 여기선 두 가지 모드로만 쓰인다.
+   *  · mode="analysis"(③ 계좌 최적화 분석): 나이·소득 기반 현재 vs 제안 비교표(table)를 노출 — 금액/목표 없음
+   *  · mode="allocation"(⑥ 최적 솔루션): 목표(월 투자금)를 계좌별로 배분하는 done 뷰
+   * 레거시(무모드) 진입은 기존 idle→loading→done 흐름을 유지한다. */
+  const [phase, setPhase] = useState(
+    mode === "analysis" ? "table" : mydata || manualAccounts ? "done" : "idle"
+  );
   // 연동 완료 후 단계 공개 — 1단계(계산+멘트+▼) → ▼ 클릭 → 2단계(투자금 타일+계좌 배분)
   const [expanded, setExpanded] = useState(false);
   const [leaving, setLeaving] = useState(false); // 멘트·▼ 가 위로 사라지는 전환 중
@@ -91,8 +94,8 @@ export function Accounts({ mydata, manualAccounts, answers, monthly, monthlyGoal
   /* 온보딩에서 정한 목표 생활비 기준 은퇴 필요 자산에서 연동된 총 금융자산을 뺀
    * 차액(gap)을 20년간 만들기 위한 월 투자금 역산 — 연동 완료 후 상단에 표시 */
   const scenario = useMemo(
-    () => projectRetirementScenario({ monthlyLivingCost: monthlyGoal * 10_000, currentAssets: mydataTotal }),
-    [monthlyGoal, mydataTotal]
+    () => projectRetirementScenario({ monthlyLivingCost: monthlyGoal * 10_000, currentAssets: mydataTotal, years }),
+    [monthlyGoal, mydataTotal, years]
   );
   const [{ etf, requiredMonthly }] = scenario.perEtf; // 단일 상품(PLUS 미국S&P500)
 
@@ -150,7 +153,7 @@ export function Accounts({ mydata, manualAccounts, answers, monthly, monthlyGoal
           /* 1단계(멘트+▼)에서는 하단 버튼도 숨긴다 — ▼로 상세를 연 뒤에만 노출 */
           phase === "done" && !expanded ? null : (
             <Button onClick={saveAndNext} icon={ArrowRight} disabled={store?.busy}>
-              {store?.busy ? "저장 중…" : "계좌 별 투자 상품 설정"}
+              {store?.busy ? "저장 중…" : nextLabel ?? "계좌 별 투자 상품 설정"}
             </Button>
           )
         }
@@ -217,16 +220,36 @@ export function Accounts({ mydata, manualAccounts, answers, monthly, monthlyGoal
               )}
             </div>
 
-            {/* 1단계 — 월 투자 시나리오 멘트, ETF명 옆 (i) 클릭 시 상세 모달 */}
+            {/* 1단계 — 월 투자 시나리오를 '실행 플랜 카드'로: 매달 투자금(강조) + 상품 + 안심 문구 */}
             {!expanded && scenario.gap > 0 && (
-              <div className={cx(styles.scenarioHead, styles.seq4, leaving && styles.leave)}>
-                <span>
-                  남은 금액은 매달 <b className={styles.scenarioAmount}>{fmtKRW(requiredMonthly)}</b>을
-                  <br />
-                  <b className={styles.scenarioAmount}>{etf.name}</b>
-                  <EtfInfoButton etf={etf} />
-                  <br />에 투자하면 20년 안에 모을 수 있어요.
-                </span>
+              <div className={cx(card.plan, styles.seq4, leaving && styles.leave)}>
+                <div className={cx(card.row, card.hero)}>
+                  <span className={card.rowIcon}>
+                    <Wallet size={20} strokeWidth={2.2} />
+                  </span>
+                  <span className={card.rowLabel}>남은 목표, 매달</span>
+                  <b className={card.heroVal}>{fmtKRW(requiredMonthly)}</b>
+                </div>
+
+                <div className={card.divider} />
+
+                <div className={card.productRow}>
+                  <span className={card.rowIcon}>
+                    <TrendingUp size={18} strokeWidth={2.2} />
+                  </span>
+                  <div className={card.productInfo}>
+                    <span className={card.miniLabel}>투자 상품</span>
+                    <span className={card.productName}>
+                      {etf.name}
+                      <EtfInfoButton etf={etf} />
+                    </span>
+                  </div>
+                </div>
+
+                <div className={card.reassure}>
+                  <BadgeCheck size={16} strokeWidth={2.4} />
+                  이대로 투자하면 은퇴 후에도 걱정 없어요!
+                </div>
               </div>
             )}
           </div>
@@ -290,9 +313,9 @@ export function Accounts({ mydata, manualAccounts, answers, monthly, monthlyGoal
   }
 
   return (
-    <Pad footer={<Button onClick={onNext} icon={ArrowRight}>{applied ? "제안 전략으로 시뮬레이션" : "이 전략으로 시뮬레이션"}</Button>}>
-      <Heading sub="지금 보유 상황과, 앱이 제안하는 계좌 재배치를 적용했을 때의 세금 차이예요.">
-        내 계좌 전략
+    <Pad footer={<Button onClick={onNext} icon={ArrowRight}>{nextLabel ?? (applied ? "제안 전략으로 시뮬레이션" : "이 전략으로 시뮬레이션")}</Button>}>
+      <Heading sub="나이·소득을 기반으로, 지금 보유 상황과 앱이 제안하는 3종 계좌 재배치의 세금 차이를 분석했어요.">
+        절세 계좌 최적화 분석
       </Heading>
 
       {/* 엔진 연결 상태 — 어떤 로직이 계산했는지 표기 */}

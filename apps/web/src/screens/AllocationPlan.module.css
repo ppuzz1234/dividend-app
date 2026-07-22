@@ -1,0 +1,179 @@
+/* ── 매수 리듬 카드 (게이미피케이션 핵심 선택) ── */
+.cycleGrid {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+.cycleCard {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 16px 8px 14px;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: var(--bg2);
+  cursor: pointer;
+  transition: border-color 0.16s, box-shadow 0.16s, transform 0.12s;
+}
+.cycleCard:hover {
+  border-color: var(--line2);
+}
+.cycleOn {
+  border-color: var(--jade);
+  box-shadow: 0 0 0 1px var(--jade);
+  transform: translateY(-2px);
+}
+.cycleIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--jade);
+  background: color-mix(in srgb, var(--jade) 14%, transparent);
+  margin-bottom: 4px;
+}
+.cycleOn .cycleIcon {
+  color: var(--on-jade, #0a0f0d);
+  background: var(--jade);
+}
+.cycleLabel {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.cycleTag {
+  font-size: 10.5px;
+  color: var(--sub);
+  text-align: center;
+  word-break: keep-all;
+  line-height: 1.3;
+  min-height: 27px;
+}
+.cycleBuy {
+  margin-top: 4px;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--jade);
+  font-variant-numeric: tabular-nums;
+}
+.cycleBuyK {
+  font-size: 10px;
+  color: var(--faint);
+}
+
+/* ── 습관 요약 (코인/스트릭) ── */
+.habit {
+  margin-top: 16px;
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: linear-gradient(160deg, var(--card-hi, var(--card)), var(--card));
+}
+.habitTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.habitBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12.5px;
+  font-weight: 800;
+  color: var(--jade);
+}
+.habitBuys {
+  font-size: 12px;
+  color: var(--sub);
+  font-weight: 600;
+}
+.habitBuys b {
+  color: var(--text);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.coins {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin: 12px 0;
+}
+.coin {
+  display: inline-flex;
+  color: var(--line2);
+}
+.coinOn {
+  color: var(--jade);
+}
+.habitNote {
+  margin: 0;
+  font-size: 12px;
+  color: var(--sub);
+  line-height: 1.55;
+  word-break: keep-all;
+}
+.habitNote b {
+  color: var(--text);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── 자동 배분 내역 ── */
+.sectionLabel {
+  font-size: 12.5px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--sub);
+  margin: 20px 2px 10px;
+}
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--bg2);
+}
+.rowAcct {
+  flex-shrink: 0;
+  min-width: 58px;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--jade);
+}
+.rowName {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rowAmt {
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--sub);
+  font-variant-numeric: tabular-nums;
+}
+.empty {
+  font-size: 13px;
+  color: var(--sub);
+  text-align: center;
+  padding: 20px 8px;
+  word-break: keep-all;
+}

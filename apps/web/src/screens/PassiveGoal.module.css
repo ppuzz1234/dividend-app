@@ -1,0 +1,168 @@
+/* ① 요약 지표 카드 (토스식) — 필요자산·기간·월 투자금을 아이콘+라벨+큰 숫자로 분리.
+ *  월 투자금만 제이드로 크게 강조해 '행동해야 할 숫자'에 시선을 고정한다. */
+.summary {
+  margin-top: 4px;
+  border-radius: 22px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  padding: 4px 18px;
+  animation: pgRise 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+@keyframes pgRise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 17px 0;
+}
+.rowIcon {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg2);
+  color: var(--sub);
+}
+.rowLabel {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--sub);
+}
+.rowVal {
+  margin-left: auto;
+  font-size: 21px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.divider {
+  height: 1px;
+  background: var(--line);
+}
+
+/* 은퇴까지 / 정년 — 2분할 셀 */
+.dual {
+  display: flex;
+}
+.dualCell {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 15px 0;
+}
+.dualCell + .dualCell {
+  padding-left: 18px;
+  border-left: 1px solid var(--line);
+  margin-left: 18px;
+}
+.miniLabel {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--sub);
+  margin-bottom: 2px;
+}
+.miniVal {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 매달 투자금 — 히어로 강조 */
+.hero .rowIcon {
+  background: color-mix(in srgb, var(--jade) 16%, transparent);
+  color: var(--jade);
+}
+.hero .rowLabel {
+  color: var(--text);
+  font-weight: 800;
+  font-size: 15px;
+}
+.heroVal {
+  margin-left: auto;
+  font-size: 31px;
+  font-weight: 800;
+  color: var(--jade);
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.foot {
+  margin: 0;
+  padding: 0 2px 16px;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--faint);
+  word-break: keep-all;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .summary {
+    animation: none;
+  }
+}
+
+/* ── 실행 플랜 카드 (전략 화면 재사용) — 제이드 톤 강조, 애니메이션은 호출부(seq4/leave)에 위임 ── */
+.plan {
+  margin-top: 6px;
+  border-radius: 22px;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--jade) 8%, var(--card)), var(--card));
+  border: 1px solid color-mix(in srgb, var(--jade) 26%, var(--line));
+  padding: 4px 18px 0;
+  text-align: left;
+}
+.productRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 0;
+}
+.productInfo {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.productName {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+.reassure {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0 -18px;
+  padding: 13px 18px;
+  border-top: 1px solid color-mix(in srgb, var(--jade) 20%, var(--line));
+  background: color-mix(in srgb, var(--jade) 10%, transparent);
+  border-radius: 0 0 22px 22px;
+  font-size: 13.5px;
+  font-weight: 800;
+  color: var(--jade);
+  word-break: keep-all;
+}
+.reassure svg {
+  flex-shrink: 0;
+}
