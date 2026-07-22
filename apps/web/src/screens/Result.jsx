@@ -38,9 +38,19 @@ const MINT = {
   sub: "#34d399", // = --gold
 };
 
-export function Result({ sim, allocation, chosen, years, reinvest, goalNestEgg, monthlyGoal, manualAccounts, income = 50_000_000, monthlyContribution = 0, productAlloc = {}, onNext }) {
-  const val = useCountUp(sim.finalValue, 1100);
-  const returnPct = (sim.finalValue / sim.contributed - 1) * 100;
+export function Result({ sim, allocation, chosen, years, reinvest, goalNestEgg, monthlyGoal, manualAccounts, income = 50_000_000, monthlyContribution = 0, existingAssets = 0, productAlloc = {}, onNext }) {
+  /* 기존 보유자산은 현재가치로(성장 없이) 목표에 합산한다 —
+   * 시뮬(sim)은 월 납입 성장분만 담고 있어(App 에서 시드 0), 이중 성장을 피한다.
+   * → 최종 평가금액 = 기존 자산(정적) + 월 납입 성장분. */
+  const finalValue = sim.finalValue + existingAssets;
+  const contributed = sim.contributed + existingAssets;
+  const val = useCountUp(finalValue, 1100);
+  const returnPct = contributed > 0 ? (finalValue / contributed - 1) * 100 : 0;
+  // 차트에도 기존 자산을 원금(정적) 베이스로 깔아 히어로 금액과 상단선을 일치시킨다
+  const series =
+    existingAssets > 0
+      ? sim.series.map((d) => ({ ...d, value: d.value + existingAssets, principal: d.principal + existingAssets }))
+      : sim.series;
   const [confirmOpen, setConfirmOpen] = useState(false); // 배분·투자 확인 시트
 
   /* 계좌별 절세·세액공제 — 배분(buildAccountRooms)의 계좌별 월 납입과
@@ -77,13 +87,13 @@ export function Result({ sim, allocation, chosen, years, reinvest, goalNestEgg, 
               목표 <b>{fmtKRW(goalNestEgg)}</b>
               {monthlyGoal ? ` (월 ${monthlyGoal.toLocaleString()}만원 생활비)` : ""}
             </span>
-            <b className={sim.finalValue >= goalNestEgg ? styles.goalOk : styles.goalShort}>
-              달성률 {Math.round((sim.finalValue / goalNestEgg) * 100)}%
+            <b className={finalValue >= goalNestEgg ? styles.goalOk : styles.goalShort}>
+              달성률 {Math.round((finalValue / goalNestEgg) * 100)}%
             </b>
           </div>
         )}
         <div className={styles.miniRow}>
-          <Mini label="총 납입금" v={fmtKRW(sim.contributed)} />
+          <Mini label="총 납입금" v={fmtKRW(contributed)} />
           <Mini label="투자 수익" v={`+${returnPct.toFixed(0)}%`} tone="gold" />
         </div>
       </div>
@@ -99,7 +109,7 @@ export function Result({ sim, allocation, chosen, years, reinvest, goalNestEgg, 
         </div>
         <div className={styles.chartBox}>
           <ResponsiveContainer>
-            <AreaChart data={sim.series} margin={{ top: 4, right: 12, bottom: 0, left: 4 }}>
+            <AreaChart data={series} margin={{ top: 4, right: 12, bottom: 0, left: 4 }}>
               <defs>
                 <linearGradient id="gP" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor={MINT.main} stopOpacity={0.7} />

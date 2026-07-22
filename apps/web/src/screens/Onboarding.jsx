@@ -4,6 +4,7 @@ import { projectRetirementScenario } from "@devidend/core";
 import { Pad } from "../components/layout/Pad.jsx";
 import { Button } from "../components/ui/Button.jsx";
 import { GoalTiles } from "../components/GoalTiles.jsx";
+import { MydataConnect } from "./MydataConnect.jsx";
 import { RollingNumber } from "../components/ui/RollingNumber.jsx";
 import { fmtKRW } from "../lib/format.js";
 import { cx } from "../lib/cx.js";
@@ -26,7 +27,7 @@ const digits = (v) => Number(String(v).replace(/\D/g, "")) || 0;
  *            슬라이더를 조작하면(moved) 하단 "필요 자산" 문구와 ▼ 가 이어서 등장
  *   stage 3  (▼ 클릭) 위 내용이 위로 페이드아웃 → 선택 요약 타일 2개 +
  *            계좌 현황 입력 안내로 전환 */
-export function Onboarding({ userName, monthlyGoal, setMonthlyGoal, onNext }) {
+export function Onboarding({ userName, monthlyGoal, setMonthlyGoal, demoMydata, onNext }) {
   const { requiredNestEgg } = projectRetirementScenario({
     monthlyLivingCost: monthlyGoal * 10_000,
     years: YEARS,
@@ -176,22 +177,30 @@ export function Onboarding({ userName, monthlyGoal, setMonthlyGoal, onNext }) {
             <GoalTiles monthlyGoal={monthlyGoal} requiredNestEgg={requiredNestEgg} />
           </div>
 
-          <div className={styles.mydataCenter}>
-            <div className={cx(styles.mydataMsg, styles.revealMid)}>
-              지금 가지고 있는 계좌를 알려주시면,
-              <br />맞춤형 투자 전략을 추천해드릴게요.
-            </div>
-            <div className={styles.revealLate}>
-              <Button onClick={onNext} icon={ArrowRight}>
-                내 계좌 입력하기
-              </Button>
-            </div>
-          </div>
+          {/* 데모(네이버·카카오): 본문에 마이데이터 연동을 임베드 — 동의→로딩→불러온 계좌→전략.
+           *  구글 실계정: 기존 계좌 현황 입력(내 계좌 입력하기) CTA 유지. */}
+          {demoMydata ? (
+            <MydataConnect onNext={onNext} />
+          ) : (
+            <>
+              <div className={styles.mydataCenter}>
+                <div className={cx(styles.mydataMsg, styles.revealMid)}>
+                  지금 가지고 있는 계좌를 알려주시면,
+                  <br />맞춤형 투자 전략을 추천해드릴게요.
+                </div>
+                <div className={styles.revealLate}>
+                  <Button onClick={onNext} icon={ArrowRight}>
+                    내 계좌 입력하기
+                  </Button>
+                </div>
+              </div>
 
-          <p className={cx(styles.disclaimer, styles.revealLate)}>
-            * 필요 자산은 은퇴 후 연 4% 인출(4% 룰)을 가정해 역산한 예시 값으로, 향후 동일한 수익을 보장하지 않습니다.
-            실제 배분·세제는 다음 단계(성향 분석)에서 계좌별로 정교하게 설계돼요.
-          </p>
+              <p className={cx(styles.disclaimer, styles.revealLate)}>
+                * 필요 자산은 은퇴 후 연 4% 인출(4% 룰)을 가정해 역산한 예시 값으로, 향후 동일한 수익을 보장하지
+                않습니다. 실제 배분·세제는 다음 단계(성향 분석)에서 계좌별로 정교하게 설계돼요.
+              </p>
+            </>
+          )}
         </div>
       )}
     </Pad>

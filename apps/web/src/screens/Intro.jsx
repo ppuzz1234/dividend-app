@@ -8,19 +8,15 @@ import styles from "./Intro.module.css";
 const SLIDES = [
   {
     Icon: ShieldCheck,
-    title: "당신은 은퇴 이후를 위해\n얼마나 대비하고 있나요?",
-    desc: "근로소득이 사라진 뒤에도 생활비를 지탱할 안정적인 현금흐름이 반드시 있어야 해요.",
+    title: "당신이 은퇴 후 목표로 하는\n월 Passive Income 1,000만원?",
+    desc: "은퇴 자산을 키워가는 계좌 최적화에 따라, 연 1.2억원의 Passive Income에 대한 소득세(지방소득세 추가), 건강보험료가 최대 0000만원까지 차이나게 됩니다.",
   },
   {
     Icon: null, // BrandMark 로 대체
-    title: "PLUS CUBE가\n똑똑한 해결책을 제안합니다",
-    desc: "절세 계좌 최적화,\n 시기에 맞는 ETF 선택 \n 그리고 은퇴 이후의 똑똑한 배당 전략까지, 당신의 20년을 설계해드려요.",
+    title: "당신의 은퇴를 위한 3개 계좌 최적화 현황을 분석하고,\n 최적의 솔루션을 제안드립니다.",
+    desc: "그리고, 목표 은퇴자산 형성, 은퇴 이후의 \n Passive Income 최적화 솔루션도 제공합니다.",
   },
-  {
-    Icon: Repeat,
-    title: "젊을 땐 성장주,\n은퇴 후엔 고배당주!",
-    desc: "성장주 ETF 장기 투자로 기초 자산을 불리고, 은퇴 후에는 배당 ETF로 전환, 그 배당금이 당신의 생활비가 될거예요.",
-  },
+  
 
 ];
 

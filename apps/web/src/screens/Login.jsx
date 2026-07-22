@@ -56,12 +56,12 @@ export function Login({ onNext }) {
             <span className={styles.ssoIc}>{GOOGLE}</span>
             {busy === "google" ? "구글 인증 중…" : "Google로 계속하기"}
           </button>
-          <button className={styles.ssoBtn} onClick={onNext} disabled={!!busy}>
+          <button className={styles.ssoBtn} onClick={() => onNext?.()} disabled={!!busy}>
             <span className={`${styles.ssoIc} ${styles.naverIc}`}>N</span>
             네이버로 계속하기
             <span className={styles.demoTag}>데모</span>
           </button>
-          <button className={styles.ssoBtn} onClick={onNext} disabled={!!busy}>
+          <button className={styles.ssoBtn} onClick={() => onNext?.()} disabled={!!busy}>
             <span className={`${styles.ssoIc} ${styles.kakaoIc}`}>{KAKAO}</span>
             카카오로 계속하기
             <span className={styles.demoTag}>데모</span>
@@ -100,7 +100,7 @@ export function Login({ onNext }) {
           </form>
         )}
 
-        <button className={styles.footLink} onClick={onNext}>
+        <button className={styles.footLink} onClick={() => onNext?.()}>
           이미 PLUS CUBE 회원이신가요? <b>로그인하세요</b>
         </button>
       </div>

@@ -412,6 +412,11 @@
 }
 .mini {
   flex: 1;
+  min-width: 0;
+}
+/* 우측 항목(투자 수익)은 위 행의 '달성률'과 같은 오른쪽 정렬로 맞춘다 */
+.miniRow .mini:last-child {
+  text-align: right;
 }
 .miniLabel {
   font-size: 11.5px;

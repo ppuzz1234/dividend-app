@@ -7,13 +7,13 @@
  * ------------------------------------------------------------------ */
 export const MYDATA_ACCOUNTS = {
   general: {
-    institution: "한화투자증권",
+    institution: "키움증권",
     balance: 255_000_000,
     contributedThisYear: 0,
     holdings: [{ name: "QQQ 나스닥100", productType: "foreignEtf", value: 255_000_000 }],
   },
   isa: {
-    institution: "미래에셋증권",
+    institution: "한화자산운용",
     balance: 12_000_000,
     contributedThisYear: 7_000_000,
     holdings: [

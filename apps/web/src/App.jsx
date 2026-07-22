@@ -12,7 +12,7 @@ import {
   MYDATA_ACCOUNTS,
   MYDATA_PROFILE,
 } from "@devidend/core";
-import { onAuthChange, isReturningFromOAuth, logAuthDiagnostics } from "./auth/google.js";
+import { onAuthChange, isReturningFromOAuth, logAuthDiagnostics, logout } from "./auth/google.js";
 import { usePlanStore } from "./lib/usePlanStore.js";
 import { Splash } from "./screens/Splash.jsx";
 import { Login } from "./screens/Login.jsx";
@@ -83,6 +83,16 @@ export default function App() {
     if (store.plan?.monthly_goal_manwon) setMonthlyGoal(store.plan.monthly_goal_manwon);
   }, [store.plan]);
 
+  /* 로그인 화면에 도달하는 순간 기존 세션을 정리한다(signOut).
+   * 구글 로그인 후 뒤로가기로 돌아와도 이전 세션이 남지 않아,
+   * 데모(네이버·카카오)·구글 어느 쪽을 다시 눌러도 깨끗한 상태에서 분기된다.
+   * 로컬 user 는 signOut → onAuthChange(SIGNED_OUT) 구독에서 null 로 정리된다.
+   * (Supabase 미설정이면 logout 은 no-op이고, 그 경우 user 는 데모 로그인에서
+   *  항상 null 로만 세팅되므로 별도 초기화가 필요 없다.) */
+  useEffect(() => {
+    if (step === "login") logout();
+  }, [step]);
+
   // 전략 화면의 마이데이터 연동 완료 → 프로필·시드 반영
   const linkMydata = () => {
     setMydata(true);
@@ -133,7 +143,11 @@ export default function App() {
   );
   const requiredMonthly = scenario.perEtf[0]?.requiredMonthly ?? monthly;
   const benchmark = ETF_BENCHMARKS[0]; // PLUS 미국S&P500 — 전 화면 공통 수익률 가정(연 10%)
-  const effectiveSeed = currentAssets;
+  /* 기존 보유자산(currentAssets)은 성장 시뮬에서 제외(시드 0)한다.
+   * 월 납입액(requiredMonthly)이 이미 gap(=필요자산−현재자산)을 채우도록 산출되므로,
+   * 시드까지 복리로 굴리면 이중 계산이 되어 목표를 크게 초과한다.
+   * → 시뮬은 '월 납입 성장분'만 계산하고, 기존 자산은 Result 에서 현재가치로 합산한다. */
+  const effectiveSeed = 0;
 
   // 로딩(simulate) 단계 → 자동으로 자산 탭(portfolio)으로 진행 ("최종 진행하기" 직후 대기 화면)
   useEffect(() => {
@@ -181,14 +195,31 @@ export default function App() {
       {step === "login" && (
         <Login
           onNext={(profile) => {
-            if (profile) setUser(profile);
+            // 데모 provider(네이버·카카오 등)는 프로필이 없다 → user 를 초기화해야
+            // 이전 구글 로그인이 남긴 user 때문에 데모 분기(마이데이터 연동)가 막히지 않는다.
+            setUser(profile ?? null);
             go("onboarding");
           }}
         />
       )}
-      {/* 목표 설정 후 → 계좌 현황 입력 바텀시트를 띄운다(화면 전환 대신 시트) */}
+      {/* 목표 설정 후 다음 단계 —
+       *  · 데모 로그인(네이버·카카오 등, user 없음): 목표 화면 본문에 마이데이터 연동을
+       *    임베드(동의 시트 → 로딩 → 불러온 계좌). 완료 시 프로필·시드를 반영(linkMydata)하고
+       *    전략(accounts)으로 진입 — accounts 는 mydata=true 라 곧바로 '전략(done)' 단계를 연다.
+       *    참조데이터는 기존과 동일하게 파일(MYDATA_ACCOUNTS)에서 가져온다.
+       *  · 구글 실계정(user 있음): 지금처럼 계좌 현황 입력 바텀시트를 띄운다. */}
       {step === "onboarding" && (
-        <Onboarding userName={user?.name} monthlyGoal={monthlyGoal} setMonthlyGoal={setMonthlyGoal} onNext={() => setManualOpen(true)} />
+        <Onboarding
+          userName={user?.name}
+          monthlyGoal={monthlyGoal}
+          setMonthlyGoal={setMonthlyGoal}
+          demoMydata={!user}
+          onNext={() =>
+            user
+              ? setManualOpen(true)
+              : (linkMydata(), go("accounts"))
+          }
+        />
       )}
       {step === "accounts" && (
         <Accounts {...{ mydata, manualAccounts, answers, monthly, monthlyGoal, finIncome, income, age, store, onLinked: linkMydata, onNext: () => go("productSetup") }} />
@@ -220,6 +251,7 @@ export default function App() {
           manualAccounts={manualAccounts}
           income={income}
           monthlyContribution={scenario.gap > 0 ? requiredMonthly : 0}
+          existingAssets={currentAssets}
           productAlloc={productAlloc}
           onNext={() => go("simulate")}
         />
