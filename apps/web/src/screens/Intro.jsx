@@ -266,7 +266,7 @@ export function Intro({ onNext }) {
           <span className={styles.chartLabelLo}>일반</span>
         </div>
         <h2 className={cx(styles.ctaTitle, styles.rise)} style={{ "--i": 1 }}>
-          지금 3분이면,<br />내 은퇴 설계가 시작됩니다.
+          지금 3분이면,<br />절세를 위한 투자 계좌<br /> 최적화 설계를 시작합니다.
         </h2>
         <div className={cx(styles.ctaAction, styles.rise)} style={{ "--i": 2 }}>
           <Button onClick={onNext} icon={ArrowRight}>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import BrandMark from "../components/ui/BrandMark.jsx";
+import { CubeLoader } from "../components/ui/CubeLoader.jsx";
 import styles from "./Splash.module.css";
 
 /* 스플래시 — hpr과 동일한 구조(시세 그리드 배경 · 발광 · 브랜드마크 · 아이브로우
@@ -36,7 +36,7 @@ export function Splash({ onStart }) {
 
       <div className={styles.core}>
         <div className={styles.mark}>
-          <BrandMark size={92} glow />
+          <CubeLoader size={84} bare />
         </div>
         <div className={styles.eyebrow}>SMART DIVIDEND · TAX SAVING</div>
         <h1 className={styles.title}>PLUS CUBE</h1>

@@ -213,6 +213,7 @@ export default function App() {
       {step === "mydata" && (
         <MydataStep
           isDemo={!user}
+          name={user?.name || MYDATA_PROFILE.name}
           onDemoLink={() => {
             linkMydata();
             go("accountsAnalysis");

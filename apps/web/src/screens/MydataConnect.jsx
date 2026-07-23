@@ -40,7 +40,7 @@ const LOADER_REPEAT = 1;
 /* (데모 전용) 마이데이터 연동 — 화면 레이아웃(본문 + 하단 고정 CTA)을 직접 소유한다.
  *  intro(동의 유도) → [동의 시트] → loading(브랜드 로더) → loaded(불러온 계좌 확인)
  *  → onNext 로 계좌 분석 화면 진입. 데이터는 파일(MYDATA_ACCOUNTS)에서 그대로. */
-export function MydataConnect({ onNext }) {
+export function MydataConnect({ onNext, name = "고객" }) {
   const [phase, setPhase] = useState("intro"); // intro | loading | loaded
   const [consentOpen, setConsentOpen] = useState(false);
 
@@ -118,7 +118,7 @@ export function MydataConnect({ onNext }) {
           <h2 className={styles.title}>
             정확한 절세 설계를 위해,
             <br />
-            계좌를 <em>안전하게</em> 불러올게요.
+            {name}님의 금융데이터를 <br /><em>안전하게</em> 가져올게요.
           </h2>
           <p className={styles.sub}>
             흩어진 계좌와 전년도 소득을 마이데이터로 한 번에 조회해, 나에게 맞는 절세·배분 솔루션을 계산해요.

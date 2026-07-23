@@ -32,6 +32,7 @@ export const MYDATA_ACCOUNTS = {
 /* 마이데이터(본인확인·소득정보)로 불러오는 개인 프로파일 — 예시 목데이터
  * 금융소득·총소득은 화면에서 사용자가 직접 수정할 수 있는 초기값이다. */
 export const MYDATA_PROFILE = {
+  name: "고객", // 데모(목업) 사용자 닉네임 — 실 로그인 시 프로필 이름으로 대체됨
   age: 45,
   financialIncomePrevYear: 30_000_000, // 전년도 금융소득
   totalIncomePrevYear: 90_000_000, // 전년도 총소득

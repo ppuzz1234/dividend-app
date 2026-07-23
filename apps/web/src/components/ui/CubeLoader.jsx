@@ -49,7 +49,7 @@ const STICKER_CLASS = {
 
 const LAYER_CLASS = ["layerTop", "layerMid", "layerBot"]; // y = -1, 0, 1
 
-export function CubeLoader({ msgs = [], size = 96 }) {
+export function CubeLoader({ msgs = [], size = 96, bare = false }) {
   const [msg, setMsg] = useState(0);
 
   useEffect(() => {
@@ -67,7 +67,7 @@ export function CubeLoader({ msgs = [], size = 96 }) {
   };
 
   return (
-    <div className={styles.wrap} role="status" aria-label="불러오는 중">
+    <div className={cx(styles.wrap, bare && styles.bare)} role="status" aria-label="불러오는 중">
       <div className={styles.stage} style={stageVars}>
         <div className={styles.glow} />
         <div className={styles.cube}>

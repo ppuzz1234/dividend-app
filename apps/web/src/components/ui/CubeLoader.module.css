@@ -14,6 +14,10 @@
   flex-direction: column;
   align-items: center;
 }
+/* bare — 스플래시 등 로고 단독 노출 시 여백 제거 */
+.bare {
+  padding: 0;
+}
 
 .stage {
   position: relative;

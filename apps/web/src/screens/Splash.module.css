@@ -51,12 +51,14 @@
 }
 
 /* 브랜드 마크(노란 스퀘어클) 자체가 아이콘 — 별도 타일/테두리 없이 그대로 노출 */
+/* 움직이는 로딩 로고(CubeLoader) 영역 — 조립 애니메이션이 상하로 번져도
+   레이아웃이 흔들리지 않도록 높이를 넉넉히 확보하고 오버플로를 허용한다. */
 .mark {
-  width: 92px;
-  height: 92px;
-  margin: 0 auto 26px;
+  min-height: 118px;
+  margin: 0 auto 22px;
   display: grid;
   place-items: center;
+  overflow: visible;
 }
 
 .eyebrow {
