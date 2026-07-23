@@ -98,7 +98,6 @@ export function Intro({ onNext }) {
   const wrapRef = useRef(null);
 
   const amount = useCountUp(1000, { enabled: !reduce && revealed.has(1) });
-  const saved = useCountUp(2433, { enabled: !reduce && revealed.has(2) }); // 절세 비교(연 1.2억) 세금+건보료 총 부담 절감액(만원) = 3,421 − 988
 
   /* 스크롤 뷰포트 높이를 측정해 각 장면을 정확히 한 화면 높이로 맞춘다(셸 무관). */
   useLayoutEffect(() => {
@@ -173,14 +172,18 @@ export function Intro({ onNext }) {
       >
         <div className={styles.orb} aria-hidden="true" />
         <h2 className={styles.hookTitle}>
-          <span className={styles.rise} style={{ "--i": 0 }}>은퇴는 끝이 아니라,</span>
+          <span className={styles.rise} style={{ "--i": 0 }}>내년 연말정산</span>
           <span className={styles.rise} style={{ "--i": 1 }}>
-            매달 <em>현금흐름</em>이
+            환급 최대화<sup className={styles.hookStar}>*</sup>,
           </span>
-          <span className={styles.rise} style={{ "--i": 2 }}>필요한 시작입니다.</span>
+          <span className={styles.rise} style={{ "--i": 2 }}>목표 현금 흐름을 위한</span>
+          <span className={styles.rise} style={{ "--i": 3 }}>
+            나의 <em>금융빌딩</em> 만들기,
+          </span>
+          <span className={styles.rise} style={{ "--i": 4 }}>5분 후에 알려드립니다.</span>
         </h2>
-        <p className={cx(styles.hookSub, styles.rise)} style={{ "--i": 3 }}>
-          국민연금만으로는 채워지지 않는 그 차이를, 지금부터 설계합니다.
+        <p className={cx(styles.hookNote, styles.rise)} style={{ "--i": 5 }}>
+          *절세 계좌(연금저축/IRP/ISA) 관련 기준입니다.
         </p>
       </section>
 
@@ -219,16 +222,16 @@ export function Intro({ onNext }) {
         <div className={styles.taxRows}>
           <div className={cx(styles.taxRow, styles.rise)} style={{ "--i": 2 }}>
             <span className={styles.taxRowK}>일반계좌 · 종합과세</span>
-            <b className={styles.taxRowV}>약 3,421만원</b>
+            <b className={styles.taxRowV}>약 3,400만원</b>
           </div>
           <div className={cx(styles.taxRow, styles.taxRowGood, styles.rise)} style={{ "--i": 3 }}>
             <span className={styles.taxRowK}>연금저축계좌 · 분리과세</span>
-            <b className={styles.taxRowV}>988만원</b>
+            <b className={styles.taxRowV}>약 1,000만원</b>
           </div>
         </div>
 
         <p className={cx(styles.taxSave, styles.rise)} style={{ "--i": 4 }}>
-          매년 <b className={styles.taxSaveVal}>{saved.toLocaleString("ko-KR")}만원</b> 덜 냅니다.
+          매년 <b className={styles.taxSaveVal}>2,400만원</b> 덜 냅니다.
         </p>
       </section>
 
@@ -266,11 +269,11 @@ export function Intro({ onNext }) {
           <span className={styles.chartLabelLo}>일반</span>
         </div>
         <h2 className={cx(styles.ctaTitle, styles.rise)} style={{ "--i": 1 }}>
-          지금 3분이면,<br />절세를 위한 투자 계좌<br /> 최적화 설계를 시작합니다.
+          지금 바로,<br />절세를 위한 투자 계좌<br /> 최적화 설계를 시작합니다.
         </h2>
         <div className={cx(styles.ctaAction, styles.rise)} style={{ "--i": 2 }}>
           <Button onClick={onNext} icon={ArrowRight}>
-            3분 만에 내 설계 시작하기
+            나의 절세 설계 시작하기
           </Button>
           <p className={styles.reassure}>예상 소요 3분 · 목표는 언제든 다시 바꿀 수 있어요</p>
         </div>

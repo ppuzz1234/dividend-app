@@ -135,16 +135,24 @@
   z-index: 1;
   margin: 0;
   font-family: var(--font-brand);
-  font-size: 36px;
+  font-size: 32px;
   font-weight: 800;
-  line-height: 1.3;
+  line-height: 1.32;
   letter-spacing: -0.03em;
   color: var(--text);
 }
 .hookTitle span {
   display: block;
 }
-/* 핵심어 '현금흐름' — 골드 강조 + 장면 진입 시 밑줄이 그어진다(키네틱) */
+/* 각주 표식 별표 — 헤드라인 위 첨자, 골드 톤 */
+.hookStar {
+  font-size: 0.42em;
+  vertical-align: super;
+  font-weight: 700;
+  color: var(--jade);
+  margin-left: 1px;
+}
+/* 핵심어 '금융빌딩' — 골드 강조 + 장면 진입 시 밑줄이 그어진다(키네틱) */
 .hookTitle em {
   position: relative;
   font-style: normal;
@@ -177,6 +185,16 @@
   word-break: keep-all;
   max-width: 30ch;
 }
+/* 헤드라인 별표 각주 — 작고 은은하게 */
+.hookNote {
+  position: relative;
+  z-index: 1;
+  margin: 20px 0 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--faint);
+  word-break: keep-all;
+}
 
 /* ---------------- 2) 목표 현금흐름 ---------------- */
 .sceneGoal {
@@ -208,7 +226,7 @@
 }
 .amount {
   font-family: var(--font-brand);
-  font-size: 76px;
+  font-size: 40px;
   font-weight: 900;
   line-height: 0.94;
   letter-spacing: -0.03em;
@@ -222,7 +240,10 @@
 }
 .goalSub {
   margin: 24px 0 0;
-  font-size: 17px;
+  /* 바로 위 "월"(.won)과 동일한 폰트 — 같은 패밀리·같은 700 굵기로 맞춤 */
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 18.7px; /* 기존 17px의 110% */
   line-height: 1.6;
   color: var(--sub);
   word-break: keep-all;
@@ -303,14 +324,16 @@
 }
 .taxSave {
   margin: 22px 0 0;
-  font-size: 18px;
+  /* 흰 문구 크기를 위 제목(.taxTitle, 27px)과 동일하게 */
+  font-size: 27px;
   font-weight: 700;
   color: var(--sub);
   letter-spacing: -0.01em;
 }
 .taxSaveVal {
   font-family: var(--font-brand);
-  font-size: 30px;
+  /* 금액 숫자는 기존 30px의 150% */
+  font-size: 45px;
   font-weight: 900;
   color: var(--jade);
   letter-spacing: -0.03em;
