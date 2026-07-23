@@ -863,6 +863,32 @@
   left: 1px;
   color: var(--faint);
 }
+/* 상단 전체 동의 카드 — 시트 최상단, 강조된 톤 */
+.agreeAll {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  margin: 4px 0 14px;
+  padding: 16px 15px;
+  border-radius: 14px;
+  border: 1.5px solid var(--line2);
+  background: var(--bg2);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+.agreeAllOn {
+  border-color: var(--jade);
+  background: color-mix(in srgb, var(--jade) 12%, var(--bg2));
+}
+.agreeAllLabel {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  word-break: keep-all;
+}
+
 .agreeBox {
   margin-top: 20px;
   display: flex;

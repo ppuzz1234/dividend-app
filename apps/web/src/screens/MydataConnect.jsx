@@ -62,8 +62,8 @@ const REQ_ITEMS = [
   { key: "provide", label: "개인(신용)정보 제공 동의" },
 ];
 const AUTH_SUBS = [
-  "[필수] 본인인증을 위한 개인정보 제3자 제공 동의 (PLUS CUBE → 카카오)",
-  "[필수] 마이데이터 통합인증을 위한 개인정보 제3자 제공 동의 (카카오 → PLUS CUBE, 정보제공자)",
+  "[필수] 본인인증을 위한 개인정보 제3자 제공 동의 (PLUS CUBE → PASS)",
+  "[필수] 마이데이터 통합인증을 위한 개인정보 제3자 제공 동의 (PASS → PLUS CUBE, 정보제공자)",
 ];
 
 /* intro 에서 미리 보여주는 연동 기관(업권) 칩 */
@@ -299,6 +299,13 @@ function ConsentSheet({ name = "고객", onAgree, onClose }) {
   const toggleOpt = (k) => setOpts((s) => ({ ...s, [k]: !s[k] }));
   const toggleReq = (k) => setReqs((s) => ({ ...s, [k]: !s[k] }));
   const allAgreed = reqs.collect && reqs.provide && reqs.auth;
+  // 상단 "전체 동의" — 선택·필수 항목이 모두 체크됐는지, 그리고 일괄 토글
+  const allChecked = allAgreed && opts.memo && opts.pay && opts.category;
+  const toggleAll = () => {
+    const v = !allChecked;
+    setOpts({ memo: v, pay: v, category: v });
+    setReqs({ collect: v, provide: v, auth: v });
+  };
 
   useEffect(() => {
     const onKey = (e) => e.key === "Escape" && onClose?.();
@@ -333,6 +340,19 @@ function ConsentSheet({ name = "고객", onAgree, onClose }) {
         </div>
 
         <div className={styles.sheetBody}>
+          {/* 상단 전체 동의 — 체크 시 선택·필수 항목이 모두 동의되고 버튼이 활성화된다 */}
+          <button
+            type="button"
+            className={cx(styles.agreeAll, allChecked && styles.agreeAllOn)}
+            onClick={toggleAll}
+            aria-pressed={allChecked}
+          >
+            <span className={cx(styles.check, allChecked && styles.checkOn)}>
+              {allChecked && <Check size={15} strokeWidth={3} />}
+            </span>
+            <span className={styles.agreeAllLabel}>마이데이터 연동 전체 동의</span>
+          </button>
+
           <p className={styles.introP}>
             <b>PLUS CUBE</b>는 「신용정보의 이용 및 보호에 관한 법률」, 「개인정보 보호법」 등 관련 법령에 따라 사용자의
             개인(신용)정보를 처리해요
@@ -464,7 +484,7 @@ function ConsentSheet({ name = "고객", onAgree, onClose }) {
                 <span className={cx(styles.check, reqs.auth && styles.checkOn)}>
                   {reqs.auth && <Check size={14} strokeWidth={3} />}
                 </span>
-                <span className={styles.agreeLabel}>카카오 인증 본인확인을 위한 동의</span>
+                <span className={styles.agreeLabel}>PASS 인증 본인확인을 위한 동의</span>
               </button>
               <div className={styles.subRows}>
                 {AUTH_SUBS.map((t) => (
@@ -483,7 +503,6 @@ function ConsentSheet({ name = "고객", onAgree, onClose }) {
           <Button onClick={() => allAgreed && onAgree?.()} icon={ArrowRight} disabled={!allAgreed}>
             모두 동의하고 계속하기
           </Button>
-          {!allAgreed && <p className={styles.footNote}>필수 항목에 모두 동의해야 계속할 수 있어요.</p>}
         </div>
       </div>
     </div>,

@@ -98,7 +98,7 @@ export function Intro({ onNext }) {
   const wrapRef = useRef(null);
 
   const amount = useCountUp(1000, { enabled: !reduce && revealed.has(1) });
-  const saved = useCountUp(1573, { enabled: !reduce && revealed.has(2) }); // 절세 비교(연 1.2억) 세금+건보료 총 부담 절감액(만원)
+  const saved = useCountUp(2433, { enabled: !reduce && revealed.has(2) }); // 절세 비교(연 1.2억) 세금+건보료 총 부담 절감액(만원) = 3,421 − 988
 
   /* 스크롤 뷰포트 높이를 측정해 각 장면을 정확히 한 화면 높이로 맞춘다(셸 무관). */
   useLayoutEffect(() => {
@@ -190,7 +190,7 @@ export function Intro({ onNext }) {
         className={cx(styles.scene, styles.sceneGoal, isIn(1) && styles.in)}
         style={sceneStyle}
       >
-        <p className={cx(styles.label, styles.rise)} style={{ "--i": 0 }}>당신의 목표 · 월 현금흐름</p>
+        <p className={cx(styles.label, styles.labelGoal, styles.rise)} style={{ "--i": 0 }}>고객님의 목표 · 월 현금흐름</p>
         <div className={cx(styles.figure, styles.rise)} style={{ "--i": 1 }}>
           <span className={styles.won}>월</span>
           <span className={styles.amount}>{amount.toLocaleString("ko-KR")}</span>
@@ -223,7 +223,7 @@ export function Intro({ onNext }) {
           </div>
           <div className={cx(styles.taxRow, styles.taxRowGood, styles.rise)} style={{ "--i": 3 }}>
             <span className={styles.taxRowK}>연금저축계좌 · 분리과세</span>
-            <b className={styles.taxRowV}>1,848만원</b>
+            <b className={styles.taxRowV}>988만원</b>
           </div>
         </div>
 

@@ -6,7 +6,10 @@
   position: relative;
 }
 
-/* 스크롤 컨테이너(#scrollArea)에 부여되는 세로 스냅 — 언마운트 시 제거된다 */
+/* 스크롤 컨테이너(#scrollArea)에 부여되는 세로 스냅 — 언마운트 시 제거된다.
+ * mandatory: 휠을 굴리면 항상 페이지(장면) 단위로 착 붙는다.
+ * 과격함은 아래 .scene 의 scroll-snap-stop: always 로 잡는다
+ * (한 제스처당 정확히 한 장면만 넘어가고, 여러 장면을 건너뛰며 오버슈트하지 않는다). */
 .snapRoot {
   scroll-snap-type: y mandatory;
   scroll-behavior: smooth;
@@ -89,6 +92,8 @@
 .scene {
   position: relative;
   scroll-snap-align: start;
+  /* 빠른 휠 플릭에도 이 장면을 건너뛰지 못하게 강제 정지 → 한 번에 한 페이지씩만 이동 */
+  scroll-snap-stop: always;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -184,6 +189,10 @@
   letter-spacing: 0.01em;
   color: var(--sub);
   margin: 0 0 14px;
+}
+/* 인트로 '목표 · 월 현금흐름' 라벨만 두 배 크기로 강조 */
+.labelGoal {
+  font-size: 28px;
 }
 .figure {
   display: flex;

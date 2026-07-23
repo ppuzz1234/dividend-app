@@ -12,7 +12,7 @@ import styles from "./AccountsAnalysis.module.css";
 const PRIORITY = ["pensionSavings", "isa", "irp"];
 const SHORT = { pensionSavings: "연금", isa: "ISA", irp: "IRP" };
 const WHY = {
-  pensionSavings: "환급률이 가장 높아 1순위로 채워요",
+  pensionSavings: "세제 운용 효율이 가장 높아 1순위로 채워요",
   isa: "전액 주식 투자·3년 롤오버로 2순위예요",
   irp: "안전자산 30% 제한이 있어 3순위예요",
 };
