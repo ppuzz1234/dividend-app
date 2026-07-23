@@ -176,11 +176,12 @@ export function Intro({ onNext }) {
           <span className={styles.rise} style={{ "--i": 1 }}>
             환급 최대화<sup className={styles.hookStar}>*</sup>,
           </span>
+          <br />
           <span className={styles.rise} style={{ "--i": 2 }}>목표 현금 흐름을 위한</span>
           <span className={styles.rise} style={{ "--i": 3 }}>
             나의 <em>금융빌딩</em> 만들기,
-          </span>
-          <span className={styles.rise} style={{ "--i": 4 }}>5분 후에 알려드립니다.</span>
+          </span> <br />
+          <span className={styles.rise} style={{ "--i": 4 }}>5분으로 알려드립니다.</span>
         </h2>
         <p className={cx(styles.hookNote, styles.rise)} style={{ "--i": 5 }}>
           *절세 계좌(연금저축/IRP/ISA) 관련 기준입니다.

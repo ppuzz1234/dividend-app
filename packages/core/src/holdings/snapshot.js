@@ -7,7 +7,7 @@
  * ------------------------------------------------------------------ */
 export const MYDATA_ACCOUNTS = {
   isa: {
-    institution: "한화자산운용",
+    institution: "한화투자증권",
     balance: 3_000_000,
     contributedThisYear: 3_000_000,
     holdings: [
@@ -16,7 +16,7 @@ export const MYDATA_ACCOUNTS = {
     ],
   },
   pension: {
-    institution: "한화투자증권",
+    institution: "한화자산운용",
     balance: 2_000_000,
     contributedThisYear: 2_000_000,
     holdings: [{ name: "TIGER 미국배당다우존스", productType: "krListedGlobalEtf", value: 2_000_000 }],

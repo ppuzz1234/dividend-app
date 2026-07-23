@@ -229,7 +229,7 @@ export function MydataConnect({ onNext, name = "고객" }) {
       <div className={cx(styles.body, styles.reveal)}>
         <header className={styles.head}>
           <h2 className={styles.title}>
-            정확한 절세 설계를 위해,
+            절세 계좌 최적화,
             <br />
             {name}님의 금융데이터를 <br /><em>안전하게</em> 가져올게요.
           </h2>
