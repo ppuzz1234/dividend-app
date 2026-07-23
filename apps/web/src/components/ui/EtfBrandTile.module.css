@@ -1,0 +1,10 @@
+.tile {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  user-select: none;
+}

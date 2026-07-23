@@ -173,13 +173,50 @@
   }
 }
 
-/* 슬라이더만 담는 둥근 타일 (목표 문장은 타일 밖으로 분리) */
+/* 안내문구 — 대화형 입력을 대체하는 상단 가이드 문장 */
+.goalGuide {
+  margin: 0 4px 18px;
+  text-align: center;
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  word-break: keep-all;
+}
+
+/* 슬라이더 + 선택 금액을 담는 둥근 타일 */
 .goalCard {
-  padding: 20px 24px;
+  padding: 22px 24px 20px;
   margin-bottom: 16px;
   border-radius: 40px;
   background: linear-gradient(160deg, var(--card-hi), var(--card));
   border: 1px solid var(--line);
+}
+/* 슬라이더로 고른 목표 금액 — 타일 안 상단에 크게 표시 */
+.goalPick {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.goalPickText {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--sub);
+}
+.goalPickVal {
+  font-size: 40px;
+  font-weight: 800;
+  color: var(--jade);
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+.goalPickUnit {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--jade);
 }
 /* 좌측 정렬 — 알약 폭이 변해도 문장 시작점("저는")이 고정되도록.
    행이 좁아지면 각 문구(흰색 텍스트) 중간이 아니라 항목 경계에서만 접히도록 함. */

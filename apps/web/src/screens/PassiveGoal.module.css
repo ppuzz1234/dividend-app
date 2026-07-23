@@ -30,11 +30,8 @@
   width: 40px;
   height: 40px;
   border-radius: 13px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--bg2);
-  color: var(--sub);
+  display: block;
+  object-fit: cover;
 }
 .rowLabel {
   font-size: 14.5px;
@@ -86,11 +83,7 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* 매달 투자금 — 히어로 강조 */
-.hero .rowIcon {
-  background: color-mix(in srgb, var(--jade) 16%, transparent);
-  color: var(--jade);
-}
+/* 매달 투자금 — 히어로 강조 (아이콘은 배경 없는 오브젝트라 라벨/숫자만 강조) */
 .hero .rowLabel {
   color: var(--text);
   font-weight: 800;
@@ -105,9 +98,19 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* 매달 투자금 하단 — 투자 상품(예시) 가정 명시 */
+.assumeNote {
+  margin: -6px 0 0;
+  padding: 0 2px 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--jade-deep, var(--faint));
+  word-break: keep-all;
+}
+
 .foot {
   margin: 0;
-  padding: 0 2px 16px;
+  padding: 8px 2px 16px;
   font-size: 12.5px;
   line-height: 1.55;
   color: var(--faint);

@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { ArrowRight, ChevronDown, Target, Hourglass, Flag, Wallet } from "lucide-react";
+import { ArrowRight, ChevronDown } from "lucide-react";
 import { Pad } from "../components/layout/Pad.jsx";
 import { Button } from "../components/ui/Button.jsx";
+import { InfoTip } from "../components/ui/InfoTip.jsx";
 import { RollingNumber } from "../components/ui/RollingNumber.jsx";
 import { fmtKRW } from "../lib/format.js";
 import { cx } from "../lib/cx.js";
@@ -9,7 +10,6 @@ import styles from "./Onboarding.module.css";
 import card from "./PassiveGoal.module.css";
 
 const GOAL_STOPS = [100, 300, 500, 1000, 2000]; // 목표 passive income 슬라이더 구간(만원)
-const digits = (v) => Number(String(v).replace(/\D/g, "")) || 0;
 
 /* ⑤ 목표 Passive Income — 계좌 최적화(③)에서 넘어오는 전환 히어로로 시작해,
  *  은퇴 후 매달 받고 싶은 passive income 을 정하면 필요 자산(4% 룰)과
@@ -51,26 +51,22 @@ export function PassiveGoal({ monthlyGoal, setMonthlyGoal, requiredNestEgg, requ
         </div>
       )}
 
-      {/* 목표 passive income 입력 + 필요 자산·월 투자금 역산 */}
+      {/* 목표 passive income 선택 + 필요 자산·월 투자금 역산 */}
       {stage === "goal" && (
         <div className={styles.goalStage}>
-          <div className={cx(styles.goalRow, styles.reveal)}>
-            <span className={styles.goalText}>"은퇴 후 매달</span>
-            <label className={styles.goalPill}>
-              <input
-                type="text"
-                inputMode="numeric"
-                value={monthlyGoal}
-                size={Math.max(String(monthlyGoal).length, 1)}
-                onChange={(e) => (setMonthlyGoal(digits(e.target.value)), reachFinal())}
-                className={styles.goalInput}
-              />
-              <span className={styles.goalUnit}>만원</span>
-            </label>
-            <span className={styles.goalText}>받고 싶어"</span>
-          </div>
+          <p className={cx(styles.goalGuide, styles.reveal)}>
+            은퇴 후 목표 Passive Income을 정하면,
+            <br />
+            필요한 자산과 매월 필요한 투자금을 알려드려요
+          </p>
 
           <div className={cx(styles.goalCard, styles.reveal)}>
+            {/* 선택한 목표 금액 — 슬라이더로 고른 값을 크게 표시 */}
+            <div className={styles.goalPick}>
+              <span className={styles.goalPickText}>매달</span>
+              <b className={styles.goalPickVal}>{monthlyGoal.toLocaleString()}</b>
+              <span className={styles.goalPickUnit}>만원</span>
+            </div>
             {(() => {
               const N = GOAL_STOPS.length - 1;
               const clamped = Math.min(GOAL_STOPS[N], Math.max(GOAL_STOPS[0], monthlyGoal));
@@ -110,35 +106,43 @@ export function PassiveGoal({ monthlyGoal, setMonthlyGoal, requiredNestEgg, requ
           <div className={styles.scenarioZone}>
             {moved && (
               <div className={card.summary}>
-                {/* 필요 자산 */}
+                {/* 필요 자산 — 4% 룰 역산 근거를 (i) 더보기로 설명 */}
                 <div className={card.row}>
-                  <span className={card.rowIcon}>
-                    <Target size={20} strokeWidth={2.2} />
+                  <img className={card.rowIcon} src="/brand/pg-nestegg.svg" alt="" />
+                  <span className={card.rowLabel}>
+                    필요 자산
+                    <InfoTip title="필요 자산은 이렇게 계산했어요">
+                      <p>
+                        은퇴 후 매달 <b>{monthlyGoal.toLocaleString()}만원</b>을 4% 룰로 평생 인출하려면, 필요한 은퇴
+                        자산은 총 <b>{fmtKRW(requiredNestEgg)}</b>이에요. (연 생활비 ÷ 4%)
+                      </p>
+                      {gap > 0 && gap < requiredNestEgg && (
+                        <p>
+                          이미 보유한 금융자산을 빼면 앞으로 <b>{fmtKRW(gap)}</b>만 더 모으면 되고, 아래 매달 투자금은 이
+                          금액을 은퇴까지 {years}년 동안 만들기 위해 역산한 값이에요.
+                        </p>
+                      )}
+                    </InfoTip>
                   </span>
-                  <span className={card.rowLabel}>필요 자산</span>
                   <RollingNumber className={card.rowVal} value={fmtKRW(requiredNestEgg)} />
                 </div>
 
                 <div className={card.divider} />
 
-                {/* 은퇴까지 / 은퇴 정년 */}
+                {/* 은퇴 정년 / 은퇴까지 (위치 교체) */}
                 <div className={card.dual}>
                   <div className={card.dualCell}>
-                    <span className={card.rowIcon}>
-                      <Hourglass size={18} strokeWidth={2.2} />
-                    </span>
-                    <div>
-                      <span className={card.miniLabel}>은퇴까지</span>
-                      <b className={card.miniVal}>{years}년</b>
-                    </div>
-                  </div>
-                  <div className={card.dualCell}>
-                    <span className={card.rowIcon}>
-                      <Flag size={18} strokeWidth={2.2} />
-                    </span>
+                    <img className={card.rowIcon} src="/brand/pg-age.svg" alt="" />
                     <div>
                       <span className={card.miniLabel}>은퇴 정년</span>
                       <b className={card.miniVal}>60세</b>
+                    </div>
+                  </div>
+                  <div className={card.dualCell}>
+                    <img className={card.rowIcon} src="/brand/pg-until.svg" alt="" />
+                    <div>
+                      <span className={card.miniLabel}>은퇴까지</span>
+                      <b className={card.miniVal}>{years}년</b>
                     </div>
                   </div>
                 </div>
@@ -147,9 +151,7 @@ export function PassiveGoal({ monthlyGoal, setMonthlyGoal, requiredNestEgg, requ
 
                 {/* 매달 투자금 — 히어로 강조 */}
                 <div className={cx(card.row, card.hero)}>
-                  <span className={card.rowIcon}>
-                    <Wallet size={20} strokeWidth={2.2} />
-                  </span>
+                  <img className={card.rowIcon} src="/brand/pg-monthly.svg" alt="" />
                   <span className={card.rowLabel}>매달 투자금</span>
                   {gap > 0 ? (
                     <RollingNumber className={card.heroVal} value={fmtKRW(requiredMonthly)} />
@@ -157,6 +159,8 @@ export function PassiveGoal({ monthlyGoal, setMonthlyGoal, requiredNestEgg, requ
                     <b className={card.heroVal}>0원</b>
                   )}
                 </div>
+
+                <p className={card.assumeNote}>PLUS 미국S&P500 ETF 상품 활용 예시예요.</p>
 
                 <p className={card.foot}>
                   {gap > 0

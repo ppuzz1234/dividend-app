@@ -1,111 +1,461 @@
+/* 온보딩 인트로 — 스크롤 내러티브(풀스크린 4 scene + 스냅 + reveal).
+ * 브랜드 테마(딥그린블랙 + 골드 단일 액센트) 유지, 카드/아이콘타일 폐기,
+ * 장면마다 의미 있는 커스텀 비주얼. 모든 모션 prefers-reduced-motion 대응. */
+
 .wrap {
   position: relative;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 0 20px max(20px, env(safe-area-inset-bottom));
 }
 
-.track {
-  display: flex;
-  overflow-x: auto;
-  overflow-y: hidden;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-}
-.track::-webkit-scrollbar {
-  display: none;
+/* 스크롤 컨테이너(#scrollArea)에 부여되는 세로 스냅 — 언마운트 시 제거된다 */
+.snapRoot {
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
 }
 
-.slide {
-  flex: 0 0 100%;
-  scroll-snap-align: center;
+/* ---------------- 고정 HUD ---------------- */
+/* height:0 sticky 박스가 스크롤 뷰포트 상단에 붙어, 자식들을 화면에 고정 노출 */
+.hud {
+  position: sticky;
+  top: 0;
+  height: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+.brand,
+.skip,
+.rail {
+  pointer-events: auto;
+}
+.brand {
+  position: absolute;
+  top: 18px;
+  left: 22px;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  text-align: center;
-  padding: 12px 10px 28px;
+  gap: 8px;
 }
-.iconWrap {
-  width: 84px;
-  height: 84px;
-  border-radius: 24px;
-  display: grid;
-  place-items: center;
-  background: var(--jade-dim);
-  color: var(--jade);
-  margin-bottom: 24px;
-}
-/* 브랜드 마크 슬라이드 — 노란 스퀘어클이 곧 아이콘. 타일 배경 없이 그대로 노출 */
-.iconWrapBrand {
-  background: none;
-  border-radius: 0;
-}
-.title {
-  font-size: 32px;
+.brandName {
+  font-family: var(--font-brand);
+  font-size: 13px;
   font-weight: 800;
-  line-height: 1.4;
-  letter-spacing: -0.02em;
-  white-space: pre-line;
-  margin: 0 0 14px;
+  letter-spacing: 1.6px;
+  color: var(--faint);
 }
-.desc {
-  font-size: 22px;
-  line-height: 1.65;
-  color: var(--sub);
-  word-break: keep-all;
-  max-width: 360px;
-}
-
-.dots {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 7px;
-  margin-top: 8px;
-}
-.dot {
-  width: 7px;
-  height: 7px;
-  padding: 0;
-  border: none;
-  border-radius: 50%;
-  background: var(--line2);
-  cursor: pointer;
-  transition: background 0.2s, width 0.2s;
-}
-.dotOn {
-  width: 18px;
-  border-radius: 4px;
-  background: var(--jade);
-}
-
-.footerRow {
-  margin-top: 36px;
-}
-
-/* 우측 상단에 고정된 '건너뛰기' 칩 — 헤더가 없는 인트로에서 안전영역을 피해 배치 */
 .skip {
   position: absolute;
-  top: max(12px, env(safe-area-inset-top));
-  right: 16px;
-  z-index: 2;
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-  padding: 7px 10px 7px 13px;
+  top: 16px;
+  right: 20px;
+  padding: 6px 4px;
+  background: none;
+  border: none;
+  font-family: var(--font-sans);
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--sub);
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 999px;
   cursor: pointer;
-  transition: color 0.18s, border-color 0.18s, background 0.18s;
+  transition: color 0.18s;
 }
 .skip:hover {
   color: var(--text);
-  border-color: var(--line2);
+}
+
+/* 진행 레일 — 우측 중앙, 장면 진행에 따라 채워진다 */
+.rail {
+  position: absolute;
+  right: 16px;
+  top: calc(var(--sceneH, 100dvh) / 2);
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+.tick {
+  width: 4px;
+  height: 14px;
+  border-radius: 2px;
+  background: var(--line2);
+  transition: background 0.35s ease, height 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.tickPast {
+  background: var(--jade-deep);
+}
+.tickOn {
+  height: 28px;
+  background: var(--jade);
+}
+
+/* ---------------- 장면 공통 ---------------- */
+.scene {
+  position: relative;
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 26px;
+  overflow: hidden;
+}
+
+/* reveal — .in 이 붙으면 자식 .rise 가 순차 상승 */
+.rise {
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: calc(var(--i, 0) * 95ms);
+}
+.in .rise {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---------------- 1) 훅 ---------------- */
+.sceneHook {
+  justify-content: flex-end;
+  padding-bottom: 21vh;
+}
+.orb {
+  position: absolute;
+  top: -8%;
+  right: -18%;
+  width: 74%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(242, 194, 48, 0.16), transparent 66%);
+}
+.hookTitle {
+  position: relative;
+  margin: 0;
+  font-family: var(--font-brand);
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1.32;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+.hookTitle span {
+  display: block;
+}
+.hookTitle em {
+  font-style: normal;
+  color: var(--jade);
+}
+.hookSub {
+  position: relative;
+  margin: 20px 0 0;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--sub);
+  word-break: keep-all;
+  max-width: 30ch;
+}
+
+/* ---------------- 2) 목표 현금흐름 ---------------- */
+.sceneGoal {
+  background: radial-gradient(120% 60% at 50% 42%, rgba(242, 194, 48, 0.08), transparent 70%);
+  align-items: flex-start;
+}
+.label {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--sub);
+  margin: 0 0 14px;
+}
+.figure {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  color: var(--jade);
+}
+.won {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--faint);
+  align-self: center;
+}
+.amount {
+  font-family: var(--font-brand);
+  font-size: 76px;
+  font-weight: 900;
+  line-height: 0.94;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 8px 40px rgba(242, 194, 48, 0.22);
+}
+.unit {
+  font-size: 30px;
+  font-weight: 800;
+  color: var(--jade-deep);
+}
+.goalSub {
+  margin: 24px 0 0;
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--sub);
+  word-break: keep-all;
+}
+.goalSub b {
+  color: var(--text);
+  font-weight: 700;
+  box-shadow: inset 0 -0.5em 0 rgba(242, 194, 48, 0.18);
+}
+
+/* ---------------- 3) 3계좌 절세 순서 ---------------- */
+.sceneHow {
+  align-items: flex-start;
+}
+.howTitle {
+  margin: 0 0 30px;
+  font-family: var(--font-brand);
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1.34;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+/* ---------------- 절세 비교 (연 1.2억) ---------------- */
+.sceneTax {
+  align-items: flex-start;
+}
+.taxTitle {
+  margin: 12px 0 26px;
+  font-family: var(--font-brand);
+  font-size: 27px;
+  font-weight: 800;
+  line-height: 1.34;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+.taxRows {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.taxRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 18px;
+  border-radius: 16px;
+  background: var(--card);
+  border: 1px solid var(--line);
+}
+.taxRowGood {
+  border-color: color-mix(in srgb, var(--jade) 45%, var(--line));
+  background: linear-gradient(160deg, color-mix(in srgb, var(--jade) 8%, var(--card)), var(--card));
+}
+.taxRowK {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--sub);
+  word-break: keep-all;
+}
+.taxRowV {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--faint);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.taxRowGood .taxRowK {
+  color: var(--text);
+}
+.taxRowGood .taxRowV {
+  color: var(--jade);
+}
+.taxSave {
+  margin: 22px 0 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--sub);
+  letter-spacing: -0.01em;
+}
+.taxSaveVal {
+  font-family: var(--font-brand);
+  font-size: 30px;
+  font-weight: 900;
+  color: var(--jade);
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 6px 30px rgba(242, 194, 48, 0.22);
+}
+.accounts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  max-width: 400px;
+}
+.accRow {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 0;
+  position: relative;
+}
+.accRow + .accRow {
+  border-top: 1px solid var(--line);
+}
+/* 우선순위 뱃지 — 세로로 연결되는 흐름선 */
+.accNum {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-brand);
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--on-jade);
+  background: var(--jade);
+}
+.accBody {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.accName {
+  font-size: 19px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+.accNote {
+  font-size: 14px;
+  color: var(--sub);
+  word-break: keep-all;
+}
+
+/* ---------------- 4) 실행 · CTA ---------------- */
+.sceneCta {
+  justify-content: center;
+  gap: 4px;
+}
+.chartWrap {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto 30px;
+}
+.chart {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.chartLabelHi,
+.chartLabelLo {
+  position: absolute;
+  right: 2px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.chartLabelHi {
+  top: -4px;
+  color: var(--jade);
+}
+.chartLabelLo {
+  bottom: 34px;
+  color: var(--sub);
+}
+.ctaTitle {
+  margin: 0;
+  text-align: center;
+  font-family: var(--font-brand);
+  font-size: 27px;
+  font-weight: 800;
+  line-height: 1.36;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+.ctaAction {
+  margin-top: 26px;
+}
+.reassure {
+  margin: 13px 0 0;
+  text-align: center;
+  font-size: 12.5px;
+  color: var(--sub);
+}
+
+/* ---------------- 곡선 드로잉 ---------------- */
+.lineOptim {
+  stroke-dasharray: 640;
+  stroke-dashoffset: 640;
+}
+.lineNormal {
+  opacity: 0;
+}
+.gap {
+  opacity: 0;
+}
+.endDot {
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scale(0);
+}
+.draw {
+  animation: draw 1.5s cubic-bezier(0.16, 1, 0.3, 1) 0.35s forwards;
+}
+.drawSlow {
+  animation: fadeIn 0.8s ease 0.2s forwards;
+}
+.gapIn {
+  animation: fadeIn 0.9s ease 0.9s forwards;
+}
+.endIn {
+  animation: pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 1.55s forwards;
+}
+
+@keyframes draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+@keyframes pop {
+  to {
+    transform: scale(1);
+  }
+}
+
+/* ---------------- 모션 최소화 ---------------- */
+@media (prefers-reduced-motion: reduce) {
+  .snapRoot {
+    scroll-behavior: auto;
+  }
+  .rise {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .lineOptim {
+    stroke-dasharray: none;
+    stroke-dashoffset: 0;
+  }
+  .lineNormal,
+  .gap {
+    opacity: 1;
+  }
+  .endDot {
+    transform: none;
+  }
+  .draw,
+  .drawSlow,
+  .gapIn,
+  .endIn {
+    animation: none;
+  }
 }

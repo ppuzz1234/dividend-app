@@ -57,6 +57,8 @@ export default function App() {
   const [manualAccounts, setManualAccounts] = useState(null);
   // 계좌 별 투자 상품 설정 결과 — { [accountId]: { [productCode]: 월배분액(원) } }
   const [productAlloc, setProductAlloc] = useState({});
+  // 매수 리듬(일/주/월) — 배분 화면(allocate)에서 결정, 확인 시트·메인 앱에 표시
+  const [buyCycle, setBuyCycle] = useState("weekly");
   /* 계좌·플랜 저장소 — Supabase 미설정이거나 로그인 전이면 no-op.
    * (로그인 전 조회는 RLS·권한에 막혀 401 만 발생시키므로 아예 호출하지 않는다) */
   const store = usePlanStore({ enabled: !!user?.userId });
@@ -261,8 +263,9 @@ export default function App() {
           monthlyContribution={scenario.gap > 0 ? requiredMonthly : 0}
           years={years}
           initialAlloc={productAlloc}
-          onNext={(alloc) => {
+          onNext={(alloc, cycle) => {
             setProductAlloc(alloc);
+            if (cycle) setBuyCycle(cycle);
             go("result");
           }}
         />
@@ -283,6 +286,7 @@ export default function App() {
           monthlyContribution={scenario.gap > 0 ? requiredMonthly : 0}
           existingAssets={currentAssets}
           productAlloc={productAlloc}
+          cycle={buyCycle}
           onNext={() => go("simulate")}
         />
       )}
@@ -290,6 +294,8 @@ export default function App() {
       {step === "portfolio" && (
         <MainApp
           alloc={productAlloc}
+          cycle={buyCycle}
+          assets={currentAssets}
           onRestart={() => {
             setSelected([]);
             go("splash");

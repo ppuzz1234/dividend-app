@@ -1,126 +1,157 @@
-/* ── 매수 리듬 카드 (게이미피케이션 핵심 선택) ── */
+/* ── 정기 투자 리듬 — 옐로우는 선택 상태·매수일 마커·CTA에만 쓴다.
+ * 라운드 시스템: 카드 16 · 행/타일 10-12 · 필 999 ── */
+
+/* 매수 리듬 선택 — 타이포 중심 세그먼트 카드 */
 .cycleGrid {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 10px;
   margin-top: 4px;
 }
 .cycleCard {
-  flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
-  padding: 16px 8px 14px;
+  gap: 2px;
+  font-family: var(--font-sans);
+  padding: 15px 8px 13px;
   border-radius: 16px;
   border: 1px solid var(--line);
   background: var(--bg2);
+  color: var(--text);
   cursor: pointer;
-  transition: border-color 0.16s, box-shadow 0.16s, transform 0.12s;
+  transition: border-color 0.16s, background 0.16s, transform 0.12s;
 }
 .cycleCard:hover {
   border-color: var(--line2);
 }
+.cycleCard:active {
+  transform: scale(0.98);
+}
 .cycleOn {
   border-color: var(--jade);
-  box-shadow: 0 0 0 1px var(--jade);
-  transform: translateY(-2px);
-}
-.cycleIcon {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--jade);
-  background: color-mix(in srgb, var(--jade) 14%, transparent);
-  margin-bottom: 4px;
-}
-.cycleOn .cycleIcon {
-  color: var(--on-jade, #0a0f0d);
-  background: var(--jade);
+  background:
+    radial-gradient(120% 150% at 50% 0%, rgba(242, 194, 48, 0.09), transparent 60%),
+    var(--bg2);
 }
 .cycleLabel {
-  font-size: 16px;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-}
-.cycleTag {
-  font-size: 10.5px;
+  font-size: 13px;
+  font-weight: 700;
   color: var(--sub);
-  text-align: center;
-  word-break: keep-all;
-  line-height: 1.3;
-  min-height: 27px;
+  letter-spacing: -0.01em;
+}
+.cycleOn .cycleLabel {
+  color: var(--jade);
+  font-weight: 800;
 }
 .cycleBuy {
-  margin-top: 4px;
-  font-size: 14px;
+  margin-top: 3px;
+  font-size: 16.5px;
   font-weight: 800;
-  color: var(--jade);
+  color: var(--text);
+  letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
 }
 .cycleBuyK {
-  font-size: 10px;
+  font-size: 10.5px;
   color: var(--faint);
 }
 
-/* ── 습관 요약 (코인/스트릭) ── */
-.habit {
-  margin-top: 16px;
+/* ── 이번 달 매수 일정 — 실제 달력 기반 스트립 ── */
+.plan {
+  margin-top: 14px;
   padding: 16px;
   border-radius: 16px;
   border: 1px solid var(--line);
   background: linear-gradient(160deg, var(--card-hi, var(--card)), var(--card));
 }
-.habitTop {
+.planHead {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: space-between;
   gap: 10px;
 }
-.habitBadge {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 12.5px;
+.planTitle {
+  font-size: 14px;
   font-weight: 800;
-  color: var(--jade);
-}
-.habitBuys {
-  font-size: 12px;
-  color: var(--sub);
-  font-weight: 600;
-}
-.habitBuys b {
+  letter-spacing: -0.02em;
   color: var(--text);
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
 }
-.coins {
+.planTag {
+  font-size: 11.5px;
+  color: var(--sub);
+  word-break: keep-all;
+  text-align: right;
+}
+
+/* 일자 스트립 — 매수일만 길고 밝은 틱 */
+.strip {
   display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  margin: 12px 0;
+  align-items: flex-end;
+  gap: 3px;
+  height: 26px;
+  margin-top: 14px;
 }
-.coin {
-  display: inline-flex;
-  color: var(--line2);
+.tick {
+  flex: 1;
+  height: 10px;
+  border-radius: 2px;
+  background: var(--line);
+  transition: height 0.25s cubic-bezier(0.16, 1, 0.3, 1), background 0.25s;
 }
-.coinOn {
-  color: var(--jade);
+.tickOn {
+  height: 26px;
+  background: var(--jade);
 }
-.habitNote {
-  margin: 0;
-  font-size: 12px;
+.axis {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-size: 10px;
+  color: var(--faint);
+}
+
+.planNote {
+  margin: 12px 0 0;
+  font-size: 12.5px;
   color: var(--sub);
   line-height: 1.55;
   word-break: keep-all;
 }
-.habitNote b {
+.planNote b {
   color: var(--text);
   font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 요약 스탯 2칸 */
+.stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.stat + .stat {
+  align-items: flex-end;
+}
+.statK {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--faint);
+}
+.statV {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
 }
 
@@ -140,34 +171,37 @@
 .row {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 12px 14px;
+  gap: 11px;
+  padding: 11px 14px;
   border-radius: 12px;
   border: 1px solid var(--line);
   background: var(--bg2);
 }
-.rowAcct {
-  flex-shrink: 0;
-  min-width: 58px;
-  font-size: 12px;
-  font-weight: 800;
-  color: var(--jade);
-}
-.rowName {
+.rowInfo {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.rowName {
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.rowAcct {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--sub);
+}
 .rowAmt {
   flex-shrink: 0;
   font-size: 13px;
   font-weight: 800;
-  color: var(--sub);
+  color: var(--text);
   font-variant-numeric: tabular-nums;
 }
 .empty {
@@ -176,4 +210,11 @@
   text-align: center;
   padding: 20px 8px;
   word-break: keep-all;
+}
+
+/* 모션 최소화 — 틱 전환 애니메이션 제거 */
+@media (prefers-reduced-motion: reduce) {
+  .tick {
+    transition: none;
+  }
 }

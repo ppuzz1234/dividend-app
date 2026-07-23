@@ -18,21 +18,28 @@ const WHY = {
 };
 const LEVEL_TAG = { good: "양호", warn: "개선 여지", act: "조치 필요" };
 
-/* 계좌별 신호등 상태 도출 — held(보유)/room(여력)/estRefund 로 판정 */
+/* 계좌별 신호등 상태 도출 — 남은 여력이 아니라 '이 계좌로 달성 가능한 총 납입금(연 한도)과
+ *  그에 따른 총 환급 예상액(한도 × 세액공제율)'을 기준으로 표기한다. */
 function analyze(r) {
-  if (r.held === false) {
-    return { level: "act", note: `아직 개설 전이에요. ${r.benefit ?? "세제 혜택"}을 놓치고 있어요.` };
-  }
   if (r.roomType === "deduct") {
-    if (r.room <= 0) return { level: "good", note: "세액공제 한도를 다 채웠어요. 잘 관리되고 있어요." };
-    return {
-      level: "warn",
-      note: `세액공제 여력이 ${fmtKRW(r.room)} 남았어요. 더 넣으면 연 ${fmtKRW(r.estRefund)}을 돌려받아요.`,
-    };
+    const level = r.held === false ? "act" : r.room <= 0 ? "good" : "warn";
+    const note =
+      r.held === false
+        ? `지금 개설하면 연 ${fmtKRW(r.limit)} 납입으로 매년 ${fmtKRW(r.maxRefund)}을 환급받을 수 있어요.`
+        : r.room <= 0
+          ? `연 ${fmtKRW(r.limit)}을 모두 채워 매년 ${fmtKRW(r.maxRefund)}을 돌려받고 있어요.`
+          : `이 계좌로 연 ${fmtKRW(r.limit)}까지 납입하면 매년 ${fmtKRW(r.maxRefund)}을 세액공제로 돌려받아요.`;
+    return { level, note };
   }
-  // ISA(limit)
-  if (r.room <= 0) return { level: "good", note: "비과세 한도를 다 채웠어요. 잘 관리되고 있어요." };
-  return { level: "warn", note: `비과세 납입 여력이 ${fmtKRW(r.room)} 남았어요. 배당형 상품을 담으면 절세가 커져요.` };
+  // ISA(limit) — 세액공제가 아닌 비과세이므로 총 납입 가능액과 비과세 혜택으로 표기
+  const level = r.held === false ? "act" : r.room <= 0 ? "good" : "warn";
+  const note =
+    r.held === false
+      ? `지금 개설하면 연 ${fmtKRW(r.limit)}까지 비과세로 굴릴 수 있어요.`
+      : r.room <= 0
+        ? `연 ${fmtKRW(r.limit)} 비과세 한도를 모두 활용하고 있어요.`
+        : `이 계좌로 연 ${fmtKRW(r.limit)}까지 담아 순이익 200만원을 비과세로 받을 수 있어요.`;
+  return { level, note };
 }
 
 /* ③ 3종 계좌 최적화 분석 — 어떤 계좌부터 납입할지(우선순위)와 각 계좌가 지금

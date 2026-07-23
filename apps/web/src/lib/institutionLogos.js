@@ -42,7 +42,7 @@ export const INSTITUTION_LOGOS = {
   "discover-card": { name: "디스커버", aliases: ["Discover"] },
   "payco-card": { name: "페이코", aliases: ["PAYCO"] },
   /* ── 증권 ─────────────────────────────────────────── */
-  "hanwha-sec": { name: "한화투자증권", aliases: ["한화증권", "한화투자"] },
+  "hanwha-sec": { name: "한화투자증권", aliases: ["한화증권", "한화투자", "한화자산운용", "한화자산", "한화운용"] },
   "miraeasset-sec": { name: "미래에셋증권", aliases: ["미래에셋", "미래에셋대우"] },
   "samsung-sec": { name: "삼성증권", aliases: ["Samsung Securities"] },
   "kiwoom-sec": { name: "키움증권", aliases: ["키움", "Kiwoom"] },

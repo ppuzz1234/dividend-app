@@ -15,12 +15,12 @@
 .insight {
   border: 1px solid var(--gold-deep);
   border-radius: 20px;
-  padding: 18px;
-  margin-bottom: 18px;
+  padding: 16px 18px;
+  margin-bottom: 16px;
   background: linear-gradient(165deg, var(--gold-dim), var(--card));
 }
 .insHead {
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 .insBadge {
   display: inline-flex;
@@ -77,91 +77,69 @@
 
 /* ── 계좌별 절세·세액공제 ── */
 /* 절세 총액 — 상단 히어로 박스 */
-.saveTotal {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 5px;
-  margin-bottom: 14px;
-  padding: 18px 14px;
-  border-radius: 16px;
-  background: linear-gradient(160deg, var(--gold-dim), var(--card));
-  border: 1px solid var(--gold-deep);
-}
-.saveTotal svg {
-  color: var(--gold);
-}
-.saveTotalCap {
-  font-size: 12.5px;
-  font-weight: 700;
-  color: var(--sub);
-}
-.saveTotalVal {
-  font-size: 34px;
+/* 헤드라인에 임베드된 절세 총액 */
+.insTotal {
+  font-size: 19px;
   font-weight: 800;
   color: var(--gold);
   font-variant-numeric: tabular-nums;
-  letter-spacing: -0.03em;
-  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--gold) 35%, transparent));
+  letter-spacing: -0.02em;
 }
-/* 계좌별 내역 — 월 납입 → 연 절세/세액공제 */
-.saveList {
-  display: flex;
-  flex-direction: column;
+
+/* ── 계좌별 절세·세액공제 — 2×2 컴팩트 그리드 (계획의 계좌별 월 납입에 연동) ── */
+.saveGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 8px;
+  margin-top: 12px;
 }
-.saveRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 12px 14px;
+.saveCell {
+  padding: 11px 12px;
   border-radius: 12px;
   background: var(--bg2);
   border: 1px solid var(--line);
 }
-.saveAcct {
+.saveCellTop {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+.saveCellBot {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 3px;
 }
 .saveName {
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 800;
-  color: var(--text);
   letter-spacing: -0.02em;
-}
-.saveMonthly {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--sub);
-  font-variant-numeric: tabular-nums;
-}
-.saveBenefit {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 2px;
-  flex-shrink: 0;
+  color: var(--text);
 }
 .saveAmt {
-  font-size: 17px;
+  font-size: 15px;
   font-weight: 800;
   color: var(--gold);
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.02em;
 }
+.saveMonthly {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--sub);
+  font-variant-numeric: tabular-nums;
+}
 .saveLabel {
   font-size: 11px;
   font-weight: 700;
-  color: var(--sub);
+  color: var(--faint);
 }
 .saveNone {
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--faint);
-  flex-shrink: 0;
 }
 
 .cmpGrid {
@@ -356,6 +334,58 @@
   color: var(--faint);
   line-height: 1.5;
   margin: 13px 0 0;
+}
+
+/* ── 추천 배당 솔루션 ── */
+.divSol {
+  border: 1px solid var(--jade-deep);
+  border-radius: 20px;
+  padding: 16px 18px 18px;
+  margin-bottom: 16px;
+  background: linear-gradient(165deg, var(--jade-dim), var(--card));
+}
+.divSegWrap {
+  margin: 14px 0;
+}
+.divHero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 18px 14px;
+  border-radius: 16px;
+  background: linear-gradient(160deg, var(--card-hi), var(--bg2));
+  border: 1px solid var(--line);
+}
+.divCap {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--sub);
+}
+.divAnnual {
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--jade);
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--jade) 30%, transparent));
+}
+.divMonthly {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--sub);
+  font-variant-numeric: tabular-nums;
+}
+.divGoal {
+  margin-top: 12px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--sub);
+  word-break: keep-all;
+}
+.divGoal b {
+  color: var(--jade);
+  font-weight: 800;
 }
 
 .hero {

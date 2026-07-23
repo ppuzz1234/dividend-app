@@ -142,6 +142,8 @@ export function buildAccountRooms({ mydata = false, manual = null, income = 50_0
     const room = Math.max(0, d.limit - used);
     const pct = d.limit > 0 ? Math.min(100, (used / d.limit) * 100) : 0;
     const estRefund = d.roomType === "deduct" ? Math.round(room * DEDUCT_RATE) : 0;
+    // 이 계좌를 한도(limit)까지 다 채웠을 때 매년 받는 총 세액공제 환급액 (여력이 아닌 총액 기준)
+    const maxRefund = d.roomType === "deduct" ? Math.round(d.limit * DEDUCT_RATE) : 0;
     // 예상 절세효과 — 연금계좌: 세액공제 환급, ISA: 비과세 한도(200만) 상당의 절세액
     const estSaving = d.roomType === "deduct" ? estRefund : d.id === "isa" ? Math.round(2_000_000 * 0.154) : 0;
 
@@ -157,6 +159,7 @@ export function buildAccountRooms({ mydata = false, manual = null, income = 50_0
       pct,
       roomText: d.roomType === "deduct" ? "올해 세액공제 여력" : "올해 납입 여력",
       estRefund,
+      maxRefund,
       estSaving,
     };
   });

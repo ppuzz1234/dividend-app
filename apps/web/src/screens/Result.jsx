@@ -1,44 +1,18 @@
 import { useMemo, useState } from "react";
-import {
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  CartesianGrid,
-} from "recharts";
-import {
-  ArrowRight,
-  CircleDollarSign,
-  Wallet,
-  PiggyBank,
-  TrendingUp,
-  AlertTriangle,
-  Sparkles,
-  RefreshCw,
-} from "lucide-react";
+import { ArrowRight, AlertTriangle, Sparkles, RefreshCw } from "lucide-react";
 import { buildAccountRooms, deductionRate } from "@devidend/core";
 import { OrderConfirmSheet } from "./OrderConfirmSheet.jsx";
 import { Pad } from "../components/layout/Pad.jsx";
 import { Heading } from "../components/layout/Heading.jsx";
 import { Button } from "../components/ui/Button.jsx";
+import { Segmented } from "../components/ui/Segmented.jsx";
 import { Tag } from "../components/ui/Tag.jsx";
 import { useCountUp } from "../hooks/useCountUp.js";
-import { fmtKRW, fmtShort } from "../lib/format.js";
+import { fmtKRW } from "../lib/format.js";
 import { cx } from "../lib/cx.js";
-import { C } from "../theme/tokens.js";
 import styles from "./Result.module.css";
 
-/* 이 페이지 한정 청녹(민트/틸) 팔레트 — CSS의 .mintScope 오버라이드와 값 동기화.
-   차트·아이콘은 CSS 변수가 아닌 JS 색상 문자열을 쓰므로 여기서 별도 치환. */
-const MINT = {
-  main: "#2dd4bf", // = --jade
-  mainDeep: "#14b8a6", // = --jade-deep
-  sub: "#34d399", // = --gold
-};
-
-export function Result({ sim, allocation, chosen, years, reinvest, goalNestEgg, monthlyGoal, manualAccounts, income = 50_000_000, monthlyContribution = 0, existingAssets = 0, productAlloc = {}, onNext }) {
+export function Result({ sim, allocation, chosen, years, reinvest, goalNestEgg, monthlyGoal, manualAccounts, income = 50_000_000, monthlyContribution = 0, existingAssets = 0, productAlloc = {}, cycle = "weekly", onNext }) {
   /* 기존 보유자산은 현재가치로(성장 없이) 목표에 합산한다 —
    * 시뮬(sim)은 월 납입 성장분만 담고 있어(App 에서 시드 0), 이중 성장을 피한다.
    * → 최종 평가금액 = 기존 자산(정적) + 월 납입 성장분. */
@@ -46,12 +20,16 @@ export function Result({ sim, allocation, chosen, years, reinvest, goalNestEgg, 
   const contributed = sim.contributed + existingAssets;
   const val = useCountUp(finalValue, 1100);
   const returnPct = contributed > 0 ? (finalValue / contributed - 1) * 100 : 0;
-  // 차트에도 기존 자산을 원금(정적) 베이스로 깔아 히어로 금액과 상단선을 일치시킨다
-  const series =
-    existingAssets > 0
-      ? sim.series.map((d) => ({ ...d, value: d.value + existingAssets, principal: d.principal + existingAssets }))
-      : sim.series;
   const [confirmOpen, setConfirmOpen] = useState(false); // 배분·투자 확인 시트
+
+  /* 추천 배당 솔루션 — 은퇴 시점에 모은 자산(finalValue)을 고배당 상품으로 전환했을 때의
+   * 연/월 배당액. 배당 ETF(연 4%) 또는 커버드콜 ETF(연 10%) 중 선택. */
+  const [divType, setDivType] = useState("div");
+  const divRate = divType === "cc" ? 0.1 : 0.04;
+  const annualDiv = Math.round((finalValue * divRate) / 10000) * 10000;
+  const monthlyDiv = Math.round(annualDiv / 12 / 10000) * 10000;
+  const goalMonthlyWon = (monthlyGoal || 0) * 10000;
+  const coverPct = goalMonthlyWon > 0 ? Math.round((monthlyDiv / goalMonthlyWon) * 100) : null;
 
   /* 계좌별 절세·세액공제 — 배분(buildAccountRooms)의 계좌별 월 납입과
    * 세제 혜택(연금·IRP 세액공제 / ISA 비과세 절세)을 계좌별로 정리하고 합계(절세 총액)를 낸다. */
@@ -101,56 +79,49 @@ export function Result({ sim, allocation, chosen, years, reinvest, goalNestEgg, 
       {/* 핵심 인사이트: 계좌별 절세·세액공제 (절세 총액 + 계좌별 내역) */}
       <TaxSaving rows={taxSaving.rows} total={taxSaving.total} deductRate={deductRate} />
 
-      {/* 눈덩이 차트 */}
-      <div className={styles.chartCard}>
-        <div className={styles.legendRow}>
-          <Legend tone="principal" t="납입 원금" />
-          <Legend tone="gain" t="수익 · 배당" />
+      {/* 추천 배당 솔루션 — 모은 자산을 은퇴 후 고배당 상품으로 전환하는 전략 시뮬 */}
+      <section className={styles.divSol}>
+        <div className={styles.insHead}>
+          <span className={styles.insBadge}>
+            <Sparkles size={13} strokeWidth={2.6} /> 추천 배당 솔루션
+          </span>
+          <h2 className={styles.insTitle}>은퇴 후엔 모은 자산을 배당으로 바꿔요</h2>
+          <p className={styles.insSub}>
+            은퇴 전까지는 성장주 ETF로 자산을 키우고, 모은 <b>{fmtKRW(finalValue)}</b>을 은퇴 시점에 고배당 상품으로
+            전환해 매달 배당으로 생활비를 만들어요.
+          </p>
         </div>
-        <div className={styles.chartBox}>
-          <ResponsiveContainer>
-            <AreaChart data={series} margin={{ top: 4, right: 12, bottom: 0, left: 4 }}>
-              <defs>
-                <linearGradient id="gP" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor={MINT.main} stopOpacity={0.7} />
-                  <stop offset="100%" stopColor={MINT.main} stopOpacity={0.08} />
-                </linearGradient>
-                <linearGradient id="gG" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor={MINT.sub} stopOpacity={0.75} />
-                  <stop offset="100%" stopColor={MINT.sub} stopOpacity={0.1} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid stroke={C.line} vertical={false} />
-              <XAxis
-                dataKey="year"
-                tick={{ fill: C.faint, fontSize: 10 }}
-                tickLine={false}
-                axisLine={false}
-                tickFormatter={(y) => (y === 0 ? "지금" : `${y}년`)}
-                interval="preserveStartEnd"
-              />
-              <YAxis
-                tick={{ fill: C.faint, fontSize: 10 }}
-                tickLine={false}
-                axisLine={false}
-                width={40}
-                tickFormatter={fmtShort}
-              />
-              <Tooltip content={<ChartTip />} />
-              <Area type="monotone" dataKey="principal" stackId="1" stroke={MINT.mainDeep} strokeWidth={2} fill="url(#gP)" />
-              <Area type="monotone" dataKey="gain" stackId="1" stroke={MINT.sub} strokeWidth={2} fill="url(#gG)" />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
 
-      {/* 배당 스탯 */}
-      <div className={styles.statGrid}>
-        <Stat icon={CircleDollarSign} label={`${years}년차 연 배당금`} v={fmtKRW(sim.annualIncome)} tone="gold" />
-        <Stat icon={Wallet} label="월 환산 배당" v={fmtKRW(sim.monthlyIncome)} tone="gold" />
-        <Stat icon={PiggyBank} label="누적 수령 배당" v={fmtKRW(sim.cumDiv)} />
-        <Stat icon={TrendingUp} label="원가대비 배당률" v={`${(sim.yoc * 100).toFixed(1)}%`} />
-      </div>
+        <div className={styles.divSegWrap}>
+          <Segmented
+            value={divType}
+            onChange={setDivType}
+            opts={[
+              { v: "div", l: "배당 ETF · 연 4%" },
+              { v: "cc", l: "커버드콜 ETF · 연 10%" },
+            ]}
+          />
+        </div>
+
+        <div className={styles.divHero}>
+          <span className={styles.divCap}>전환 시 예상 연 배당액</span>
+          <b className={styles.divAnnual}>{fmtKRW(annualDiv)}</b>
+          <span className={styles.divMonthly}>월 환산 약 {fmtKRW(monthlyDiv)}</span>
+        </div>
+
+        {coverPct != null && (
+          <div className={styles.divGoal}>
+            목표 월 생활비 {monthlyGoal.toLocaleString()}만원의 <b>{coverPct}%</b>를 배당으로 충당해요
+          </div>
+        )}
+
+        <p className={styles.insNote}>
+          {divType === "cc"
+            ? "커버드콜 ETF는 월배당·고분배로 현금흐름이 크지만, 상승장에서 주가 상승이 제한되고 분배율이 변동될 수 있어요. "
+            : "배당 ETF는 변동성이 상대적으로 낮지만, 배당은 시장 상황에 따라 달라질 수 있어요. "}
+          전환 금액은 은퇴 시점 평가액 가정이며, 실제 배당은 상품·시장에 따라 달라져요.
+        </p>
+      </section>
 
       {/* 가정·세금 */}
       <div className={styles.assume}>
@@ -216,6 +187,7 @@ export function Result({ sim, allocation, chosen, years, reinvest, goalNestEgg, 
       {confirmOpen && (
         <OrderConfirmSheet
           alloc={productAlloc}
+          cycle={cycle}
           onConfirm={() => {
             setConfirmOpen(false);
             onNext?.();
@@ -237,39 +209,33 @@ function TaxSaving({ rows, total, deductRate }) {
         <span className={styles.insBadge}>
           <Sparkles size={13} strokeWidth={2.6} /> 핵심 인사이트
         </span>
-        <h2 className={styles.insTitle}>계좌 배분만으로 매년 이만큼 절세돼요</h2>
-        <p className={styles.insSub}>계좌별 납입액 기준 · 연간 절세·세액공제 혜택</p>
+        <h2 className={styles.insTitle}>
+          계좌 배분만으로 <b className={styles.insTotal}>연 {fmtKRW(total)}</b> 절세돼요
+        </h2>
       </div>
 
-      {/* 절세 총액 (상단) — 계좌별 혜택의 합계 */}
-      <div className={styles.saveTotal}>
-        <PiggyBank size={20} strokeWidth={2.4} />
-        <span className={styles.saveTotalCap}>연간 절세 총액</span>
-        <strong className={styles.saveTotalVal}>{fmtKRW(total)}</strong>
-      </div>
-
-      {/* 계좌별 내역 (하단) — 월 납입 → 연 절세/세액공제 */}
-      <div className={styles.saveList}>
+      {/* 계좌별 내역 — 계획의 계좌별 월 납입(납입여력 기준)에 연동된 연 절세/세액공제 */}
+      <div className={styles.saveGrid}>
         {rows.map((r) => (
-          <div key={r.id} className={styles.saveRow}>
-            <div className={styles.saveAcct}>
+          <div key={r.id} className={styles.saveCell}>
+            <div className={styles.saveCellTop}>
               <span className={styles.saveName}>{r.name}</span>
-              <span className={styles.saveMonthly}>월 {fmtKRW(r.monthly)} 납입</span>
-            </div>
-            {r.benefit > 0 ? (
-              <div className={styles.saveBenefit}>
+              {r.benefit > 0 ? (
                 <b className={styles.saveAmt}>+{fmtKRW(r.benefit)}</b>
-                <span className={styles.saveLabel}>연 {r.label}</span>
-              </div>
-            ) : (
-              <span className={styles.saveNone}>절세 혜택 없음</span>
-            )}
+              ) : (
+                <span className={styles.saveNone}>혜택 없음</span>
+              )}
+            </div>
+            <div className={styles.saveCellBot}>
+              <span className={styles.saveMonthly}>월 {fmtKRW(r.monthly)}</span>
+              {r.label && <span className={styles.saveLabel}>{r.label}</span>}
+            </div>
           </div>
         ))}
       </div>
 
       <p className={styles.insNote}>
-        ※ 세액공제율 {(deductRate * 100).toFixed(1)}%(총급여 기준) 적용 · ISA는 순이익 200만 비과세 상당. 단순화 추정치이며 세무 자문이 아닙니다.
+        세액공제율 {(deductRate * 100).toFixed(1)}%(총급여 기준)·ISA 비과세 반영. 단순화 추정치예요.
       </p>
     </section>
   );
@@ -284,25 +250,6 @@ function Mini({ label, v, tone }) {
   );
 }
 
-function Legend({ tone, t }) {
-  return (
-    <span className={styles.legend}>
-      <span className={cx(styles.legendDot, tone === "gain" ? styles.dotGain : styles.dotPrincipal)} />
-      {t}
-    </span>
-  );
-}
-
-function Stat({ icon: Icon, label, v, tone }) {
-  return (
-    <div className={styles.stat}>
-      <Icon size={18} color={tone === "gold" ? MINT.sub : MINT.main} />
-      <div className={styles.statLabel}>{label}</div>
-      <div className={cx(styles.statVal, tone === "gold" && styles.statValGold)}>{v}</div>
-    </div>
-  );
-}
-
 function Row({ k, v, last }) {
   return (
     <div className={cx(styles.row, last && styles.rowLast)}>
@@ -312,17 +259,3 @@ function Row({ k, v, last }) {
   );
 }
 
-function ChartTip({ active, payload, label }) {
-  if (!active || !payload?.length) return null;
-  const d = payload[0].payload;
-  return (
-    <div className={styles.tip}>
-      <div className={styles.tipLabel}>{label === 0 ? "지금" : `${label}년 후`}</div>
-      <div className={styles.tipVal}>{fmtKRW(d.value)}</div>
-      <div className={styles.tipSub}>
-        원금 {fmtKRW(d.principal)} · 수익 {fmtKRW(d.gain)}
-      </div>
-      <div className={styles.tipGold}>연 배당 {fmtKRW(d.income)}</div>
-    </div>
-  );
-}

@@ -1,97 +1,183 @@
-/* ── (데모) 마이데이터 연동 — 온보딩 목표 화면 본문 임베드 블록 ── */
-.block {
-  margin-top: 14px;
-}
-.reveal {
-  animation: mdRise 0.4s ease both;
-}
-
-/* intro — 제목 + 안내 */
-.introHead {
-  margin-bottom: 12px;
-}
-.introTitle {
-  margin: 0;
-  font-size: 20px;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  line-height: 1.3;
-}
-.introSub {
-  margin: 7px 0 0;
-  font-size: 13px;
-  color: var(--sub);
-  line-height: 1.55;
-  word-break: keep-all;
-}
-.cta {
-  margin-top: 18px;
-}
-
-/* intro — 안전 연동 안내 히어로 */
-.hero {
-  margin-top: 6px;
-  padding: 26px 20px 22px;
-  border-radius: 18px;
-  border: 1px solid var(--line);
-  background: linear-gradient(165deg, var(--card-hi, var(--card)), var(--card));
-  text-align: center;
-}
-.heroIcon {
-  width: 62px;
-  height: 62px;
-  margin: 0 auto 14px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--jade);
-  background: color-mix(in srgb, var(--jade) 14%, transparent);
-  border: 1px solid color-mix(in srgb, var(--jade) 32%, transparent);
-}
-.heroTitle {
-  font-size: 17px;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-}
-.heroSub {
-  margin-top: 6px;
-  font-size: 12.5px;
-  color: var(--sub);
-  word-break: keep-all;
-}
-.assure {
-  list-style: none;
-  margin: 16px 0 0;
-  padding: 0;
+/* ── (데모) 마이데이터 연동 — 화면 레이아웃을 직접 소유 ──
+ * screen(풀하이트 flex) = body(flex:1) + footer(하단 고정 CTA).
+ * intro 는 상단 헤드 / 중앙 신뢰 패널 / 하단 CTA 로 상하 비율을 균형 있게 배분한다. */
+.screen {
+  flex: 1;
+  min-height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+}
+.body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 8px 22px 8px;
+}
+.bodyCenter {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+.footer {
+  position: sticky;
+  bottom: 0;
+  padding: 12px 22px calc(14px + env(safe-area-inset-bottom));
+  background: var(--bg);
+  box-shadow: 0 -10px 20px -12px rgba(0, 0, 0, 0.4);
+}
+.footNote {
+  margin: 10px 0 0;
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--faint);
+  word-break: keep-all;
+}
+
+.reveal {
+  animation: mdRise 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* ── intro: 헤드 ── */
+.head {
+  padding-top: 10px;
+}
+.title {
+  margin: 0;
+  font-family: var(--font-brand);
+  font-size: 25px;
+  font-weight: 800;
+  line-height: 1.4;
+  letter-spacing: -0.03em;
+  color: var(--text);
+}
+.title em {
+  font-style: normal;
+  color: var(--jade);
+}
+.sub {
+  margin: 12px 0 0;
+  font-size: 14.5px;
+  line-height: 1.62;
+  color: var(--sub);
+  word-break: keep-all;
+  max-width: 33ch;
+}
+
+/* ── intro: 중앙 신뢰 패널 (남는 세로 공간에서 상하 균등 정렬) ── */
+.panel {
+  position: relative;
+  margin: auto 0;
+  padding: 30px 22px 22px;
+  border-radius: 22px;
+  border: 1px solid var(--line);
+  background:
+    radial-gradient(120% 90% at 50% -10%, color-mix(in srgb, var(--jade) 9%, transparent), transparent 60%),
+    linear-gradient(168deg, var(--card-hi, var(--card)), var(--card));
+  text-align: center;
+  overflow: hidden;
+}
+.emblem {
+  position: relative;
+  width: 66px;
+  height: 66px;
+  margin: 0 auto 16px;
+  border-radius: 20px;
+  display: grid;
+  place-items: center;
+  color: var(--jade);
+  background: color-mix(in srgb, var(--jade) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--jade) 34%, transparent);
+}
+/* 자물쇠 뒤 은은한 링 (네온 아님, 저강도) */
+.emblemRing {
+  position: absolute;
+  inset: -11px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--jade) 22%, transparent);
+  pointer-events: none;
+}
+.panelTitle {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+.panelSub {
+  margin-top: 7px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--sub);
+  word-break: keep-all;
+}
+
+.assure {
+  list-style: none;
+  margin: 20px 0 0;
+  padding: 16px 0 4px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: left;
 }
 .assure li {
   display: flex;
-  align-items: center;
-  gap: 9px;
-  font-size: 13px;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 13.5px;
   font-weight: 600;
-  color: var(--sub);
+  line-height: 1.45;
+  color: var(--faint);
+  word-break: keep-all;
 }
 .assure svg {
   flex-shrink: 0;
+  margin-top: 1px;
   color: var(--jade);
 }
 
-/* loaded — 총 평가 요약 카드 */
+/* 조회 범위 미리보기 칩 */
+.scopes {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+  text-align: left;
+}
+.scopeCap {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--sub);
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.chip {
+  padding: 7px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--line2);
+  background: var(--bg2);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--faint);
+  white-space: nowrap;
+}
+
+/* ── loaded — 총 평가 요약 카드 ── */
 .totalCard {
   margin-top: 6px;
-  padding: 18px 20px 16px;
-  border-radius: 18px;
+  padding: 20px 22px 18px;
+  border-radius: 20px;
   border: 1px solid var(--line);
-  background: linear-gradient(165deg, var(--card-hi, var(--card)), var(--card));
+  background: linear-gradient(168deg, var(--card-hi, var(--card)), var(--card));
   display: flex;
   flex-direction: column;
   gap: 3px;
-  animation: mdRise 0.4s ease both;
 }
 .totalHead {
   display: flex;
@@ -106,7 +192,7 @@
   color: var(--jade);
 }
 .totalV {
-  font-size: 26px;
+  font-size: 28px;
   font-weight: 800;
   letter-spacing: -0.03em;
   color: var(--jade);
@@ -117,7 +203,7 @@
   color: var(--faint);
 }
 
-/* loaded — 계좌 리스트 */
+/* ── loaded — 계좌 리스트 ── */
 .acctList {
   list-style: none;
   margin: 14px 0 0;
@@ -186,7 +272,7 @@
 @keyframes mdRise {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
@@ -194,6 +280,7 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
+  .reveal,
   .totalCard,
   .seq {
     animation: none;
@@ -226,12 +313,20 @@
   animation: mdUp 0.28s cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 @keyframes mdFade {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 @keyframes mdUp {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   .overlay,
@@ -360,10 +455,4 @@
   padding: 12px 20px calc(14px + env(safe-area-inset-bottom));
   border-top: 1px solid var(--line);
   background: var(--card);
-}
-.footNote {
-  margin: 8px 0 0;
-  text-align: center;
-  font-size: 11.5px;
-  color: var(--faint);
 }

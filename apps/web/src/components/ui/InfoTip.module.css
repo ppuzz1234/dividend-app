@@ -1,0 +1,107 @@
+/* 범용 정보 더보기(ⓘ) 버튼 + 레이어팝업 */
+.dot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 3px;
+  padding: 0;
+  border: none;
+  background: none;
+  line-height: 0;
+  vertical-align: middle;
+  cursor: pointer;
+  transition: transform 0.12s;
+  -webkit-tap-highlight-color: transparent;
+}
+.dot:active {
+  transform: scale(0.9);
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  background: rgba(0, 0, 0, 0.58);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: itFade 0.18s ease;
+}
+.popup {
+  position: relative;
+  width: 100%;
+  max-width: 360px;
+  padding: 22px 20px 20px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+  animation: itUp 0.24s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: var(--bg2);
+  color: var(--sub);
+  cursor: pointer;
+}
+.title {
+  margin: 0 34px 14px 0;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  word-break: keep-all;
+}
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+.body p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.62;
+  color: var(--sub);
+  word-break: keep-all;
+}
+.body b {
+  color: var(--jade);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes itFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes itUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .overlay,
+  .popup {
+    animation: none;
+  }
+}

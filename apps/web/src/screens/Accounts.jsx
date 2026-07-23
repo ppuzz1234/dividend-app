@@ -6,9 +6,10 @@ import { Pad } from "../components/layout/Pad.jsx";
 import { Heading } from "../components/layout/Heading.jsx";
 import { Button } from "../components/ui/Button.jsx";
 import { Segmented } from "../components/ui/Segmented.jsx";
-import { BrandLoader } from "../components/ui/BrandLoader.jsx";
+import { CubeLoader } from "../components/ui/CubeLoader.jsx";
 import { AccountRooms } from "../components/AccountRooms.jsx";
 import { EtfInfoButton } from "../components/EtfProductCard.jsx";
+import { InfoTip } from "../components/ui/InfoTip.jsx";
 import { GoalTiles } from "../components/GoalTiles.jsx";
 import { PlanHistory } from "../components/PlanHistory.jsx";
 import { fmtKRW } from "../lib/format.js";
@@ -44,8 +45,9 @@ export function Accounts({ mode, nextLabel, years = 20, mydata, manualAccounts, 
   const [phase, setPhase] = useState(
     mode === "analysis" ? "table" : mydata || manualAccounts ? "done" : "idle"
   );
-  // 연동 완료 후 단계 공개 — 1단계(계산+멘트+▼) → ▼ 클릭 → 2단계(투자금 타일+계좌 배분)
-  const [expanded, setExpanded] = useState(false);
+  /* 연동 완료 후 단계 공개 — 1단계(계산+멘트+▼) → ▼ 클릭 → 2단계(투자금 + 계좌 배분).
+   * 솔루션(allocation) 진입 시에는 요약 1단계를 건너뛰고 곧바로 배분 2단계로 노출한다. */
+  const [expanded, setExpanded] = useState(mode === "allocation");
   const [leaving, setLeaving] = useState(false); // 멘트·▼ 가 위로 사라지는 전환 중
   // 계좌별 매수 주기 (weekly|monthly|yearly) — 저장 시 plan_orders.cycle 로 봉인
   const [cycles, setCycles] = useState({});
@@ -164,7 +166,25 @@ export function Accounts({ mode, nextLabel, years = 20, mydata, manualAccounts, 
           monthlyGoal={monthlyGoal}
           requiredNestEgg={scenario.requiredNestEgg}
           myAsset={phase === "done" ? mydataTotal : undefined}
-          pulse={phase === "done"}
+          netRequired={expanded ? scenario.gap : undefined}
+          needInfo={
+            expanded ? (
+              <InfoTip title="추가 필요 자산은 이렇게 계산했어요">
+                <p>
+                  은퇴 후 매달 <b>{monthlyGoal.toLocaleString()}만원</b>을 4% 룰로 평생 인출하려면, 필요한 은퇴 자산은
+                  총 <b>{fmtKRW(scenario.requiredNestEgg)}</b>이에요. (연 생활비 ÷ 4%)
+                </p>
+                <p>
+                  이미 보유한 금융자산 <b>{fmtKRW(mydataTotal)}</b>을 빼면, 앞으로 <b>{fmtKRW(scenario.gap)}</b>만 더
+                  모으면 목표에 도착해요.
+                </p>
+                <p>
+                  아래 매달 투자금은 이 <b>추가 필요 자산</b>을 은퇴까지 {years}년 동안 만들기 위해 역산한 금액이에요.
+                </p>
+              </InfoTip>
+            ) : null
+          }
+          pulse={phase === "done" && !expanded}
         />
 
         {/* 직접 진입(idle)에서만 연동 버튼 노출 — 로딩 중에는 아래 브랜드 로더가 상태를 대신한다 */}
@@ -181,16 +201,21 @@ export function Accounts({ mode, nextLabel, years = 20, mydata, manualAccounts, 
          * 그 아래 숨겨뒀던 계좌 배분 콘텐츠가 비로소 열린다 */}
         {phase === "done" && (
           <div className={styles.scenarioWrap}>
-            <div className={styles.gapSplit}>
-              <div className={cx(styles.gapCard, expanded && styles.gapCardHalf)}>
-                {expanded ? (
-                  /* 2단계 — 계산 과정은 접고 다른 타일처럼 제목 + 금액만 */
-                  <>
-                    <span className={styles.monthlyK}>더 모아야 할 금액</span>
-                    <b className={styles.monthlyV}>{fmtKRW(scenario.gap)}</b>
-                  </>
-                ) : (
-                  <>
+            {expanded ? (
+              /* 2단계(솔루션 배분) — 추가 필요 자산은 상단 타일로 옮겼으므로, 여기선
+               * 매달 투자금 하나만 강조 카드로. 투자 상품(PLUS 미국S&P500) 가정을 함께 명시한다. */
+              <div className={styles.monthlyCard}>
+                <span className={styles.monthlyK}>매달 투자금</span>
+                <b className={styles.monthlyBig}>{scenario.gap > 0 ? fmtKRW(requiredMonthly) : "0원"}</b>
+                <span className={styles.monthlyEtf}>
+                  {etf.name}
+                  <EtfInfoButton etf={etf} />
+                </span>
+              </div>
+            ) : (
+              <>
+                <div className={styles.gapSplit}>
+                  <div className={styles.gapCard}>
                     <div className={cx(styles.gapRow, styles.seq1)}>
                       <span>필요 자산</span>
                       <b className={styles.flashNeed}>{fmtKRW(scenario.requiredNestEgg)}</b>
@@ -203,54 +228,42 @@ export function Accounts({ mode, nextLabel, years = 20, mydata, manualAccounts, 
                       <span>더 모아야 할 금액</span>
                       <b className={styles.gapPop}>{fmtKRW(scenario.gap)}</b>
                     </div>
-                  </>
-                )}
-              </div>
-
-              {/* 멘트가 변신한 매달 투자금 타일 — 우측 상단 빈 공간으로 떠오른다 */}
-              {expanded && (
-                <div className={styles.monthlyTile}>
-                  <span className={styles.monthlyK}>매달 투자금</span>
-                  <b className={styles.monthlyV}>{fmtKRW(requiredMonthly)}</b>
-                  <span className={styles.monthlyEtf}>
-                    {etf.name}
-                    <EtfInfoButton etf={etf} />
-                  </span>
-                </div>
-              )}
-            </div>
-
-            {/* 1단계 — 월 투자 시나리오를 '실행 플랜 카드'로: 매달 투자금(강조) + 상품 + 안심 문구 */}
-            {!expanded && scenario.gap > 0 && (
-              <div className={cx(card.plan, styles.seq4, leaving && styles.leave)}>
-                <div className={cx(card.row, card.hero)}>
-                  <span className={card.rowIcon}>
-                    <Wallet size={20} strokeWidth={2.2} />
-                  </span>
-                  <span className={card.rowLabel}>남은 목표, 매달</span>
-                  <b className={card.heroVal}>{fmtKRW(requiredMonthly)}</b>
-                </div>
-
-                <div className={card.divider} />
-
-                <div className={card.productRow}>
-                  <span className={card.rowIcon}>
-                    <TrendingUp size={18} strokeWidth={2.2} />
-                  </span>
-                  <div className={card.productInfo}>
-                    <span className={card.miniLabel}>투자 상품</span>
-                    <span className={card.productName}>
-                      {etf.name}
-                      <EtfInfoButton etf={etf} />
-                    </span>
                   </div>
                 </div>
 
-                <div className={card.reassure}>
-                  <BadgeCheck size={16} strokeWidth={2.4} />
-                  이대로 투자하면 은퇴 후에도 걱정 없어요!
-                </div>
-              </div>
+                {/* 1단계 — 월 투자 시나리오를 '실행 플랜 카드'로: 매달 투자금(강조) + 상품 + 안심 문구 */}
+                {scenario.gap > 0 && (
+                  <div className={cx(card.plan, styles.seq4, leaving && styles.leave)}>
+                    <div className={cx(card.row, card.hero)}>
+                      <span className={card.rowIcon}>
+                        <Wallet size={20} strokeWidth={2.2} />
+                      </span>
+                      <span className={card.rowLabel}>남은 목표, 매달</span>
+                      <b className={card.heroVal}>{fmtKRW(requiredMonthly)}</b>
+                    </div>
+
+                    <div className={card.divider} />
+
+                    <div className={card.productRow}>
+                      <span className={card.rowIcon}>
+                        <TrendingUp size={18} strokeWidth={2.2} />
+                      </span>
+                      <div className={card.productInfo}>
+                        <span className={card.miniLabel}>투자 상품</span>
+                        <span className={card.productName}>
+                          {etf.name}
+                          <EtfInfoButton etf={etf} />
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className={card.reassure}>
+                      <BadgeCheck size={16} strokeWidth={2.4} />
+                      이대로 투자하면 은퇴 후에도 걱정 없어요!
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </div>
         )}
@@ -270,7 +283,7 @@ export function Accounts({ mode, nextLabel, years = 20, mydata, manualAccounts, 
         {/* 하단 영역 — 여력 안내 → 브랜드 로딩 → (▼ 이후) 연동완료 계좌 배분 */}
         {phase === "idle" && <AccountRooms mydata={false} income={income} />}
         {phase === "loading" && (
-          <BrandLoader msgs={["금융사 계좌 조회 중", "잔고·거래내역 취합 중", "전년도 소득정보 확인 중"]} />
+          <CubeLoader msgs={["금융사 계좌 조회 중", "잔고·거래내역 취합 중", "전년도 소득정보 확인 중"]} />
         )}
         {phase === "done" && expanded && (
           <div className={styles.revealBlock}>

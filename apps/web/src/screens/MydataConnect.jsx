@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 import { ArrowRight, RefreshCw, ShieldCheck, Lock, Check, X, BadgeCheck } from "lucide-react";
 import { MYDATA_ACCOUNTS } from "@devidend/core";
 import { Button } from "../components/ui/Button.jsx";
-import { BrandLoader } from "../components/ui/BrandLoader.jsx";
+import { CubeLoader } from "../components/ui/CubeLoader.jsx";
 import { logoFor } from "../lib/institutionLogos.js";
 import { fmtKRW } from "../lib/format.js";
 import { cx } from "../lib/cx.js";
@@ -20,6 +20,9 @@ const SCOPES = [
   "전년도 소득정보 (금융소득·총소득)",
 ];
 
+/* intro 에서 미리 보여주는 조회 범위 축약 칩 */
+const SCOPE_CHIPS = ["잔고·평가금액", "거래내역", "보유상품", "전년 소득"];
+
 /* 불러온 계좌 리스트 — 스냅샷을 화면용으로 정규화 */
 const LOADED = Object.entries(MYDATA_ACCOUNTS).map(([id, a]) => ({
   id,
@@ -30,18 +33,21 @@ const LOADED = Object.entries(MYDATA_ACCOUNTS).map(([id, a]) => ({
 }));
 const LOADED_TOTAL = LOADED.reduce((s, a) => s + (a.balance || 0), 0);
 
-/* (데모 전용) 마이데이터 연동 — 온보딩 목표 화면 본문에 임베드되는 인라인 블록.
- *  상단 목표 타일·스텝퍼는 온보딩이 유지하고, 이 컴포넌트는 그 아래 본문만 담당한다.
+/* CubeLoader 애니메이션 한 사이클(4.6s)을 1회 재생한 뒤 계좌 화면으로 넘어간다 */
+const LOADER_CYCLE_MS = 4600;
+const LOADER_REPEAT = 1;
+
+/* (데모 전용) 마이데이터 연동 — 화면 레이아웃(본문 + 하단 고정 CTA)을 직접 소유한다.
  *  intro(동의 유도) → [동의 시트] → loading(브랜드 로더) → loaded(불러온 계좌 확인)
- *  → onNext 로 전략(accounts) 화면 진입. 데이터는 파일(MYDATA_ACCOUNTS)에서 그대로. */
+ *  → onNext 로 계좌 분석 화면 진입. 데이터는 파일(MYDATA_ACCOUNTS)에서 그대로. */
 export function MydataConnect({ onNext }) {
   const [phase, setPhase] = useState("intro"); // intro | loading | loaded
   const [consentOpen, setConsentOpen] = useState(false);
 
   // 동의 완료 → 로딩 → 불러오기 완료
   useEffect(() => {
-    if (phase !== "loading") return;
-    const t = setTimeout(() => setPhase("loaded"), 2600);
+    if (phase !== "loading") return undefined;
+    const t = setTimeout(() => setPhase("loaded"), LOADER_CYCLE_MS * LOADER_REPEAT);
     return () => clearTimeout(t);
   }, [phase]);
 
@@ -50,47 +56,23 @@ export function MydataConnect({ onNext }) {
     setPhase("loading");
   };
 
-  return (
-    <div className={styles.block}>
-      {phase === "intro" && (
-        <div className={styles.reveal}>
-          <div className={styles.introHead}>
-            <h2 className={styles.introTitle}>마이데이터로 내 계좌 불러오기</h2>
-            <p className={styles.introSub}>흩어진 계좌와 전년도 소득을 한 번에 불러와 절세 전략을 짜드려요.</p>
-          </div>
-
-          <div className={styles.hero}>
-            <div className={styles.heroIcon}>
-              <Lock size={28} />
-            </div>
-            <div className={styles.heroTitle}>안전하게 연동돼요</div>
-            <div className={styles.heroSub}>금융보안원 인증 · 조회 전용 권한만 사용해요</div>
-          </div>
-
-          <ul className={styles.assure}>
-            <li>
-              <ShieldCheck size={16} /> 이체·출금 권한은 요청하지 않아요
-            </li>
-            <li>
-              <ShieldCheck size={16} /> 조회한 정보는 전략 계산에만 쓰여요
-            </li>
-          </ul>
-
-          <div className={styles.cta}>
-            <Button onClick={() => setConsentOpen(true)} icon={RefreshCw}>
-              마이데이터 연동하기
-            </Button>
-          </div>
+  // ── 로딩 ──
+  if (phase === "loading") {
+    return (
+      <div className={styles.screen}>
+        <div className={styles.bodyCenter}>
+          <CubeLoader msgs={["금융사 계좌 조회 중", "잔고·거래내역 취합 중", "전년도 소득정보 확인 중"]} />
         </div>
-      )}
+      </div>
+    );
+  }
 
-      {phase === "loading" && (
-        <BrandLoader msgs={["금융사 계좌 조회 중", "잔고·거래내역 취합 중", "전년도 소득정보 확인 중"]} />
-      )}
-
-      {phase === "loaded" && (
-        <div className={styles.reveal}>
-          <div className={styles.totalCard}>
+  // ── 불러오기 완료 ──
+  if (phase === "loaded") {
+    return (
+      <div className={styles.screen}>
+        <div className={styles.body}>
+          <div className={cx(styles.totalCard, styles.reveal)}>
             <div className={styles.totalHead}>
               <BadgeCheck size={16} className={styles.totalCheck} />
               <span>계좌 {LOADED.length}개 연동 완료</span>
@@ -117,14 +99,68 @@ export function MydataConnect({ onNext }) {
               </li>
             ))}
           </ul>
-
-          <div className={styles.cta}>
-            <Button onClick={onNext} icon={ArrowRight}>
-              이 계좌로 분석 시작하기
-            </Button>
-          </div>
         </div>
-      )}
+
+        <div className={styles.footer}>
+          <Button onClick={onNext} icon={ArrowRight}>
+            이 계좌로 분석 시작하기
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // ── intro: 최적 솔루션을 위해 마이데이터 조회 동의를 구하는 화면 ──
+  return (
+    <div className={styles.screen}>
+      <div className={cx(styles.body, styles.reveal)}>
+        <header className={styles.head}>
+          <h2 className={styles.title}>
+            정확한 절세 설계를 위해,
+            <br />
+            계좌를 <em>안전하게</em> 불러올게요.
+          </h2>
+          <p className={styles.sub}>
+            흩어진 계좌와 전년도 소득을 마이데이터로 한 번에 조회해, 나에게 맞는 절세·배분 솔루션을 계산해요.
+          </p>
+        </header>
+
+        <section className={styles.panel} aria-label="안전한 마이데이터 연동 안내">
+          <div className={styles.emblem} aria-hidden="true">
+            <span className={styles.emblemRing} />
+            <Lock size={26} strokeWidth={2} />
+          </div>
+          <div className={styles.panelTitle}>조회 전용으로만 연결돼요</div>
+          <div className={styles.panelSub}>금융보안원 인증 · 이체나 출금 권한은 요청하지 않아요</div>
+
+          <ul className={styles.assure}>
+            <li>
+              <ShieldCheck size={16} /> 조회한 정보는 오직 절세·배분 전략 계산에만 사용돼요
+            </li>
+            <li>
+              <ShieldCheck size={16} /> 동의 후에도 언제든 연동을 해지할 수 있어요
+            </li>
+          </ul>
+
+          <div className={styles.scopes}>
+            <span className={styles.scopeCap}>불러오는 정보</span>
+            <div className={styles.chips}>
+              {SCOPE_CHIPS.map((c) => (
+                <span key={c} className={styles.chip}>
+                  {c}
+                </span>
+              ))}
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div className={styles.footer}>
+        <Button onClick={() => setConsentOpen(true)} icon={RefreshCw}>
+          마이데이터 연동하기
+        </Button>
+        <p className={styles.footNote}>연동은 30초면 끝나요. 다음 화면에서 조회 범위를 확인하고 동의할 수 있어요.</p>
+      </div>
 
       {consentOpen && <ConsentSheet onAgree={onAgree} onClose={() => setConsentOpen(false)} />}
     </div>

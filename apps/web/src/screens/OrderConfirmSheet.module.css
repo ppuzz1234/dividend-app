@@ -1,4 +1,5 @@
-/* ── 배분·투자 확인 바텀시트 — 딤 + 슬라이드업 ── */
+/* ── 배분·투자 확인 바텀시트 — 딤 + 슬라이드업.
+ * 라운드 시스템: 시트 22 · 카드 16 · 행/타일 10 · 필 999 ── */
 .overlay {
   position: fixed;
   inset: 0;
@@ -47,23 +48,16 @@
 }
 .head {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 4px 20px 12px;
+  padding: 6px 20px 10px;
 }
 .title {
   margin: 0;
-  font-size: 20px;
+  font-size: 19px;
   font-weight: 800;
   letter-spacing: -0.03em;
-}
-.sub {
-  margin: 6px 0 0;
-  font-size: 12.5px;
-  color: var(--sub);
-  line-height: 1.5;
-  word-break: keep-all;
 }
 .close {
   flex-shrink: 0;
@@ -81,41 +75,85 @@
 .scrollBody {
   flex: 1;
   overflow-y: auto;
-  padding: 4px 20px;
+  padding: 2px 20px 8px;
   scrollbar-width: none;
 }
 .scrollBody::-webkit-scrollbar {
   display: none;
 }
 
-/* 계좌별 매수 종합 표 */
-.table {
+/* 매수 리듬 히어로 — 주기 필 + 회당 매수금 */
+.hero {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  align-items: center;
+  gap: 8px;
+  padding: 20px 16px 18px;
+  margin-bottom: 12px;
+  border-radius: 16px;
+  background:
+    radial-gradient(120% 140% at 50% 0%, rgba(242, 194, 48, 0.12), transparent 55%),
+    var(--bg2);
+  border: 1px solid color-mix(in srgb, var(--jade) 24%, var(--line));
 }
-.acct {
-  border-radius: 14px;
+.heroCycle {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--jade);
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: var(--jade-dim, #2c2409);
+  border: 1px solid color-mix(in srgb, var(--jade) 38%, var(--line));
+}
+.heroAmt {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+.heroAmt b {
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.heroAmt span {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--sub);
+}
+.heroSub {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--sub);
+  word-break: keep-all;
+}
+
+/* 계좌별 매수 상품 — 한 카드, 계좌 섹션 구분 */
+.list {
+  border-radius: 16px;
   border: 1px solid var(--line);
   background: var(--bg2);
   overflow: hidden;
+}
+.acct + .acct {
+  border-top: 1px solid var(--line);
 }
 .acctHead {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  padding: 11px 14px;
-  background: linear-gradient(160deg, var(--card-hi, var(--card)), var(--card));
-  border-bottom: 1px solid var(--line);
+  padding: 10px 14px 8px;
 }
 .acctName {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 800;
-  letter-spacing: -0.02em;
+  color: var(--sub);
+  letter-spacing: -0.01em;
 }
 .acctSum {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 800;
   color: var(--jade);
   font-variant-numeric: tabular-nums;
@@ -123,23 +161,21 @@
 .item {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 10px 14px;
-}
-.item + .item {
-  border-top: 1px solid var(--line);
+  gap: 11px;
+  padding: 8px 14px 12px;
 }
 .itemName {
-  font-size: 13px;
-  font-weight: 600;
+  flex: 1;
+  min-width: 0;
+  font-size: 13.5px;
+  font-weight: 700;
   color: var(--text);
   word-break: keep-all;
 }
 .itemAmt {
   font-size: 13px;
   font-weight: 700;
-  color: var(--sub);
+  color: var(--faint);
   font-variant-numeric: tabular-nums;
   flex-shrink: 0;
 }
@@ -151,66 +187,45 @@
   word-break: keep-all;
 }
 
-/* 총 매수금 */
-.total {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 12px;
-  margin-top: 12px;
-  padding: 14px 16px;
-  border-radius: 14px;
-  background: var(--bg2);
-  border: 1px solid var(--line);
-}
-.totalK {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--sub);
-}
-.totalV {
-  font-size: 20px;
-  font-weight: 800;
-  color: var(--jade);
-  font-variant-numeric: tabular-nums;
-}
-
 /* 필수 확인 */
 .agreeWrap {
-  margin-top: 18px;
+  margin-top: 12px;
   display: flex;
   flex-direction: column;
   gap: 8px;
-}
-.agreeTitle {
-  font-size: 13px;
-  font-weight: 800;
-  color: var(--text);
-  margin-bottom: 2px;
 }
 .agreeRow {
   display: flex;
   align-items: center;
   gap: 11px;
-  padding: 13px 14px;
-  border-radius: 12px;
+  padding: 12px 14px;
+  border-radius: 10px;
   border: 1px solid var(--line);
   background: var(--bg2);
   cursor: pointer;
   text-align: left;
   width: 100%;
+  transition: border-color 0.15s, background 0.15s;
+}
+.agreeRow:active {
+  transform: scale(0.99);
+}
+.agreeOn {
+  border-color: color-mix(in srgb, var(--jade) 40%, var(--line));
+  background: color-mix(in srgb, var(--jade) 6%, var(--bg2));
 }
 .check {
   flex-shrink: 0;
-  width: 22px;
-  height: 22px;
+  width: 21px;
+  height: 21px;
   border-radius: 7px;
   border: 2px solid var(--line2);
   background: var(--bg);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--on-jade, #0a0f0d);
+  color: #17150f;
+  transition: border-color 0.15s, background 0.15s;
 }
 .checkOn {
   border-color: var(--jade);

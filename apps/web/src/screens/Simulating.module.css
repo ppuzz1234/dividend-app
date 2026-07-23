@@ -8,33 +8,3 @@
 .center {
   text-align: center;
 }
-
-/* 앱 로고 — 은은한 펄스 */
-.logo {
-  display: inline-flex;
-  animation: simPulse 1.6s ease-in-out infinite;
-}
-@keyframes simPulse {
-  0%,
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(0.93);
-    opacity: 0.75;
-  }
-}
-
-.msg {
-  font-size: 14px;
-  color: var(--sub);
-  margin-top: 30px;
-  font-weight: 600;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .logo {
-    animation: none;
-  }
-}

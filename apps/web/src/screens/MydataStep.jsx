@@ -22,13 +22,9 @@ const digits = (v) => Number(String(v).replace(/\D/g, "")) || 0;
  *  · 데모(네이버·카카오): 목업 마이데이터 연동(MydataConnect: 동의 시트 → 로딩 → 불러온 계좌)
  *  · 구글 실계정: 실제 데이터 입력이므로 '수기입력'(계좌 현황 + 나이 + 연소득)으로 진행 */
 export function MydataStep({ isDemo, onDemoLink, onManualNext }) {
-  // ── 데모: 목업 마이데이터 연동 ──
+  // ── 데모: 목업 마이데이터 연동 (MydataConnect 가 화면 레이아웃을 직접 소유) ──
   if (isDemo) {
-    return (
-      <Pad>
-        <MydataConnect onNext={onDemoLink} />
-      </Pad>
-    );
+    return <MydataConnect onNext={onDemoLink} />;
   }
 
   // ── 구글: 수기입력(계좌 + 나이 + 연소득) ──

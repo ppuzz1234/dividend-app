@@ -1,9 +1,10 @@
 import { useMemo, useState } from "react";
-import { ArrowRight, CalendarDays, CalendarRange, CalendarCheck, Flame, Coins } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { buildAccountRooms, recommendedProducts, findProduct } from "@devidend/core";
 import { Pad } from "../components/layout/Pad.jsx";
 import { Heading } from "../components/layout/Heading.jsx";
 import { Button } from "../components/ui/Button.jsx";
+import { EtfBrandTile } from "../components/ui/EtfBrandTile.jsx";
 import { fmtKRW } from "../lib/format.js";
 import { cx } from "../lib/cx.js";
 import styles from "./AllocationPlan.module.css";
@@ -12,15 +13,31 @@ const ACCT_LABELS = { isa: "ISA", pensionSavings: "연금저축", irp: "IRP", ge
 const STEP = 10_000;
 const snap = (v) => Math.round(v / STEP) * STEP;
 
-/* 매수 리듬 — 게이미피케이션의 핵심 선택지 (일/주/월) */
+/* 매수 리듬 — 일/주/월. 주기별 매수일: 매일=영업일 개념 없이 매일, 매주=월요일, 매월=1일 */
 const CYCLES = [
-  { id: "daily", label: "매일", tagline: "습관처럼 매일 조금씩", perYear: 365, icon: CalendarDays },
-  { id: "weekly", label: "매주", tagline: "주 1회 루틴으로", perYear: 52, icon: CalendarRange },
-  { id: "monthly", label: "매월", tagline: "월급날 한 번에", perYear: 12, icon: CalendarCheck },
+  { id: "daily", label: "매일", tagline: "습관처럼 매일 조금씩", perYear: 365 },
+  { id: "weekly", label: "매주", tagline: "매주 월요일, 주 1회 루틴", perYear: 52 },
+  { id: "monthly", label: "매월", tagline: "매달 1일, 월급날 한 번에", perYear: 12 },
 ];
 
-/* ⑦ 정기적 투자금 배분 방식 결정 — 상품 선택보다 '매수 리듬(일/주/월)'을 재미있게 고른다.
- *  추천 상품은 계좌별 월 투자금에 자동 배분하고, 사용자는 주기만 선택한다(게이미피케이션).
+/* 이번 달 실제 달력 기준 매수일 계산 — 리듬 선택이 곧 일정으로 보이게 한다 */
+function buyDaysOfMonth(cycleId) {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = now.getMonth();
+  const dim = new Date(y, m + 1, 0).getDate();
+  const days = [];
+  for (let d = 1; d <= dim; d++) {
+    const wd = new Date(y, m, d).getDay();
+    if (cycleId === "daily" || (cycleId === "weekly" && wd === 1) || (cycleId === "monthly" && d === 1)) {
+      days.push(d);
+    }
+  }
+  return { month: m + 1, dim, days };
+}
+
+/* ⑦ 정기적 투자금 배분 방식 결정 — 상품 선택보다 '매수 리듬(일/주/월)'을 고른다.
+ *  추천 상품은 계좌별 월 투자금에 자동 배분하고, 사용자는 주기만 선택한다.
  *  결과(productAlloc)는 기존 종목 화면과 동일한 형식이라 확인 시트·주문에 그대로 이어진다. */
 export function AllocationPlan({ manualAccounts, income, monthlyContribution = 0, years = 20, initialAlloc, onNext }) {
   const { rooms } = useMemo(
@@ -57,6 +74,8 @@ export function AllocationPlan({ manualAccounts, income, monthlyContribution = 0
   const active = CYCLES.find((c) => c.id === cycle) || CYCLES[1];
   const perBuy = Math.round(((totalMonthly * 12) / active.perYear) / 1000) * 1000;
   const totalBuys = Math.round(active.perYear * years);
+  const { month, dim, days } = useMemo(() => buyDaysOfMonth(cycle), [cycle]);
+  const buySet = useMemo(() => new Set(days), [days]);
 
   return (
     <Pad
@@ -70,10 +89,9 @@ export function AllocationPlan({ manualAccounts, income, monthlyContribution = 0
         정기 투자 리듬 정하기
       </Heading>
 
-      {/* 매수 리듬 카드 — 게이미피케이션 핵심 선택 */}
+      {/* 매수 리듬 선택 — 타이포 중심 세그먼트 카드 (선택 상태만 강조색) */}
       <div className={styles.cycleGrid} role="group" aria-label="매수 리듬">
         {CYCLES.map((c) => {
-          const Icon = c.icon;
           const on = cycle === c.id;
           const buy = Math.round(((totalMonthly * 12) / c.perYear) / 1000) * 1000;
           return (
@@ -84,38 +102,45 @@ export function AllocationPlan({ manualAccounts, income, monthlyContribution = 0
               onClick={() => setCycle(c.id)}
               aria-pressed={on}
             >
-              <span className={styles.cycleIcon}>
-                <Icon size={22} strokeWidth={2.2} />
-              </span>
               <span className={styles.cycleLabel}>{c.label}</span>
-              <span className={styles.cycleTag}>{c.tagline}</span>
-              <span className={styles.cycleBuy}>{fmtKRW(buy)}</span>
+              <b className={styles.cycleBuy}>{fmtKRW(buy)}</b>
               <span className={styles.cycleBuyK}>회당</span>
             </button>
           );
         })}
       </div>
 
-      {/* 선택 리듬 요약 — 습관 게이지(코인/스트릭) */}
-      <div className={styles.habit}>
-        <div className={styles.habitTop}>
-          <span className={styles.habitBadge}>
-            <Flame size={14} strokeWidth={2.6} /> {active.label} 적립 습관
-          </span>
-          <span className={styles.habitBuys}>
-            은퇴까지 <b>{totalBuys.toLocaleString()}</b>번 매수
-          </span>
+      {/* 이번 달 매수 일정 — 실제 달력 기준. 리듬을 바꾸면 매수일 마커가 바뀐다 */}
+      <div className={styles.plan}>
+        <div className={styles.planHead}>
+          <b className={styles.planTitle}>{month}월 매수 일정</b>
+          <span className={styles.planTag}>{active.tagline}</span>
         </div>
-        <div className={styles.coins} aria-hidden="true">
-          {Array.from({ length: 24 }).map((_, i) => (
-            <span key={i} className={cx(styles.coin, i < Math.min(24, Math.round((active.perYear / 365) * 24)) && styles.coinOn)}>
-              <Coins size={12} />
-            </span>
+
+        <div className={styles.strip} aria-hidden="true">
+          {Array.from({ length: dim }, (_, i) => (
+            <i key={i} className={cx(styles.tick, buySet.has(i + 1) && styles.tickOn)} />
           ))}
         </div>
-        <p className={styles.habitNote}>
-          회당 <b>{fmtKRW(perBuy)}</b>씩, 매달 총 <b>{fmtKRW(totalMonthly)}</b>을 계좌별 추천 상품에 자동 매수해요.
+        <div className={styles.axis} aria-hidden="true">
+          <span>1일</span>
+          <span>{dim}일</span>
+        </div>
+
+        <p className={styles.planNote}>
+          이번 달 <b>{days.length}번</b>, 회당 <b>{fmtKRW(perBuy)}</b>씩 자동 매수해요.
         </p>
+
+        <div className={styles.stats}>
+          <div className={styles.stat}>
+            <span className={styles.statK}>매달 총액</span>
+            <b className={styles.statV}>{fmtKRW(totalMonthly)}</b>
+          </div>
+          <div className={styles.stat}>
+            <span className={styles.statK}>은퇴까지</span>
+            <b className={styles.statV}>{totalBuys.toLocaleString()}번 매수</b>
+          </div>
+        </div>
       </div>
 
       {/* 자동 배분 내역 — 계좌별 추천 상품/월 금액 (읽기 전용) */}
@@ -126,8 +151,11 @@ export function AllocationPlan({ manualAccounts, income, monthlyContribution = 0
         ) : (
           lines.map((l) => (
             <div key={`${l.acct}-${l.code}`} className={styles.row}>
-              <span className={styles.rowAcct}>{ACCT_LABELS[l.acct] ?? l.acct}</span>
-              <span className={styles.rowName}>{l.name}</span>
+              <EtfBrandTile name={l.name} size={32} />
+              <span className={styles.rowInfo}>
+                <span className={styles.rowName}>{l.name}</span>
+                <span className={styles.rowAcct}>{ACCT_LABELS[l.acct] ?? l.acct}계좌</span>
+              </span>
               <span className={styles.rowAmt}>월 {fmtKRW(l.amt)}</span>
             </div>
           ))

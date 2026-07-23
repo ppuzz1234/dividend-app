@@ -7,8 +7,10 @@ import styles from "./GoalTiles.module.css";
  * myAsset 전달 시 3열 — 기존 두 타일이 좌측으로 줄어들며 우측에 "내 자산" 타일이 열린다.
  * pulse: 화면 구성 완료 후 필요 자산 → 내 자산 순으로 숫자가 한 번 반짝이며
  *        아래 계산식(필요 − 보유)에 반영된다는 느낌을 준다 (계산 카드 쪽과 시차 동기). */
-export function GoalTiles({ monthlyGoal, requiredNestEgg, myAsset, pulse }) {
+export function GoalTiles({ monthlyGoal, requiredNestEgg, myAsset, pulse, netRequired, needInfo }) {
   const hasAsset = myAsset != null;
+  // 보유 자산을 아는 단계에서는 '추가 필요 자산'(필요 자산 − 보유 자산)만 표기한다.
+  const showNet = netRequired != null;
   return (
     <div className={cx(styles.grid, hasAsset && styles.grid3)}>
       <div className={styles.tile}>
@@ -16,8 +18,11 @@ export function GoalTiles({ monthlyGoal, requiredNestEgg, myAsset, pulse }) {
         <b className={styles.v}>월 {monthlyGoal.toLocaleString()}만원</b>
       </div>
       <div className={styles.tile}>
-        <span className={styles.k}>필요 자산</span>
-        <b className={cx(styles.v, pulse && styles.flashNeed)}>{fmtKRW(requiredNestEgg)}</b>
+        <span className={styles.k}>
+          {showNet ? "추가 필요 자산" : "필요 자산"}
+          {needInfo}
+        </span>
+        <b className={cx(styles.v, pulse && styles.flashNeed)}>{fmtKRW(showNet ? netRequired : requiredNestEgg)}</b>
       </div>
       {hasAsset && (
         <div className={cx(styles.tile, styles.assetTile)}>
