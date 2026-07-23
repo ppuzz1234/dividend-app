@@ -98,7 +98,7 @@ export function Intro({ onNext }) {
   const wrapRef = useRef(null);
 
   const amount = useCountUp(1000, { enabled: !reduce && revealed.has(1) });
-  const saved = useCountUp(612, { enabled: !reduce && revealed.has(2) }); // 절세 비교 장면(연 1.2억) 절세액(만원)
+  const saved = useCountUp(1573, { enabled: !reduce && revealed.has(2) }); // 절세 비교(연 1.2억) 세금+건보료 총 부담 절감액(만원)
 
   /* 스크롤 뷰포트 높이를 측정해 각 장면을 정확히 한 화면 높이로 맞춘다(셸 무관). */
   useLayoutEffect(() => {
@@ -211,18 +211,18 @@ export function Intro({ onNext }) {
       >
         <p className={cx(styles.label, styles.rise)} style={{ "--i": 0 }}>연 1.2억을 배당으로 받는다면</p>
         <h2 className={cx(styles.taxTitle, styles.rise)} style={{ "--i": 1 }}>
-          받는 방법에 따라
+          세금에 건강보험료까지,
           <br />
-          세금이 이만큼 달라집니다.
+          부담이 이만큼 달라집니다.
         </h2>
 
         <div className={styles.taxRows}>
           <div className={cx(styles.taxRow, styles.rise)} style={{ "--i": 2 }}>
             <span className={styles.taxRowK}>일반계좌 · 종합과세</span>
-            <b className={styles.taxRowV}>약 2,460만원</b>
+            <b className={styles.taxRowV}>약 3,421만원</b>
           </div>
           <div className={cx(styles.taxRow, styles.taxRowGood, styles.rise)} style={{ "--i": 3 }}>
-            <span className={styles.taxRowK}>절세 계좌 · 분리과세</span>
+            <span className={styles.taxRowK}>연금저축계좌 · 분리과세</span>
             <b className={styles.taxRowV}>1,848만원</b>
           </div>
         </div>
