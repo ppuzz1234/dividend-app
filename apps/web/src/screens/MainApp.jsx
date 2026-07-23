@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from "react";
 import {
   Newspaper,
-  LineChart,
+  Rss,
   Wallet,
   RotateCcw,
   Landmark,
@@ -15,11 +15,11 @@ import {
   NotebookPen,
 } from "lucide-react";
 import { findProduct } from "@devidend/core";
-import BrandMark from "../components/ui/BrandMark.jsx";
 import { EtfBrandTile } from "../components/ui/EtfBrandTile.jsx";
 import { PrepModal } from "../components/ui/PrepModal.jsx";
 import { CoachTour } from "../components/ui/CoachTour.jsx";
 import { DividendSwitch } from "./DividendSwitch.jsx";
+import { NewsFeed } from "./NewsFeed.jsx";
 import { fmtKRW } from "../lib/format.js";
 import { cx } from "../lib/cx.js";
 import styles from "./MainApp.module.css";
@@ -40,7 +40,7 @@ const ACCOUNT_LABELS = { isa: "ISA", pensionSavings: "연금저축", irp: "IRP",
 const ORDER = ["isa", "pensionSavings", "irp", "general"];
 const TABS = [
   { id: "news", label: "뉴스", Icon: Newspaper },
-  { id: "analysis", label: "분석", Icon: LineChart },
+  { id: "feed", label: "피드", Icon: Rss },
   { id: "assets", label: "자산", Icon: Wallet },
 ];
 const CYCLES = {
@@ -61,11 +61,12 @@ const QUICK_MENU = [
   { label: "전체메뉴", Icon: LayoutGrid, color: "#aab4ad" },
 ];
 
-/* 투자 시작 이후의 메인 앱 — 뉴스 · 분석 · 자산 3탭.
+/* 투자 시작 이후의 메인 앱 — 뉴스 · 피드 · 자산 3탭.
  * 최종 진행 직후 '자산' 탭(홈)으로 진입해 내 투자 현황을 본다. */
 export function MainApp({ alloc = {}, cycle = "weekly", assets = 0, defaultTab = "assets", onRestart }) {
   const [tab, setTab] = useState(defaultTab);
   const [tour, setTour] = useState(shouldShowCoach);
+  const activeIndex = Math.max(0, TABS.findIndex((t) => t.id === tab)); // 하이라이트 알약 위치
 
   // 코치마크 하이라이트 대상 (보유 ETF 현황 / 퀵메뉴 / 하단 탭)
   const holdRef = useRef(null);
@@ -96,24 +97,32 @@ export function MainApp({ alloc = {}, cycle = "weekly", assets = 0, defaultTab =
         {tab === "assets" && (
           <Home alloc={alloc} cycle={cycle} assets={assets} onRestart={onRestart} holdRef={holdRef} quickRef={quickRef} />
         )}
-        {tab === "news" && <Placeholder Icon={Newspaper} title="뉴스" desc="보유 종목·시장 뉴스를 여기서 모아 보여드릴 예정이에요." />}
-        {tab === "analysis" && <Placeholder Icon={LineChart} title="분석" desc="내 포트폴리오의 수익·배당·세금 분석을 여기서 제공할 예정이에요." />}
+        {tab === "news" && <NewsFeed />}
+        {tab === "feed" && <Placeholder Icon={Rss} title="피드" desc="내 투자와 관심 종목 소식을 모아 보는 피드를 준비하고 있어요." />}
       </div>
 
       <nav ref={tabRef} className={styles.tabBar} role="tablist" aria-label="메인 탭">
-        {TABS.map(({ id, label, Icon }) => (
-          <button
-            key={id}
-            type="button"
-            role="tab"
-            aria-selected={tab === id}
-            className={cx(styles.tab, tab === id && styles.tabOn)}
-            onClick={() => setTab(id)}
-          >
-            <Icon size={22} strokeWidth={2.2} />
-            <span>{label}</span>
-          </button>
-        ))}
+        <div className={styles.tabRow}>
+          {/* 선택 탭을 따라 미끄러지는 하이라이트 알약 (토스·카카오페이 스타일) */}
+          <span
+            className={styles.tabInd}
+            style={{ width: `${100 / TABS.length}%`, transform: `translateX(${activeIndex * 100}%)` }}
+            aria-hidden="true"
+          />
+          {TABS.map(({ id, label, Icon }) => (
+            <button
+              key={id}
+              type="button"
+              role="tab"
+              aria-selected={tab === id}
+              className={cx(styles.tab, tab === id && styles.tabOn)}
+              onClick={() => setTab(id)}
+            >
+              <Icon size={23} strokeWidth={2.2} className={styles.tabIcon} />
+              <span>{label}</span>
+            </button>
+          ))}
+        </div>
       </nav>
 
       {/* 최초 진입 스포트라이트 안내 — 자산 탭에서만(대상 요소 존재) */}
@@ -160,12 +169,6 @@ function Home({ alloc, cycle, assets, onRestart, holdRef, quickRef }) {
 
   return (
     <div className={styles.home}>
-      {/* 브랜드 헤더 */}
-      <header className={styles.homeHead}>
-        <BrandMark size={26} />
-        <span className={styles.homeBrand}>PLUS CUBE</span>
-      </header>
-
       {/* 퀵메뉴 그리드 */}
       <div ref={quickRef} className={styles.quickCard}>
         {QUICK_MENU.map(({ label, Icon, color }) => (
@@ -191,10 +194,12 @@ function Home({ alloc, cycle, assets, onRestart, holdRef, quickRef }) {
         </div>
 
         <div className={styles.holdTotal}>
-          <span className={styles.holdCap}>매달 자동 매수</span>
+          {/* 261만원은 '월 투자 총액'(합계) — 상단 배지·하단 문구의 매수 주기({c.label})와 별개.
+           * 이전엔 '매달 자동 매수'로 하드코딩돼 배지의 주기와 모순돼 보였다. */}
+          <span className={styles.holdCap}>월 투자 총액</span>
           <strong className={styles.holdVal}>{fmtKRW(grandTotal)}</strong>
           <span className={styles.holdSub}>
-            {c.label} {fmtKRW(perBuy)}씩, 총 평가금액은 첫 매수 후 표시돼요.
+            {c.label} {fmtKRW(perBuy)}씩 자동 매수 · 총 평가금액은 첫 매수 후 표시돼요.
           </span>
         </div>
 
@@ -253,7 +258,7 @@ function Home({ alloc, cycle, assets, onRestart, holdRef, quickRef }) {
   );
 }
 
-/* 뉴스·분석 탭 — 추후 콘텐츠 정의 예정 */
+/* 피드 탭 — 추후 콘텐츠 정의 예정 */
 function Placeholder({ Icon, title, desc }) {
   return (
     <div className={styles.placeholder}>

@@ -14,7 +14,8 @@ const ACCOUNTS = [
   { id: "isa", name: "ISA", max: 20_000_000, hint: "연 2,000만원까지" },
   { id: "pensionSavings", name: "연금저축", max: 18_000_000, hint: "납입 1,800만·공제 600만" },
   { id: "irp", name: "IRP", max: 18_000_000, hint: "연금저축과 합산 1,800만" },
-  { id: "general", name: "일반 위탁계좌", max: 100_000_000, hint: "한도·상품 제약 없음" },
+  // 일반계좌는 한도가 없어 최대 10억까지 입력 가능하게 잡는다
+  { id: "general", name: "일반 위탁계좌", max: 1_000_000_000, hint: "한도·상품 제약 없음" },
 ];
 const digits = (v) => Number(String(v).replace(/\D/g, "")) || 0;
 
@@ -61,6 +62,50 @@ function ManualForm({ onNext }) {
         내 정보 직접 입력
       </Heading>
 
+      {/* 나이 · 연소득 — 계좌 최적화 가설과 투자기간(60−나이) 산정에 쓰는 필수 입력이라 맨 위에 배치 */}
+      <div className={styles.sectionLabel}>나이 · 연소득</div>
+      <div className={styles.fields}>
+        <label className={cx(styles.field, age.trim() !== "" && styles.fieldOn)}>
+          <span className={styles.fieldK}>
+            나이
+            <span className={styles.editBadge} aria-hidden="true">
+              <Pencil size={11} strokeWidth={2.6} />
+            </span>
+          </span>
+          <div className={styles.inputWrap}>
+            <input
+              className={styles.input}
+              inputMode="numeric"
+              value={age}
+              onChange={(e) => setAge(String(digits(e.target.value) || ""))}
+              placeholder="45"
+            />
+            <span className={styles.unit}>세</span>
+          </div>
+        </label>
+        <label className={cx(styles.field, income.trim() !== "" && styles.fieldOn)}>
+          <span className={styles.fieldK}>
+            전년도 연소득
+            <span className={styles.editBadge} aria-hidden="true">
+              <Pencil size={11} strokeWidth={2.6} />
+            </span>
+          </span>
+          <div className={styles.inputWrap}>
+            <input
+              className={styles.input}
+              inputMode="numeric"
+              value={income}
+              onChange={(e) => setIncome(String(digits(e.target.value) || ""))}
+              placeholder="9000"
+            />
+            <span className={styles.unit}>만원</span>
+          </div>
+        </label>
+      </div>
+      <p className={styles.hint2}>
+        <BadgeCheck size={12} /> 총급여 5,500만원 이하면 연금 세액공제율이 16.5%로 높아져요. 은퇴 정년은 60세로 계산돼요.
+      </p>
+
       {/* 계좌 현황 — 올해 납입액(=현재 평가액 가정) */}
       <div className={styles.sectionLabel}>계좌 현황</div>
       <div className={styles.list}>
@@ -98,44 +143,6 @@ function ManualForm({ onNext }) {
         <span className={styles.sumK}>{owned.length ? `보유 계좌 ${owned.length}개` : "보유 계좌 없음"}</span>
         <b className={styles.sumV}>{fmtKRW(total)}</b>
       </div>
-
-      {/* 나이 · 연소득 — 계좌 최적화 가설과 투자기간(60−나이) 산정에 사용 */}
-      <div className={styles.sectionLabel}>나이 · 연소득</div>
-      <div className={styles.fields}>
-        <label className={styles.field}>
-          <span className={styles.fieldK}>
-            <Pencil size={12} /> 나이
-          </span>
-          <div className={styles.inputWrap}>
-            <input
-              className={styles.input}
-              inputMode="numeric"
-              value={age}
-              onChange={(e) => setAge(String(digits(e.target.value) || ""))}
-              placeholder="45"
-            />
-            <span className={styles.unit}>세</span>
-          </div>
-        </label>
-        <label className={styles.field}>
-          <span className={styles.fieldK}>
-            <Pencil size={12} /> 전년도 연소득
-          </span>
-          <div className={styles.inputWrap}>
-            <input
-              className={styles.input}
-              inputMode="numeric"
-              value={income}
-              onChange={(e) => setIncome(String(digits(e.target.value) || ""))}
-              placeholder="9000"
-            />
-            <span className={styles.unit}>만원</span>
-          </div>
-        </label>
-      </div>
-      <p className={styles.hint2}>
-        <BadgeCheck size={12} /> 총급여 5,500만원 이하면 연금 세액공제율이 16.5%로 높아져요. 은퇴 정년은 60세로 계산돼요.
-      </p>
     </Pad>
   );
 }

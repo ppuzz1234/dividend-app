@@ -95,7 +95,8 @@ export function OrderConfirmSheet({ alloc = {}, cycle = "weekly", onConfirm, onC
                     <div key={it.code} className={styles.item}>
                       <EtfBrandTile name={it.name} size={34} />
                       <span className={styles.itemName}>{it.name}</span>
-                      <span className={styles.itemAmt}>월 {fmtKRW(it.amt)}</span>
+                      {/* 상품이 하나면 계좌 헤더 합계와 금액이 같아 중복되므로, 2개 이상일 때만 상품별 금액 표기 */}
+                      {a.items.length > 1 && <span className={styles.itemAmt}>월 {fmtKRW(it.amt)}</span>}
                     </div>
                   ))}
                 </section>
@@ -123,7 +124,6 @@ export function OrderConfirmSheet({ alloc = {}, cycle = "weekly", onConfirm, onC
           <Button onClick={() => allChecked && onConfirm?.()} variant="gold" icon={ArrowRight} disabled={!allChecked || grandTotal === 0}>
             최종 진행하기
           </Button>
-          {!allChecked && <p className={styles.footNote}>필수 확인 항목을 모두 체크해 주세요.</p>}
         </div>
       </div>
     </div>,

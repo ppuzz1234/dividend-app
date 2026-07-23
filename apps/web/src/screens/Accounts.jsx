@@ -161,7 +161,9 @@ export function Accounts({ mode, nextLabel, years = 20, mydata, manualAccounts, 
         }
       >
         {/* 목표 요약 타일 — 온보딩 마지막 화면과 동일한 최상단 위치로, 전환 시 그대로 이어짐.
-         * 연동 완료 시 두 타일이 좌측으로 줄며 우측에 "내 자산"(연동 총 평가액) 타일이 열린다 */}
+         * 연동 완료 시 두 타일이 좌측으로 줄며 우측에 "내 자산"(연동 총 평가액) 타일이 열린다.
+         * 배분(솔루션) 단계에서는 상단 요약 타일·매달 투자금 카드를 접고 계좌 배분에 집중한다 */}
+        {!(phase === "done" && expanded) && (
         <GoalTiles
           monthlyGoal={monthlyGoal}
           requiredNestEgg={scenario.requiredNestEgg}
@@ -186,6 +188,7 @@ export function Accounts({ mode, nextLabel, years = 20, mydata, manualAccounts, 
           }
           pulse={phase === "done" && !expanded}
         />
+        )}
 
         {/* 직접 진입(idle)에서만 연동 버튼 노출 — 로딩 중에는 아래 브랜드 로더가 상태를 대신한다 */}
         {phase === "idle" && (
@@ -199,21 +202,9 @@ export function Accounts({ mode, nextLabel, years = 20, mydata, manualAccounts, 
          * 이어서 월 투자 멘트까지만 보여주고 ▼ 로 다음 단계 진행:
          * ▼ 클릭 시 계산 카드가 절반으로 줄며 멘트가 우측 "매달 투자금" 타일로 떠오르고,
          * 그 아래 숨겨뒀던 계좌 배분 콘텐츠가 비로소 열린다 */}
-        {phase === "done" && (
+        {phase === "done" && !expanded && (
           <div className={styles.scenarioWrap}>
-            {expanded ? (
-              /* 2단계(솔루션 배분) — 추가 필요 자산은 상단 타일로 옮겼으므로, 여기선
-               * 매달 투자금 하나만 강조 카드로. 투자 상품(PLUS 미국S&P500) 가정을 함께 명시한다. */
-              <div className={styles.monthlyCard}>
-                <span className={styles.monthlyK}>매달 투자금</span>
-                <b className={styles.monthlyBig}>{scenario.gap > 0 ? fmtKRW(requiredMonthly) : "0원"}</b>
-                <span className={styles.monthlyEtf}>
-                  {etf.name}
-                  <EtfInfoButton etf={etf} />
-                </span>
-              </div>
-            ) : (
-              <>
+            <>
                 <div className={styles.gapSplit}>
                   <div className={styles.gapCard}>
                     <div className={cx(styles.gapRow, styles.seq1)}>
@@ -264,7 +255,6 @@ export function Accounts({ mode, nextLabel, years = 20, mydata, manualAccounts, 
                   </div>
                 )}
               </>
-            )}
           </div>
         )}
 

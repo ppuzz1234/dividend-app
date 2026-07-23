@@ -6,26 +6,26 @@
  *  · contributedThisYear: 올해 납입액 (연 한도·세액공제 한도 소진분)
  * ------------------------------------------------------------------ */
 export const MYDATA_ACCOUNTS = {
-  general: {
-    institution: "키움증권",
-    balance: 255_000_000,
-    contributedThisYear: 0,
-    holdings: [{ name: "QQQ 나스닥100", productType: "foreignEtf", value: 255_000_000 }],
-  },
   isa: {
     institution: "한화자산운용",
-    balance: 12_000_000,
-    contributedThisYear: 7_000_000,
+    balance: 3_000_000,
+    contributedThisYear: 3_000_000,
     holdings: [
-      { name: "KODEX 배당가치", productType: "krEtf", value: 7_000_000 },
-      { name: "TIGER 리츠부동산인프라", productType: "krReit", value: 5_000_000 },
+      { name: "KODEX 배당가치", productType: "krEtf", value: 2_000_000 },
+      { name: "TIGER 리츠부동산인프라", productType: "krReit", value: 1_000_000 },
     ],
   },
   pension: {
     institution: "한화투자증권",
-    balance: 5_000_000,
-    contributedThisYear: 3_000_000,
-    holdings: [{ name: "TIGER 미국배당다우존스", productType: "krListedGlobalEtf", value: 5_000_000 }],
+    balance: 2_000_000,
+    contributedThisYear: 2_000_000,
+    holdings: [{ name: "TIGER 미국배당다우존스", productType: "krListedGlobalEtf", value: 2_000_000 }],
+  },
+  general: {
+    institution: "키움증권",
+    balance: 15_000_000,
+    contributedThisYear: 0,
+    holdings: [{ name: "QQQ 나스닥100", productType: "foreignEtf", value: 15_000_000 }],
   },
 };
 
@@ -33,8 +33,8 @@ export const MYDATA_ACCOUNTS = {
  * 금융소득·총소득은 화면에서 사용자가 직접 수정할 수 있는 초기값이다. */
 export const MYDATA_PROFILE = {
   name: "고객", // 데모(목업) 사용자 닉네임 — 실 로그인 시 프로필 이름으로 대체됨
-  age: 45,
-  financialIncomePrevYear: 30_000_000, // 전년도 금융소득
+  age: 35,
+  financialIncomePrevYear: 10_000_000, // 전년도 금융소득
   totalIncomePrevYear: 90_000_000, // 전년도 총소득
 };
 

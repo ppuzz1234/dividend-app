@@ -80,33 +80,56 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* 나이 · 연소득 */
+/* 나이 · 연소득 — 필수 입력. 라벨 옆 연필 배지로 '직접 입력' 성격을 명확히 */
 .fields {
   display: flex;
   gap: 12px;
 }
 .field {
   flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: 8px;
 }
 .fieldK {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--sub);
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+/* 편집 가능 표시 연필 배지 — 제이드 틴트 라운드 칩 */
+.editBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: 6px;
+  background: var(--jade-dim);
+  color: var(--jade);
 }
 .inputWrap {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 12px 14px;
-  border-radius: 12px;
+  padding: 13px 14px;
+  border-radius: 13px;
   border: 1px solid var(--line);
   background: var(--bg2);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+/* 값이 입력된 필드는 테두리를 제이드로 살짝 물들여 완료 상태를 알린다 */
+.fieldOn .inputWrap {
+  border-color: color-mix(in srgb, var(--jade) 45%, var(--line));
+}
+.inputWrap:focus-within {
+  border-color: var(--jade);
+  box-shadow: 0 0 0 3px var(--jade-dim);
 }
 .input {
   flex: 1;
@@ -114,16 +137,21 @@
   border: none;
   background: transparent;
   color: var(--text);
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 800;
+  letter-spacing: -0.01em;
   font-variant-numeric: tabular-nums;
   outline: none;
+}
+.input::placeholder {
+  color: var(--faint);
+  font-weight: 700;
 }
 .unit {
   flex-shrink: 0;
   font-size: 12.5px;
   font-weight: 700;
-  color: var(--faint);
+  color: var(--sub);
 }
 .hint2 {
   display: flex;

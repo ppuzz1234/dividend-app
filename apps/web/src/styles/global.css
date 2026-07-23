@@ -15,6 +15,15 @@ body {
   color: var(--text);
 }
 
+/* 폼·인터랙티브 요소(button/input/select/textarea)는 폰트를 상속하지 않으므로
+ * 전역으로 앱 폰트(LifePlus)를 물려준다 — 개별 컴포넌트에서 빠뜨린 곳까지 일괄 적용 */
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
 /* 스크롤바 숨김 */
 .noscroll::-webkit-scrollbar {
   display: none;

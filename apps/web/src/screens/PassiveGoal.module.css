@@ -5,7 +5,7 @@
   border-radius: 22px;
   background: var(--card);
   border: 1px solid var(--line);
-  padding: 4px 18px;
+  padding: 6px 18px;
   animation: pgRise 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) both;
 }
 @keyframes pgRise {
@@ -22,28 +22,29 @@
 .row {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 17px 0;
+  gap: 13px;
+  padding: 16px 0;
 }
 .rowIcon {
   flex-shrink: 0;
-  width: 40px;
-  height: 40px;
-  border-radius: 13px;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
   display: block;
   object-fit: cover;
 }
 .rowLabel {
-  font-size: 14.5px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--sub);
+  letter-spacing: -0.01em;
 }
 .rowVal {
   margin-left: auto;
-  font-size: 21px;
+  font-size: 20px;
   font-weight: 800;
   color: var(--text);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
   font-variant-numeric: tabular-nums;
 }
 
@@ -60,8 +61,8 @@
   flex: 1;
   display: flex;
   align-items: center;
-  gap: 11px;
-  padding: 15px 0;
+  gap: 12px;
+  padding: 14px 0;
 }
 .dualCell + .dualCell {
   padding-left: 18px;
@@ -69,17 +70,17 @@
   margin-left: 18px;
 }
 .miniLabel {
-  display: block;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--sub);
-  margin-bottom: 2px;
+  letter-spacing: -0.01em;
 }
 .miniVal {
+  margin-left: auto;
   font-size: 18px;
   font-weight: 800;
   color: var(--text);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
   font-variant-numeric: tabular-nums;
 }
 
@@ -87,32 +88,36 @@
 .hero .rowLabel {
   color: var(--text);
   font-weight: 800;
-  font-size: 15px;
+  font-size: 14.5px;
+  letter-spacing: -0.01em;
 }
 .heroVal {
   margin-left: auto;
-  font-size: 31px;
+  font-size: 30px;
   font-weight: 800;
   color: var(--jade);
-  letter-spacing: -0.03em;
+  letter-spacing: -0.035em;
   font-variant-numeric: tabular-nums;
 }
 
 /* 매달 투자금 하단 — 투자 상품(예시) 가정 명시 */
 .assumeNote {
-  margin: -6px 0 0;
-  padding: 0 2px 4px;
+  margin: -3px 0 0;
+  padding: 0 2px;
   font-size: 12px;
   font-weight: 600;
+  line-height: 1.45;
+  letter-spacing: -0.01em;
   color: var(--jade-deep, var(--faint));
   word-break: keep-all;
 }
 
 .foot {
   margin: 0;
-  padding: 8px 2px 16px;
-  font-size: 12.5px;
+  padding: 10px 2px 16px;
+  font-size: 12px;
   line-height: 1.55;
+  letter-spacing: -0.01em;
   color: var(--faint);
   word-break: keep-all;
 }

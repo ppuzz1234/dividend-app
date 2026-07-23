@@ -9,9 +9,15 @@
 }
 .body {
   flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   padding: 8px 22px 8px;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.body::-webkit-scrollbar {
+  display: none;
 }
 .bodyCenter {
   flex: 1;
@@ -455,4 +461,469 @@
   padding: 12px 20px calc(14px + env(safe-area-inset-bottom));
   border-top: 1px solid var(--line);
   background: var(--card);
+}
+
+/* ── loading — 여러 업권의 금융사·기관이 순차적으로 연동되는 비주얼 ── */
+.loadBody {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 16px 22px calc(16px + env(safe-area-inset-bottom));
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.loadBody::-webkit-scrollbar {
+  display: none;
+}
+.loadHead {
+  margin: 6px 0 18px;
+}
+.loadTitle {
+  margin: 0;
+  font-size: 23px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.35;
+}
+.loadSub {
+  margin: 10px 0 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--sub);
+  word-break: keep-all;
+}
+.srcGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.srcTile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 15px 14px;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: linear-gradient(160deg, var(--card-hi), var(--bg2));
+  opacity: 0.42;
+  animation: mdConnect 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@keyframes mdConnect {
+  from {
+    opacity: 0.42;
+    transform: translateY(5px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.srcTileIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  margin-bottom: 4px;
+  border-radius: 11px;
+  /* 업권별 고유 색 (var(--c)) — 미지정 시 제이드 폴백 */
+  color: var(--c, var(--jade));
+  background: color-mix(in srgb, var(--c, var(--jade)) 16%, transparent);
+}
+.srcTileName {
+  font-size: 14.5px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+.srcTileCount {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--sub);
+  font-variant-numeric: tabular-nums;
+}
+.srcTileCheck {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  color: #0d1211;
+  background: var(--c, var(--jade));
+  transform: scale(0);
+  animation: mdPop 0.4s cubic-bezier(0.22, 1.4, 0.4, 1) forwards;
+}
+@keyframes mdPop {
+  to {
+    transform: scale(1);
+  }
+}
+.loadFoot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 18px 0 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--faint);
+  text-align: center;
+  word-break: keep-all;
+}
+.loadFoot svg {
+  flex-shrink: 0;
+  color: var(--jade);
+}
+@media (prefers-reduced-motion: reduce) {
+  .srcTile {
+    opacity: 1;
+    animation: none;
+  }
+  .srcTileCheck {
+    transform: scale(1);
+    animation: none;
+  }
+}
+
+/* ── loaded — 광범위 연동 요약 카드 (업권별 연동 기관 수) ── */
+.linkCard {
+  margin-top: 6px;
+  padding: 16px 18px;
+  border-radius: 20px;
+  border: 1px solid var(--line);
+  background: linear-gradient(160deg, var(--card-hi), var(--card));
+}
+.linkHead {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+.linkHead svg {
+  flex-shrink: 0;
+  color: var(--jade);
+}
+.linkCats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 13px;
+}
+.linkCat {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 11px 6px 7px;
+  border-radius: 999px;
+  border: 1px solid var(--line2);
+  background: var(--bg2);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--sub);
+}
+.linkCat b {
+  color: var(--c, var(--jade));
+  font-variant-numeric: tabular-nums;
+}
+.linkCatIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 6px;
+  color: var(--c, var(--jade));
+  background: color-mix(in srgb, var(--c, var(--jade)) 15%, transparent);
+}
+.acctLabel {
+  margin: 16px 2px 8px;
+  font-size: 12.5px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--sub);
+}
+
+/* ── 동의 시트 콘텐츠 (전송요구서·선택 동의·제공 동의·유의사항) ── */
+.eyebrow {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--jade);
+}
+.introP {
+  margin: 14px 0;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--sub);
+  word-break: keep-all;
+}
+.introP b {
+  color: var(--text);
+  font-weight: 800;
+}
+.introP u {
+  color: var(--sub);
+  text-underline-offset: 2px;
+}
+.legalH {
+  margin: 18px 0 10px;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  word-break: keep-all;
+}
+.subH {
+  margin: 14px 0 8px;
+  font-size: 13.5px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+.sectSub {
+  margin: 0 0 10px;
+  font-size: 12.5px;
+  color: var(--sub);
+  word-break: keep-all;
+}
+.metaCard {
+  padding: 2px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: var(--bg2);
+}
+.metaRow {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 11px 0;
+}
+.metaRow:not(:last-child) {
+  border-bottom: 1px solid var(--line);
+}
+.metaK {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--sub);
+}
+.metaV {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.55;
+  color: var(--text);
+  word-break: keep-all;
+}
+.metaAccent {
+  color: var(--jade);
+  font-weight: 700;
+}
+.metaUnderline {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.bullets {
+  list-style: none;
+  margin: 0 0 6px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.bullet {
+  position: relative;
+  padding-left: 13px;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--sub);
+  word-break: keep-all;
+}
+.bullet::before {
+  content: "•";
+  position: absolute;
+  left: 1px;
+  color: var(--faint);
+}
+.bulletK {
+  color: var(--text);
+  font-weight: 800;
+}
+.freq {
+  margin: 14px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text);
+}
+.freq p {
+  margin: 0;
+  word-break: keep-all;
+}
+.pick {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 9px;
+  border-radius: 8px;
+  border: 1px solid var(--line2);
+  background: var(--card);
+  font-size: 12.5px;
+  font-weight: 800;
+  color: var(--jade);
+  vertical-align: middle;
+}
+.pick svg {
+  color: var(--sub);
+}
+.freqNote {
+  font-size: 12px;
+  color: var(--faint);
+}
+.rule {
+  height: 1px;
+  margin: 18px 0;
+  background: var(--line);
+}
+.optList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+.optCard {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  padding: 15px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: var(--bg2);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s, background 0.15s;
+}
+.optCardOn {
+  border-color: var(--jade);
+  background: color-mix(in srgb, var(--jade) 8%, var(--bg2));
+}
+.optCheck {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid var(--line2);
+  background: var(--bg);
+  color: transparent;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+.optCheckOn {
+  border-color: var(--jade);
+  background: var(--jade);
+  color: #101410;
+}
+.optLabel {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+.notes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.note {
+  position: relative;
+  padding-left: 13px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--sub);
+  word-break: keep-all;
+}
+.note::before {
+  content: "•";
+  position: absolute;
+  left: 1px;
+  color: var(--faint);
+}
+.agreeBox {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.agreeCard {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  padding: 15px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: var(--bg2);
+  cursor: pointer;
+  text-align: left;
+}
+.agreeGroup {
+  display: flex;
+  flex-direction: column;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: var(--bg2);
+}
+.agreeGroupHead {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  padding: 15px 14px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+.subRows {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 4px 14px 15px 47px;
+}
+.subRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.subCheck {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--sub);
+}
+.subText {
+  flex: 1;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--sub);
+  word-break: keep-all;
+}
+.subChevron {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--faint);
 }

@@ -24,28 +24,33 @@ export function Result({ sim, allocation, chosen, years, reinvest, goalNestEgg, 
 
   /* 추천 배당 솔루션 — 은퇴 시점에 모은 자산(finalValue)을 고배당 상품으로 전환했을 때의
    * 연/월 배당액. 배당 ETF(연 4%) 또는 커버드콜 ETF(연 10%) 중 선택. */
-  const [divType, setDivType] = useState("div");
+  const [divType, setDivType] = useState("cc");
   const divRate = divType === "cc" ? 0.1 : 0.04;
   const annualDiv = Math.round((finalValue * divRate) / 10000) * 10000;
   const monthlyDiv = Math.round(annualDiv / 12 / 10000) * 10000;
   const goalMonthlyWon = (monthlyGoal || 0) * 10000;
   const coverPct = goalMonthlyWon > 0 ? Math.round((monthlyDiv / goalMonthlyWon) * 100) : null;
 
-  /* 계좌별 절세·세액공제 — 배분(buildAccountRooms)의 계좌별 월 납입과
-   * 세제 혜택(연금·IRP 세액공제 / ISA 비과세 절세)을 계좌별로 정리하고 합계(절세 총액)를 낸다. */
+  /* 계좌별 절세·세액공제 — (a) '올해 총 세액공제' 기준.
+   *  연금저축·IRP: 당해 기납(used) + 이번 배분 공제분(planAnnual)을 세액공제 한도(limit) 내에서
+   *  합산해 공제율을 곱한다 → 이미 낸 기납분의 공제까지 포함한다.
+   *  ISA: 순이익 200만원 비과세 상당액(estSaving)을 보유/배분이 있을 때만 반영. */
   const deductRate = deductionRate(income);
   const taxSaving = useMemo(() => {
     const { rooms } = buildAccountRooms({ mydata: true, manual: manualAccounts, income, monthlyContribution });
     const rows = rooms
-      .filter((r) => (r.planTotalAnnual || 0) > 0)
       .map((r) => {
-        // 세액공제(연금저축·IRP)는 공제분(planAnnual)에만, ISA는 비과세 절세 상당(estSaving).
+        // 올해 공제 대상 납입액 = 기납 + 배분 공제분 (세액공제 한도 내). 기납+배분이 한도를 넘지 않도록 clamp.
+        const deductibleAnnual = Math.min((r.used || 0) + (r.planAnnual || 0), r.limit || 0);
+        const hasIsa = r.id === "isa" && ((r.planTotalAnnual || 0) > 0 || (r.used || 0) > 0);
+        const raw =
+          r.roomType === "deduct" ? deductibleAnnual * deductRate : hasIsa ? r.estSaving || 0 : 0;
         // 만원 단위로 반올림 — 계좌별 표시값의 합이 절세 총액과 정확히 일치하도록.
-        const raw = r.roomType === "deduct" ? (r.planAnnual || 0) * deductRate : r.id === "isa" ? r.estSaving || 0 : 0;
         const benefit = Math.round(raw / 10000) * 10000;
         const label = r.roomType === "deduct" ? "세액공제" : r.id === "isa" ? "비과세 절세" : null;
         return { id: r.id, name: r.name, monthly: Math.round(r.planMonthly || 0), benefit, label };
-      });
+      })
+      .filter((r) => r.benefit > 0);
     const total = rows.reduce((s, r) => s + r.benefit, 0);
     return { rows, total };
   }, [manualAccounts, income, monthlyContribution, deductRate]);
@@ -97,8 +102,8 @@ export function Result({ sim, allocation, chosen, years, reinvest, goalNestEgg, 
             value={divType}
             onChange={setDivType}
             opts={[
-              { v: "div", l: "배당 ETF · 연 4%" },
               { v: "cc", l: "커버드콜 ETF · 연 10%" },
+              { v: "div", l: "배당 ETF · 연 4%" },
             ]}
           />
         </div>
@@ -210,11 +215,11 @@ function TaxSaving({ rows, total, deductRate }) {
           <Sparkles size={13} strokeWidth={2.6} /> 핵심 인사이트
         </span>
         <h2 className={styles.insTitle}>
-          계좌 배분만으로 <b className={styles.insTotal}>연 {fmtKRW(total)}</b> 절세돼요
+          절세 계좌를 채우면 <b className={styles.insTotal}>연 {fmtKRW(total)}</b> 절세돼요
         </h2>
       </div>
 
-      {/* 계좌별 내역 — 계획의 계좌별 월 납입(납입여력 기준)에 연동된 연 절세/세액공제 */}
+      {/* 계좌별 내역 — 월 납입(배분 계획) + 올해 총 공제대상(기납+배분, 한도 내)에 따른 연 절세/세액공제 */}
       <div className={styles.saveGrid}>
         {rows.map((r) => (
           <div key={r.id} className={styles.saveCell}>
@@ -235,7 +240,8 @@ function TaxSaving({ rows, total, deductRate }) {
       </div>
 
       <p className={styles.insNote}>
-        세액공제율 {(deductRate * 100).toFixed(1)}%(총급여 기준)·ISA 비과세 반영. 단순화 추정치예요.
+        세액공제율 {(deductRate * 100).toFixed(1)}%(총급여 기준)·ISA 비과세 반영. 올해 납입액(기납+배분, 한도 내) 기준
+        단순화 추정치예요.
       </p>
     </section>
   );

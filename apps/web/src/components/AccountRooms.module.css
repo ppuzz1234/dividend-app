@@ -7,7 +7,7 @@
   border: 1px solid var(--line);
 }
 .allocHead {
-  font-size: 13.5px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--text);
 }
@@ -16,23 +16,61 @@
   font-weight: 800;
   font-variant-numeric: tabular-nums;
 }
-/* 계좌별 몫을 폭으로 보여주는 스택 막대 */
+/* 계좌별 몫을 폭으로 보여주는 스택 막대 — 큼직한 높이 안에 계좌명·월 납입액을 직접 표기.
+ * 각 세그먼트가 곧 버튼: 누르면 해당 계좌 탭으로 이동한다. */
 .allocBar {
   display: flex;
-  gap: 3px;
-  height: 10px;
-  margin-top: 10px;
+  gap: 4px;
+  height: 84px;
+  margin-top: 12px;
 }
 .allocSeg {
-  border-radius: 5px;
-  min-width: 6px;
-  position: relative;
-  transition: box-shadow 0.15s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  min-width: 60px;
+  padding: 4px 5px;
+  border: none;
+  border-radius: 12px;
+  overflow: hidden;
+  /* 세그먼트 색상이 모두 밝은 톤이라 진한 글자로 대비를 확보한다 */
+  color: #14170f;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  transition: box-shadow 0.15s, transform 0.1s, filter 0.15s;
 }
-/* 선택된 계좌(탭·칩)의 바 — 밝은 링 테두리로 시인성 강조 */
+.allocSeg:hover {
+  filter: brightness(1.05);
+}
+.allocSeg:active {
+  transform: translateY(1px);
+}
+/* 선택된 계좌의 세그먼트 — 밝은 링 + 살짝 띄워 강조 */
 .allocSegOn {
-  box-shadow: 0 0 0 2px var(--text);
+  box-shadow: 0 0 0 2.5px var(--text), inset 0 1px 0 rgba(255, 255, 255, 0.3);
   z-index: 1;
+}
+.segName {
+  max-width: 100%;
+  font-size: 12.5px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.segAmt {
+  max-width: 100%;
+  font-size: 13.5px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 .seg_pensionSavings {
   background: var(--jade);
@@ -45,43 +83,6 @@
 }
 .seg_general {
   background: var(--sub);
-}
-.allocChips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 10px;
-}
-/* 칩 클릭 시 해당 계좌 탭으로 이동 */
-.allocChip {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 5px 10px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: var(--bg2);
-  color: var(--sub);
-  font-family: var(--font-sans);
-  font-size: 11.5px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  cursor: pointer;
-  transition: color 0.15s, border-color 0.15s, background 0.15s;
-}
-.allocChip:hover {
-  color: var(--text);
-}
-.allocChipOn {
-  border-color: var(--line2);
-  background: var(--card);
-  color: var(--text);
-}
-.allocDot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  display: inline-block;
 }
 
 /* ── 계좌 탭바 — ISA · 연금저축 · IRP · 일반.
@@ -527,6 +528,17 @@
   font-weight: 700;
   color: var(--gold);
   margin-top: 8px;
+}
+/* 공제 한도와 납입 한도가 다른 계좌(IRP) 안내 — 여력 박스 하단 보조 캡션 */
+.roomNote {
+  margin: 10px 0 0;
+  padding-top: 10px;
+  border-top: 1px dashed var(--line2);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.55;
+  color: var(--sub);
+  word-break: keep-all;
 }
 
 /* ── 한줄 정리 / 섹션 ─────────────────────────────────────── */

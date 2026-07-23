@@ -78,29 +78,24 @@ export function AccountRooms({ mydata, manual, income, monthlyContribution = 0 }
           <div className={styles.allocHead}>
             매달 <b>{fmtKRW(monthlyContribution)}</b>은 이렇게 나눠 담아요
           </div>
+          {/* 각 세그먼트가 곧 계좌 선택 버튼 — 내부에 계좌명·월 납입액을 직접 표기 */}
           <div className={styles.allocBar}>
-            {planned.map((r) => (
-              <div
-                key={r.id}
-                className={cx(
-                  styles.allocSeg,
-                  styles[`seg_${r.id}`],
-                  tab === r.id && styles.allocSegOn // 선택 계좌의 바를 테두리로 강조
-                )}
-                style={{ flexGrow: r.planShare }}
-              />
-            ))}
-          </div>
-          <div className={styles.allocChips}>
             {planned.map((r) => (
               <button
                 key={r.id}
                 type="button"
-                className={cx(styles.allocChip, tab === r.id && styles.allocChipOn)}
+                aria-label={`${TAB_LABELS[r.id]} 월 ${fmtKRW(Math.round(r.planMonthly))} 선택`}
+                aria-pressed={tab === r.id}
+                className={cx(
+                  styles.allocSeg,
+                  styles[`seg_${r.id}`],
+                  tab === r.id && styles.allocSegOn // 선택 계좌의 세그먼트를 링으로 강조
+                )}
+                style={{ flexGrow: r.planShare }}
                 onClick={() => setTab(r.id)}
               >
-                <i className={cx(styles.allocDot, styles[`seg_${r.id}`])} />
-                {TAB_LABELS[r.id]} 월 {fmtKRW(Math.round(r.planMonthly))}
+                <span className={styles.segName}>{TAB_LABELS[r.id]}</span>
+                <span className={styles.segAmt}>{fmtKRW(Math.round(r.planMonthly))}</span>
               </button>
             ))}
           </div>
@@ -233,6 +228,8 @@ export function AccountRooms({ mydata, manual, income, monthlyContribution = 0 }
           {room.estRefund > 0 && (
             <div className={styles.roomRefund}>여력을 다 채우면 예상 세액공제 환급 +{fmtKRW(room.estRefund)}</div>
           )}
+          {/* 공제 한도 ≠ 납입 한도 안내 — IRP처럼 둘이 다른 계좌에서만 노출 */}
+          {room.depositNote && <p className={styles.roomNote}>{room.depositNote}</p>}
         </div>
 
         {/* 한줄 정리 — 미보유(개설 추천) 계좌는 계좌 소개로 대체 */}

@@ -17,13 +17,11 @@ const GOAL_STOPS = [100, 300, 500, 1000, 2000]; // 목표 passive income 슬라�
  *  (기존 온보딩 목표 슬라이더 화면을 착안 — 마이데이터는 이미 앞 단계에서 연동됨) */
 export function PassiveGoal({ monthlyGoal, setMonthlyGoal, requiredNestEgg, requiredMonthly, years, gap, onNext }) {
   const [stage, setStage] = useState("hero"); // hero → goal
-  const [moved, setMoved] = useState(false);
-  const reachFinal = () => setMoved(true);
 
   return (
     <Pad
       footer={
-        stage === "goal" && moved ? (
+        stage === "goal" ? (
           <Button onClick={onNext} icon={ArrowRight}>
             이 목표로 솔루션 도출하기
           </Button>
@@ -88,12 +86,17 @@ export function PassiveGoal({ monthlyGoal, setMonthlyGoal, requiredNestEgg, requ
                     step="any"
                     value={pos}
                     aria-label="목표 passive income 선택"
-                    onChange={(e) => (setMonthlyGoal(toVal(Number(e.target.value))), reachFinal())}
+                    onChange={(e) => setMonthlyGoal(toVal(Number(e.target.value)))}
                     style={{ width: "100%" }}
                   />
+                  {/* 라벨 중심을 각 구간의 슬라이더 썸(지름 26px) 중심에 정확히 정렬 */}
                   <div className={styles.stopLabels}>
-                    {GOAL_STOPS.map((v) => (
-                      <span key={v} className={cx(styles.stopLabel, v === clamped && styles.stopOn)}>
+                    {GOAL_STOPS.map((v, i) => (
+                      <span
+                        key={v}
+                        className={cx(styles.stopLabel, v === clamped && styles.stopOn)}
+                        style={{ left: `calc(13px + ${i / N} * (100% - 26px))` }}
+                      >
                         {v.toLocaleString()}만원
                       </span>
                     ))}
@@ -104,8 +107,7 @@ export function PassiveGoal({ monthlyGoal, setMonthlyGoal, requiredNestEgg, requ
           </div>
 
           <div className={styles.scenarioZone}>
-            {moved && (
-              <div className={card.summary}>
+            <div className={card.summary}>
                 {/* 필요 자산 — 4% 룰 역산 근거를 (i) 더보기로 설명 */}
                 <div className={card.row}>
                   <img className={card.rowIcon} src="/brand/pg-nestegg.svg" alt="" />
@@ -129,21 +131,17 @@ export function PassiveGoal({ monthlyGoal, setMonthlyGoal, requiredNestEgg, requ
 
                 <div className={card.divider} />
 
-                {/* 은퇴 정년 / 은퇴까지 (위치 교체) */}
+                {/* 은퇴 정년 / 은퇴까지 — 라벨 좌측, 값 우측 (상단 행과 동일 리듬) */}
                 <div className={card.dual}>
                   <div className={card.dualCell}>
                     <img className={card.rowIcon} src="/brand/pg-age.svg" alt="" />
-                    <div>
-                      <span className={card.miniLabel}>은퇴 정년</span>
-                      <b className={card.miniVal}>60세</b>
-                    </div>
+                    <span className={card.miniLabel}>은퇴 정년</span>
+                    <b className={card.miniVal}>60세</b>
                   </div>
                   <div className={card.dualCell}>
                     <img className={card.rowIcon} src="/brand/pg-until.svg" alt="" />
-                    <div>
-                      <span className={card.miniLabel}>은퇴까지</span>
-                      <b className={card.miniVal}>{years}년</b>
-                    </div>
+                    <span className={card.miniLabel}>은퇴까지</span>
+                    <b className={card.miniVal}>{years}년</b>
                   </div>
                 </div>
 
@@ -168,7 +166,6 @@ export function PassiveGoal({ monthlyGoal, setMonthlyGoal, requiredNestEgg, requ
                     : "이미 보유한 자산만으로 목표를 달성할 수 있어요 🎉"}
                 </p>
               </div>
-            )}
           </div>
         </div>
       )}

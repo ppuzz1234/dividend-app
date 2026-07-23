@@ -107,8 +107,12 @@ export function Onboarding({ monthlyGoal, setMonthlyGoal, onNext }) {
                 style={{ width: "100%" }}
               />
               <div className={styles.stopLabels}>
-                {GOAL_STOPS.map((v) => (
-                  <span key={v} className={cx(styles.stopLabel, v === clamped && styles.stopOn)}>
+                {GOAL_STOPS.map((v, i) => (
+                  <span
+                    key={v}
+                    className={cx(styles.stopLabel, v === clamped && styles.stopOn)}
+                    style={{ left: `calc(13px + ${i / N} * (100% - 26px))` }}
+                  >
                     {v.toLocaleString()}만원
                   </span>
                 ))}

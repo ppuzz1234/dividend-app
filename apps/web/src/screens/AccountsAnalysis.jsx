@@ -19,26 +19,35 @@ const WHY = {
 const LEVEL_TAG = { good: "양호", warn: "개선 여지", act: "조치 필요" };
 
 /* 계좌별 신호등 상태 도출 — 남은 여력이 아니라 '이 계좌로 달성 가능한 총 납입금(연 한도)과
- *  그에 따른 총 환급 예상액(한도 × 세액공제율)'을 기준으로 표기한다. */
+ *  그에 따른 총 환급 예상액(한도 × 세액공제율)'을 기준으로 표기한다.
+ *  · 조치 필요: 미개설(held===false)
+ *  · 양호: 한도를 모두 채웠거나(room<=0), 개설된 상태에서 한도의 50% 이상 기납(pct>=50)
+ *  · 개선 여지: 개설됐으나 기납이 한도의 50% 미만 */
 function analyze(r) {
+  const filled = r.room <= 0; // 한도 소진
+  const half = r.held !== false && (r.pct ?? 0) >= 50; // 개설 & 한도 50%+ 기납
+  const level = r.held === false ? "act" : filled || half ? "good" : "warn";
+
   if (r.roomType === "deduct") {
-    const level = r.held === false ? "act" : r.room <= 0 ? "good" : "warn";
     const note =
       r.held === false
         ? `지금 개설하면 연 ${fmtKRW(r.limit)} 납입으로 매년 ${fmtKRW(r.maxRefund)}을 환급받을 수 있어요.`
-        : r.room <= 0
+        : filled
           ? `연 ${fmtKRW(r.limit)}을 모두 채워 매년 ${fmtKRW(r.maxRefund)}을 돌려받고 있어요.`
-          : `이 계좌로 연 ${fmtKRW(r.limit)}까지 납입하면 매년 ${fmtKRW(r.maxRefund)}을 세액공제로 돌려받아요.`;
+          : half
+            ? `한도의 절반 이상을 채웠어요. 남은 ${fmtKRW(r.room)}까지 더 넣으면 매년 ${fmtKRW(r.maxRefund)}을 모두 세액공제로 돌려받아요.`
+            : `이 계좌로 연 ${fmtKRW(r.limit)}까지 납입하면 매년 ${fmtKRW(r.maxRefund)}을 세액공제로 돌려받아요.`;
     return { level, note };
   }
   // ISA(limit) — 세액공제가 아닌 비과세이므로 총 납입 가능액과 비과세 혜택으로 표기
-  const level = r.held === false ? "act" : r.room <= 0 ? "good" : "warn";
   const note =
     r.held === false
       ? `지금 개설하면 연 ${fmtKRW(r.limit)}까지 비과세로 굴릴 수 있어요.`
-      : r.room <= 0
+      : filled
         ? `연 ${fmtKRW(r.limit)} 비과세 한도를 모두 활용하고 있어요.`
-        : `이 계좌로 연 ${fmtKRW(r.limit)}까지 담아 순이익 200만원을 비과세로 받을 수 있어요.`;
+        : half
+          ? `비과세 한도의 절반 이상을 채웠어요. 남은 ${fmtKRW(r.room)}까지 더 담으면 순이익 200만원을 비과세로 받아요.`
+          : `이 계좌로 연 ${fmtKRW(r.limit)}까지 담아 순이익 200만원을 비과세로 받을 수 있어요.`;
   return { level, note };
 }
 
