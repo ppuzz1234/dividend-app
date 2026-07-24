@@ -1,12 +1,16 @@
-/* 루빅스 큐브 로더 — 층별 비틀림 조립 → 정면 로고 정지 루프.
+/* 루빅스 큐브 로더 — 세로(열)·가로(층) 양방향 비틀림 조립 → 정면 로고 정지 루프.
  * --s 큐비 한 변 · --u 큐비 피치 (CubeLoader.jsx 에서 주입)
  *
  * 타임라인(4.6s):
- *   0-14%   비틀린 층들이 위아래에서 모여들며 큐브가 스케일 인(아이소 뷰)
- *   14-58%  아래→중간→위 층이 차례로 되감기며 맞춰짐
+ *   0-14%   열·층 모두 비틀린 채 위아래에서 모여들며 큐브가 스케일 인(아이소 뷰)
+ *   14-40%  [세로] 좌→중→우 열이 차례로 되감기며 맞춰짐 (rotateX, 큐브 중심 축)
+ *   36-58%  [가로] 아래→중간→위 층이 차례로 되감기며 맞춰짐 (rotateY)
  *   58-72%  큐브 전체가 정면으로 회전(살짝 오버슈트 후 정착)
  *   72-94%  정면 = 브랜드 마크(노랑 C + 외곽선 카운터)로 정지
- *   94-100% 회전하며 스케일 아웃 → 0% 상태와 동일해 루프가 이어짐 */
+ *   94-100% 회전하며 스케일 아웃 → 0% 상태와 동일해 루프가 이어짐
+ *
+ * 역산 배치: 스티커는 '완성 상태' 기준으로 칠해져 있고, 모든 비틀림
+ * 키프레임이 0(identity)으로 되감기므로 마지막 씬은 항상 브랜드 아이콘. */
 
 .wrap {
   padding: 42px 0 46px;
@@ -43,7 +47,8 @@
   animation: cubeSpin 4.6s cubic-bezier(0.45, 0, 0.25, 1) infinite;
 }
 
-/* 가로 층 — 원점 기준 translateY(층 오프셋) + rotateY(비틀림) */
+/* 가로 층 — 원점 기준 translateY(층 오프셋) + rotateY(비틀림)
+ * --ly: 정착 시 층의 Y 오프셋 — 큐비 열 비틀림의 회전축(큐브 중심) 보정에 쓴다 */
 .layer {
   position: absolute;
   width: 0;
@@ -51,16 +56,19 @@
   transform-style: preserve-3d;
 }
 .layerTop {
+  --ly: calc(var(--u) * -1);
   animation: twistTop 4.6s ease-in-out infinite;
 }
 .layerMid {
+  --ly: 0px;
   animation: twistMid 4.6s ease-in-out infinite;
 }
 .layerBot {
+  --ly: var(--u);
   animation: twistBot 4.6s ease-in-out infinite;
 }
 
-/* 큐비 — 층 내부 고정 배치(transform 은 JSX 인라인) */
+/* 큐비 — 층 내부 고정 배치(--cx/--cz 는 JSX 인라인 변수) */
 .cubie {
   position: absolute;
   left: calc(var(--s) / -2);
@@ -68,6 +76,18 @@
   width: var(--s);
   height: var(--s);
   transform-style: preserve-3d;
+  transform: translate3d(calc(var(--cx) * var(--u)), 0, calc(var(--cz) * var(--u)));
+}
+/* 세로 열 비틀림 — 큐비마다 translateY(-층오프셋)→rotateX→translateY(층오프셋)로
+ * 회전축을 큐브 중심에 맞춘다(열은 3개 층에 걸쳐 있어 래퍼 회전 불가). */
+.colL {
+  animation: colTwistL 4.6s ease-in-out infinite;
+}
+.colM {
+  animation: colTwistM 4.6s ease-in-out infinite;
+}
+.colR {
+  animation: colTwistR 4.6s ease-in-out infinite;
 }
 
 /* 면 — 다크 바디 + ::after 스티커 */
@@ -161,20 +181,86 @@
   }
 }
 
-/* 층 비틀림 — 위아래에서 모여들며(translateY) 차례로 되감긴다.
- * 아래층 → 중간층 → 윗층 순서, 각각 살짝 오버슈트 후 정착. */
+/* 세로 열 비틀림 — 좌→중→우 순서로 되감긴다(14-40%), 각각 살짝 오버슈트 후 정착.
+ * 매 프레임: 축 보정(translateY ±--ly) + rotateX(비틀림) + 큐비 고정 배치(translate3d). */
+@keyframes colTwistL {
+  0%,
+  100% {
+    transform: translateY(calc(var(--ly) * -1)) rotateX(140deg) translateY(var(--ly))
+      translate3d(calc(var(--cx) * var(--u)), 0, calc(var(--cz) * var(--u)));
+  }
+  14% {
+    transform: translateY(calc(var(--ly) * -1)) rotateX(140deg) translateY(var(--ly))
+      translate3d(calc(var(--cx) * var(--u)), 0, calc(var(--cz) * var(--u)));
+  }
+  24% {
+    transform: translateY(calc(var(--ly) * -1)) rotateX(-8deg) translateY(var(--ly))
+      translate3d(calc(var(--cx) * var(--u)), 0, calc(var(--cz) * var(--u)));
+  }
+  28%,
+  94% {
+    transform: translateY(calc(var(--ly) * -1)) rotateX(0deg) translateY(var(--ly))
+      translate3d(calc(var(--cx) * var(--u)), 0, calc(var(--cz) * var(--u)));
+  }
+}
+@keyframes colTwistM {
+  0%,
+  100% {
+    transform: translateY(calc(var(--ly) * -1)) rotateX(-110deg) translateY(var(--ly))
+      translate3d(calc(var(--cx) * var(--u)), 0, calc(var(--cz) * var(--u)));
+  }
+  14%,
+  20% {
+    transform: translateY(calc(var(--ly) * -1)) rotateX(-110deg) translateY(var(--ly))
+      translate3d(calc(var(--cx) * var(--u)), 0, calc(var(--cz) * var(--u)));
+  }
+  30% {
+    transform: translateY(calc(var(--ly) * -1)) rotateX(7deg) translateY(var(--ly))
+      translate3d(calc(var(--cx) * var(--u)), 0, calc(var(--cz) * var(--u)));
+  }
+  34%,
+  94% {
+    transform: translateY(calc(var(--ly) * -1)) rotateX(0deg) translateY(var(--ly))
+      translate3d(calc(var(--cx) * var(--u)), 0, calc(var(--cz) * var(--u)));
+  }
+}
+@keyframes colTwistR {
+  0%,
+  100% {
+    transform: translateY(calc(var(--ly) * -1)) rotateX(200deg) translateY(var(--ly))
+      translate3d(calc(var(--cx) * var(--u)), 0, calc(var(--cz) * var(--u)));
+  }
+  14%,
+  26% {
+    transform: translateY(calc(var(--ly) * -1)) rotateX(200deg) translateY(var(--ly))
+      translate3d(calc(var(--cx) * var(--u)), 0, calc(var(--cz) * var(--u)));
+  }
+  36% {
+    transform: translateY(calc(var(--ly) * -1)) rotateX(-8deg) translateY(var(--ly))
+      translate3d(calc(var(--cx) * var(--u)), 0, calc(var(--cz) * var(--u)));
+  }
+  40%,
+  94% {
+    transform: translateY(calc(var(--ly) * -1)) rotateX(0deg) translateY(var(--ly))
+      translate3d(calc(var(--cx) * var(--u)), 0, calc(var(--cz) * var(--u)));
+  }
+}
+
+/* 층 비틀림 — 위아래에서 모여들며(translateY), 세로 페이즈가 끝나갈 무렵부터
+ * 아래층 → 중간층 → 윗층 순서로 되감긴다(36-58%), 각각 살짝 오버슈트 후 정착. */
 @keyframes twistBot {
   0%,
   100% {
     transform: translateY(calc(var(--u) * 2.2)) rotateY(160deg);
   }
-  14% {
+  14%,
+  36% {
     transform: translateY(var(--u)) rotateY(160deg);
   }
-  28% {
+  44% {
     transform: translateY(var(--u)) rotateY(-7deg);
   }
-  33%,
+  48%,
   94% {
     transform: translateY(var(--u)) rotateY(0deg);
   }
@@ -185,13 +271,13 @@
     transform: translateY(0) rotateY(-130deg);
   }
   14%,
-  26% {
+  40% {
     transform: translateY(0) rotateY(-130deg);
   }
-  40% {
+  50% {
     transform: translateY(0) rotateY(6deg);
   }
-  45%,
+  54%,
   94% {
     transform: translateY(0) rotateY(0deg);
   }
@@ -202,10 +288,10 @@
     transform: translateY(calc(var(--u) * -2.2)) rotateY(220deg);
   }
   14%,
-  38% {
+  44% {
     transform: translateY(calc(var(--u) * -1)) rotateY(220deg);
   }
-  53% {
+  54% {
     transform: translateY(calc(var(--u) * -1)) rotateY(-6deg);
   }
   58%,
@@ -244,6 +330,12 @@
   .layerBot {
     animation: none;
     transform: translateY(var(--u));
+  }
+  /* 큐비 열 비틀림 정지 — 기본 transform(정위치)이 그대로 남아 로고 상태 유지 */
+  .colL,
+  .colM,
+  .colR {
+    animation: none;
   }
   .glow {
     animation: none;

@@ -2,13 +2,18 @@ import { useEffect, useState } from "react";
 import { cx } from "../../lib/cx.js";
 import styles from "./CubeLoader.module.css";
 
-/* 루빅스 큐브 로더 — 3x3x3 큐브가 층(layer)별로 비틀린 채 모여들어
- * 차례로 맞춰지고, 마지막에 큐브 전체가 정면으로 돌아서면
- * 앞면이 브랜드 마크(노랑 C + 외곽선 카운터 타일)로 멈추는 루프.
+/* 루빅스 큐브 로더 — 3x3x3 큐브가 세로 열(column)·가로 층(layer) 양방향으로
+ * 비틀린 채 모여들어, 세로(열) → 가로(층) 순서로 차례로 맞춰지고,
+ * 마지막에 큐브 전체가 정면으로 돌아서면 앞면이 브랜드 마크
+ * (노랑 C + 외곽선 카운터 타일)로 멈추는 루프.
  *
- * 구조: cubeWrap(큐브 전체 회전) > layer 3개(가로 층 비틀림)
- *      > cubie 26개(고정 배치) > face 6개(스티커).
- * 층 비틀림이 모두 세로축(Y) 회전이라 재부모화 없이 CSS만으로 동작한다.
+ * 구조: cubeWrap(큐브 전체 회전) > layer 3개(가로 층 비틀림 rotateY)
+ *      > cubie 26개(열 비틀림 rotateX — 큐브 중심 축 보정) > face 6개(스티커).
+ * 열은 3개 층에 걸쳐 있어 래퍼 회전이 불가하므로, 큐비 키프레임에서
+ * translateY(-층오프셋) → rotateX → translateY(층오프셋) 합성으로
+ * 회전축을 큐브 중심에 맞춘다(재부모화 없이 CSS만으로 동작).
+ * 스티커는 '완성 상태' 기준으로 미리 칠해져 있고 모든 비틀림이 0으로
+ * 되감기도록 역산 배치 — 마지막 씬은 항상 브랜드 아이콘이 된다.
  * 주의: opacity 는 3D 조상에서 애니메이션하면 컨텍스트가 평면화되므로
  * 등장·퇴장은 전부 transform(스케일·회전)으로만 처리한다.
  *
@@ -48,6 +53,7 @@ const STICKER_CLASS = {
 };
 
 const LAYER_CLASS = ["layerTop", "layerMid", "layerBot"]; // y = -1, 0, 1
+const COL_CLASS = { "-1": "colL", 0: "colM", 1: "colR" }; // x = -1, 0, 1 — 세로 열 비틀림
 
 export function CubeLoader({ msgs = [], size = 96, bare = false }) {
   const [msg, setMsg] = useState(0);
@@ -80,8 +86,8 @@ export function CubeLoader({ msgs = [], size = 96, bare = false }) {
                   return (
                     <div
                       key={`${x},${z}`}
-                      className={styles.cubie}
-                      style={{ transform: `translate3d(calc(${x} * var(--u)), 0, calc(${z} * var(--u)))` }}
+                      className={cx(styles.cubie, styles[COL_CLASS[x]])}
+                      style={{ "--cx": x, "--cz": z }}
                     >
                       {FACES.map((f) => (
                         <i
