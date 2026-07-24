@@ -341,7 +341,7 @@
 .taxSaveVal {
   font-family: var(--font-brand);
   /* 금액 숫자는 기존 30px의 150% */
-  font-size: 45px;
+  font-size: 40px;
   font-weight: 900;
   color: var(--jade);
   letter-spacing: -0.03em;
