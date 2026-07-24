@@ -33,14 +33,14 @@ export function PassiveGoal({ monthlyGoal, setMonthlyGoal, requiredNestEgg, requ
         <div className={styles.heroStage}>
           <div className={styles.hero}>
             <h1 className={styles.heroTitle}>
-              은퇴 준비를 위한
+              금융 빌딩을 만들어 갈,
               <br />
-              세금 최적화 계좌를 구성했어요.
+              절세 계좌 최적화 설계가 완료되었어요.
             </h1>
             <p className={styles.heroSub}>
-              이제 은퇴 후 Passive Income을 만들기 위한
+              이제 금융 빌딩 만들기 위한
               <br />
-              목표 자산 형성 솔루션을 도출해볼까요?
+              목표 자산  형성 솔루션을 도출해볼까요?
             </p>
           </div>
           <button type="button" className={styles.stepNext} aria-label="다음 단계" onClick={() => setStage("goal")}>
