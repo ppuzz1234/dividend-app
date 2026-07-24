@@ -196,15 +196,28 @@
 /* 슬라이더로 고른 목표 금액 — 타일 안 상단에 크게 표시 */
 .goalPick {
   display: flex;
-  align-items: baseline;
-  justify-content: center;
-  gap: 5px;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
   margin-bottom: 18px;
 }
 .goalPickText {
   font-size: 16px;
   font-weight: 700;
   color: var(--sub);
+  white-space: nowrap;
+}
+/* 값 줄 — "매달 300만원" 이 한 덩어리로 붙어 절대 중간에서 안 깨진다 */
+.goalPickAmount {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  white-space: nowrap;
+}
+.goalPickPrefix {
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--jade);
 }
 .goalPickVal {
   font-size: 38px;

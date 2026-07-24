@@ -59,21 +59,28 @@
 }
 .dualCell {
   flex: 1;
+  min-width: 0;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 9px;
   padding: 14px 0;
 }
 .dualCell + .dualCell {
-  padding-left: 18px;
+  padding-left: 12px;
   border-left: 1px solid var(--line);
-  margin-left: 18px;
+  margin-left: 12px;
+}
+/* dual 셀은 반폭이라 아이콘을 줄여 라벨·값이 한 줄에 들어갈 여유를 준다 */
+.dualCell .rowIcon {
+  width: 30px;
+  height: 30px;
 }
 .miniLabel {
   font-size: 13px;
   font-weight: 600;
   color: var(--sub);
   letter-spacing: -0.01em;
+  white-space: nowrap;
 }
 .miniVal {
   margin-left: auto;
@@ -82,6 +89,7 @@
   color: var(--text);
   letter-spacing: -0.025em;
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 /* 매달 투자금 — 히어로 강조 (아이콘은 배경 없는 오브젝트라 라벨/숫자만 강조) */

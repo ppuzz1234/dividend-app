@@ -156,7 +156,7 @@ export default function App() {
   // 로딩(simulate) 단계 → 자동으로 자산 탭(portfolio)으로 진행 ("최종 진행하기" 직후 대기 화면)
   useEffect(() => {
     if (step === "simulate") {
-      const t = setTimeout(() => go("portfolio"), 2600);
+      const t = setTimeout(() => go("portfolio"), 4600); // CubeLoader 한 사이클(4.6s) 완주 후 진행
       return () => clearTimeout(t);
     }
   }, [step]);

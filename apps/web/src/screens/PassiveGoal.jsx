@@ -53,17 +53,19 @@ export function PassiveGoal({ monthlyGoal, setMonthlyGoal, requiredNestEgg, requ
       {stage === "goal" && (
         <div className={styles.goalStage}>
           <p className={cx(styles.goalGuide, styles.reveal)}>
-            은퇴 후 목표 Passive Income을 정하면,
+            이제 금융 빌딩 만들기 위한
             <br />
-            필요한 자산과 매월 필요한 투자금을 알려드려요
+            목표 월 투자금을 도출해볼까요?
           </p>
-
           <div className={cx(styles.goalCard, styles.reveal)}>
             {/* 선택한 목표 금액 — 슬라이더로 고른 값을 크게 표시 */}
             <div className={styles.goalPick}>
-              <span className={styles.goalPickText}>매달</span>
-              <b className={styles.goalPickVal}>{monthlyGoal.toLocaleString()}</b>
-              <span className={styles.goalPickUnit}>만원</span>
+              <span className={styles.goalPickText}>금융 빌딩 현금 창출액 목표</span>
+              <span className={styles.goalPickAmount}>
+                <span className={styles.goalPickPrefix}>매달</span>
+                <b className={styles.goalPickVal}>{monthlyGoal.toLocaleString()}</b>
+                <span className={styles.goalPickUnit}>만원</span>
+              </span>
             </div>
             {(() => {
               const N = GOAL_STOPS.length - 1;

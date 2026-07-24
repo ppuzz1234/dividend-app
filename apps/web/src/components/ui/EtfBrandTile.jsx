@@ -7,7 +7,7 @@ const BRANDS = {
   TIGER: { bg: "#e8672b", fg: "#fdf3ec" }, // 미래에셋 오렌지
   KODEX: { bg: "#1f4fbf", fg: "#eef2fc" }, // 삼성 블루
   ACE: { bg: "#0f7a6c", fg: "#eaf6f3" }, // 한국투자 그린
-  PLUS: { bg: "#f2c21d", fg: "#17150f" }, // 한화 옐로우(브랜드)
+  PLUS: { bg: "#ffffff", fg: "#111111" }, // PLUS ETF — 흰색 배경 + 검정 글자
 };
 const FALLBACK = { bg: "#39453e", fg: "#eaf1ec" };
 

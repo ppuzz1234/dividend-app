@@ -43,7 +43,7 @@ export const ACCOUNT_PRODUCTS = {
   irp: {
     headline: "코어 성장 70% + 안전자산 30%",
     products: [
-      { code: "379800", name: "KODEX 미국S&P500(TR)", desc: "분배금 재투자 TR형 → 과세이연 계좌에서 복리 효율 극대화" },
+      { code: "433870", name: "PLUS TDF2050액티브", desc: "TDF — 2050 은퇴시점에 맞춰 위험·안전자산 비중(약 2.5:7.5)을 자동 조정, 퇴직연금 100% 투자 가능한 원스톱 자산배분 (보수 연 0.18%)" },
       { code: "379810", name: "KODEX 미국나스닥100(TR)", desc: "나스닥100 성장주 집중 + TR형, 연금 장기복리에 최적" },
       { code: "381170", name: "TIGER 미국테크TOP10 INDXX", desc: "애플·MS·엔비디아 등 빅테크 10종 집중, 순도 높은 성장 베팅" },
       { code: "458730", name: "TIGER 미국배당다우존스", yield: 0.035, desc: "SCHD 추종, 배당+완만한 성장. 안전자산 대체 겸 현금흐름" },
