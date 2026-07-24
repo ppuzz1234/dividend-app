@@ -212,6 +212,14 @@
 .labelGoal {
   font-size: 28px;
 }
+/* 절세 비교 라벨 — 하단 제목(.taxTitle, 27px)과 동일 크기로 상향 */
+.labelTax {
+  font-size: 27px;
+  font-weight: 800;
+  line-height: 1.34;
+  letter-spacing: -0.02em;
+  font-family: var(--font-brand);
+}
 .figure {
   display: flex;
   align-items: baseline;

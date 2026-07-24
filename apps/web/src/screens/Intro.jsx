@@ -213,7 +213,7 @@ export function Intro({ onNext }) {
         className={cx(styles.scene, styles.sceneTax, isIn(2) && styles.in)}
         style={sceneStyle}
       >
-        <p className={cx(styles.label, styles.rise)} style={{ "--i": 0 }}>연 1.2억을 배당으로 받는다면</p>
+        <p className={cx(styles.label, styles.labelTax, styles.rise)} style={{ "--i": 0 }}>연 1.2억을 배당으로 받는다면</p>
         <h2 className={cx(styles.taxTitle, styles.rise)} style={{ "--i": 1 }}>
           세금에 건강보험료까지,
           <br />
@@ -226,7 +226,7 @@ export function Intro({ onNext }) {
             <b className={styles.taxRowV}>약 3,400만원</b>
           </div>
           <div className={cx(styles.taxRow, styles.taxRowGood, styles.rise)} style={{ "--i": 3 }}>
-            <span className={styles.taxRowK}>연금저축계좌 · 분리과세</span>
+            <span className={styles.taxRowK}>절세3종계좌 · 분리과세</span>
             <b className={styles.taxRowV}>약 1,000만원</b>
           </div>
         </div>
