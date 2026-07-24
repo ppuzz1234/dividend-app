@@ -863,27 +863,43 @@
   left: 1px;
   color: var(--faint);
 }
-/* 상단 전체 동의 카드 — 시트 최상단, 강조된 톤 */
+/* 상단 전체 동의 카드 — 시트 최상단, 크고 밝은 톤으로 시선을 끈다 */
 .agreeAll {
   display: flex;
   align-items: center;
-  gap: 11px;
+  gap: 14px;
   width: 100%;
-  margin: 4px 0 14px;
-  padding: 16px 15px;
-  border-radius: 14px;
-  border: 1.5px solid var(--line2);
-  background: var(--bg2);
+  margin: 6px 0 18px;
+  padding: 22px 20px;
+  border-radius: 16px;
+  border: 2px solid color-mix(in srgb, var(--jade) 55%, var(--line2));
+  /* 기본부터 밝은 제이드 틴트 배경 → 어두운 시트 위에서 확실히 도드라진다 */
+  background: color-mix(in srgb, var(--jade) 16%, var(--card));
   cursor: pointer;
   text-align: left;
   transition: border-color 0.2s ease, background 0.2s ease;
 }
 .agreeAllOn {
   border-color: var(--jade);
-  background: color-mix(in srgb, var(--jade) 12%, var(--bg2));
+  background: color-mix(in srgb, var(--jade) 28%, var(--card));
+}
+/* 이 카드 안의 체크박스만 크게 + 밝은 카드 위에서 잘 보이도록 강조 */
+.agreeAll .check {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  /* 미체크: 흰 배경 + 진한 제이드 테두리 → 어두운 기본색 대신 또렷하게 */
+  background: #fff;
+  border-color: var(--jade);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--jade) 22%, transparent);
+}
+/* 체크 상태는 제이드로 채움(동일 특이도, 뒤에 선언해 우선 적용) */
+.agreeAll .checkOn {
+  background: var(--jade);
+  border-color: var(--jade);
 }
 .agreeAllLabel {
-  font-size: 15px;
+  font-size: 17.5px;
   font-weight: 800;
   color: var(--text);
   word-break: keep-all;
