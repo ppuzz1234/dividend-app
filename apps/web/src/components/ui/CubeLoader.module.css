@@ -1,16 +1,17 @@
-/* 루빅스 큐브 로더 — 세로(열)·가로(층) 양방향 비틀림 조립 → 정면 로고 정지 루프.
+/* 루빅스 큐브 로더 — 가로(층) 되감기 → 세로(열) 롤 → 정면 로고 정지 루프.
  * --s 큐비 한 변 · --u 큐비 피치 (CubeLoader.jsx 에서 주입)
  *
  * 타임라인(4.6s):
- *   0-14%   열·층 모두 비틀린 채 위아래에서 모여들며 큐브가 스케일 인(아이소 뷰)
- *   14-40%  [세로] 좌→중→우 열이 차례로 되감기며 맞춰짐 (rotateX, 큐브 중심 축)
- *   36-58%  [가로] 아래→중간→위 층이 차례로 되감기며 맞춰짐 (rotateY)
+ *   0-14%   층이 비틀린 채 위아래에서 모여들며 큐브가 스케일 인(아이소 뷰)
+ *   14-36%  [가로] 아래→중간→위 층이 차례로 되감기며 정육면체로 맞춰짐 (rotateY)
+ *   36-60%  [세로] 정렬된 큐브에서 좌→중→우 열이 차례로 360° 세로 롤 (rotateX)
+ *           — 층이 전부 정착한 뒤에만 돌므로 축 보정이 정확, 큐브가 깨지지 않는다
  *   58-72%  큐브 전체가 정면으로 회전(살짝 오버슈트 후 정착)
  *   72-94%  정면 = 브랜드 마크(노랑 C + 외곽선 카운터)로 정지
  *   94-100% 회전하며 스케일 아웃 → 0% 상태와 동일해 루프가 이어짐
  *
- * 역산 배치: 스티커는 '완성 상태' 기준으로 칠해져 있고, 모든 비틀림
- * 키프레임이 0(identity)으로 되감기므로 마지막 씬은 항상 브랜드 아이콘. */
+ * 역산 배치: 스티커는 '완성 상태' 기준으로 칠해져 있고, 층 비틀림은 0으로
+ * 되감기고 열 롤은 정확히 360°(identity)라 마지막 씬은 항상 브랜드 아이콘. */
 
 .wrap {
   padding: 42px 0 46px;
@@ -181,86 +182,61 @@
   }
 }
 
-/* 세로 열 비틀림 — 좌→중→우 순서로 되감긴다(14-40%), 각각 살짝 오버슈트 후 정착.
- * 매 프레임: 축 보정(translateY ±--ly) + rotateX(비틀림) + 큐비 고정 배치(translate3d). */
+/* 세로 열 롤 — 층이 전부 정착한 36% 이후에만, 좌→중→우 순서로 정확히 360° 한 바퀴.
+ * 층 정렬 상태에서만 돌기 때문에 축 보정(translateY ±--ly)이 실제 층 위치와 일치해
+ * 정육면체를 유지한 채 해당 슬라이스만 세로로 회전한다. 360° = identity 라
+ * 끝나면 시작과 동일한 정렬 상태(로고 정합 유지). 그 외 구간은 rotateX(0) 고정. */
 @keyframes colTwistL {
   0%,
-  100% {
-    transform: translateY(calc(var(--ly) * -1)) rotateX(140deg) translateY(var(--ly))
-      translate3d(calc(var(--cx) * var(--u)), 0, calc(var(--cz) * var(--u)));
-  }
-  14% {
-    transform: translateY(calc(var(--ly) * -1)) rotateX(140deg) translateY(var(--ly))
-      translate3d(calc(var(--cx) * var(--u)), 0, calc(var(--cz) * var(--u)));
-  }
-  24% {
-    transform: translateY(calc(var(--ly) * -1)) rotateX(-8deg) translateY(var(--ly))
-      translate3d(calc(var(--cx) * var(--u)), 0, calc(var(--cz) * var(--u)));
-  }
-  28%,
-  94% {
+  36% {
     transform: translateY(calc(var(--ly) * -1)) rotateX(0deg) translateY(var(--ly))
+      translate3d(calc(var(--cx) * var(--u)), 0, calc(var(--cz) * var(--u)));
+  }
+  50%,
+  100% {
+    transform: translateY(calc(var(--ly) * -1)) rotateX(360deg) translateY(var(--ly))
       translate3d(calc(var(--cx) * var(--u)), 0, calc(var(--cz) * var(--u)));
   }
 }
 @keyframes colTwistM {
   0%,
-  100% {
-    transform: translateY(calc(var(--ly) * -1)) rotateX(-110deg) translateY(var(--ly))
-      translate3d(calc(var(--cx) * var(--u)), 0, calc(var(--cz) * var(--u)));
-  }
-  14%,
-  20% {
-    transform: translateY(calc(var(--ly) * -1)) rotateX(-110deg) translateY(var(--ly))
-      translate3d(calc(var(--cx) * var(--u)), 0, calc(var(--cz) * var(--u)));
-  }
-  30% {
-    transform: translateY(calc(var(--ly) * -1)) rotateX(7deg) translateY(var(--ly))
-      translate3d(calc(var(--cx) * var(--u)), 0, calc(var(--cz) * var(--u)));
-  }
-  34%,
-  94% {
+  41% {
     transform: translateY(calc(var(--ly) * -1)) rotateX(0deg) translateY(var(--ly))
+      translate3d(calc(var(--cx) * var(--u)), 0, calc(var(--cz) * var(--u)));
+  }
+  55%,
+  100% {
+    transform: translateY(calc(var(--ly) * -1)) rotateX(360deg) translateY(var(--ly))
       translate3d(calc(var(--cx) * var(--u)), 0, calc(var(--cz) * var(--u)));
   }
 }
 @keyframes colTwistR {
   0%,
-  100% {
-    transform: translateY(calc(var(--ly) * -1)) rotateX(200deg) translateY(var(--ly))
-      translate3d(calc(var(--cx) * var(--u)), 0, calc(var(--cz) * var(--u)));
-  }
-  14%,
-  26% {
-    transform: translateY(calc(var(--ly) * -1)) rotateX(200deg) translateY(var(--ly))
-      translate3d(calc(var(--cx) * var(--u)), 0, calc(var(--cz) * var(--u)));
-  }
-  36% {
-    transform: translateY(calc(var(--ly) * -1)) rotateX(-8deg) translateY(var(--ly))
-      translate3d(calc(var(--cx) * var(--u)), 0, calc(var(--cz) * var(--u)));
-  }
-  40%,
-  94% {
+  46% {
     transform: translateY(calc(var(--ly) * -1)) rotateX(0deg) translateY(var(--ly))
+      translate3d(calc(var(--cx) * var(--u)), 0, calc(var(--cz) * var(--u)));
+  }
+  60%,
+  100% {
+    transform: translateY(calc(var(--ly) * -1)) rotateX(360deg) translateY(var(--ly))
       translate3d(calc(var(--cx) * var(--u)), 0, calc(var(--cz) * var(--u)));
   }
 }
 
-/* 층 비틀림 — 위아래에서 모여들며(translateY), 세로 페이즈가 끝나갈 무렵부터
- * 아래층 → 중간층 → 윗층 순서로 되감긴다(36-58%), 각각 살짝 오버슈트 후 정착. */
+/* 층 비틀림 — 위아래에서 모여들며(translateY) 아래→중간→위 순서로 되감긴다(14-36%).
+ * 각각 살짝 오버슈트 후 정착, 36% 이후에는 완전히 정렬돼 세로 롤에 자리를 내준다. */
 @keyframes twistBot {
   0%,
   100% {
     transform: translateY(calc(var(--u) * 2.2)) rotateY(160deg);
   }
-  14%,
-  36% {
+  14% {
     transform: translateY(var(--u)) rotateY(160deg);
   }
-  44% {
+  22% {
     transform: translateY(var(--u)) rotateY(-7deg);
   }
-  48%,
+  26%,
   94% {
     transform: translateY(var(--u)) rotateY(0deg);
   }
@@ -271,13 +247,13 @@
     transform: translateY(0) rotateY(-130deg);
   }
   14%,
-  40% {
+  20% {
     transform: translateY(0) rotateY(-130deg);
   }
-  50% {
+  28% {
     transform: translateY(0) rotateY(6deg);
   }
-  54%,
+  32%,
   94% {
     transform: translateY(0) rotateY(0deg);
   }
@@ -288,13 +264,13 @@
     transform: translateY(calc(var(--u) * -2.2)) rotateY(220deg);
   }
   14%,
-  44% {
+  24% {
     transform: translateY(calc(var(--u) * -1)) rotateY(220deg);
   }
-  54% {
+  32% {
     transform: translateY(calc(var(--u) * -1)) rotateY(-6deg);
   }
-  58%,
+  36%,
   94% {
     transform: translateY(calc(var(--u) * -1)) rotateY(0deg);
   }

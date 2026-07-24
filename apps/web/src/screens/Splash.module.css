@@ -84,6 +84,16 @@
   word-break: keep-all;
 }
 
+/* 보조 로고 — 루빅스 큐브 위쪽 중앙 배치.
+ * 검정 원본을 흰색으로 반전(알파 보존, 다크 배경 대응). */
+.subLogo {
+  display: block;
+  margin: 0 auto 26px;
+  width: 62px;
+  height: auto;
+  filter: brightness(0) invert(1);
+}
+
 .foot {
   position: absolute;
   left: 0;

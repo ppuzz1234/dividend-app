@@ -36,6 +36,8 @@ export function Splash({ onStart }) {
       <div className={styles.glow} />
 
       <div className={styles.core}>
+        {/* 보조 로고 — 큐브 위쪽, 흰색 반전(다크 배경 대응) */}
+        <img className={styles.subLogo} src="/plus-logo-small.png" alt="PLUS" />
         <div className={styles.mark}>
           <CubeLoader size={84} bare />
         </div>
