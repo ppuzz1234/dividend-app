@@ -174,7 +174,7 @@ export function Intro({ onNext }) {
         <h2 className={styles.hookTitle}>
           <span className={styles.rise} style={{ "--i": 0 }}>내년 연말정산</span>
           <span className={styles.rise} style={{ "--i": 1 }}>
-            환급 최대화<sup className={styles.hookStar}>*</sup>,
+            <em>환급 최대화</em><sup className={styles.hookStar}>*</sup>,
           </span>
           <br />
           <span className={styles.rise} style={{ "--i": 2 }}>목표 현금 흐름을 위한</span>

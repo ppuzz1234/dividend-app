@@ -68,13 +68,14 @@
   font-weight: 700;
 }
 .title {
-  font-size: 46px;
-  font-weight: 900;
+  font-size: 20px;
+  font-weight: 700; /* LIFEPLUS BOLD.TTF 매핑 */
+  -webkit-text-stroke: 0.6px currentColor; /* 강제 볼드 — 글자 외곽선을 덧대 획을 두껍게 */
   letter-spacing: 4px;
   line-height: 1.05;
   margin: 14px 0 0;
   color: #f3f8f4;
-  font-family: var(--font-brand);
+  font-family: "LifePlus", var(--font-brand);
 }
 .slogan {
   color: #a9b6ac;
@@ -92,6 +93,8 @@
   width: 62px;
   height: auto;
   filter: brightness(0) invert(1);
+  /* 큐브·타이틀은 그대로 두고 로고만 위로 끌어올린다 */
+  transform: translateY(-28px);
 }
 
 .foot {
