@@ -1,5 +1,5 @@
-import { useMemo } from "react";
-import { ArrowRight, ArrowDown, Sparkles, SlidersHorizontal, Lock } from "lucide-react";
+import { useMemo, useState } from "react";
+import { ArrowRight, ArrowDown, Sparkles, SlidersHorizontal, Lock, Box, Check } from "lucide-react";
 import { buildAccountRooms, deductionRate, TAX_PREFS, ISA_ROLLOVERS } from "@devidend/core";
 import { Pad } from "../components/layout/Pad.jsx";
 import { Heading } from "../components/layout/Heading.jsx";
@@ -12,6 +12,10 @@ import styles from "./AccountsAnalysis.module.css";
  * 절세선호도(taxPref)에 따라 growth: 연금저축→ISA→IRP / refund: 연금저축→IRP→ISA */
 const SHORT = { pensionSavings: "연금", isa: "ISA", irp: "IRP" };
 const LEVEL_TAG = { good: "양호", warn: "개선 여지", act: "조치 필요" };
+
+/* CUBE 추천 — 시스템이 고르는 단 하나의 설계안. 장기 투자와 ISA 롤오버(연금 이전)에
+ * 중점을 두며, 나이·소득은 엔진(scorePriority)이 자동 반영한다. */
+const CUBE_PICK = { taxPref: "growth", isaRollover: "isa1" };
 
 /* 계좌별 신호등 상태 도출 — 남은 여력이 아니라 '이 계좌로 달성 가능한 총 납입금(연 한도)과
  *  그에 따른 총 환급 예상액(한도 × 세액공제율)'을 기준으로 표기한다.
@@ -73,6 +77,15 @@ export function AccountsAnalysis({ mydata, manualAccounts, income, age, taxPref 
       ? `연금저축·IRP 세액공제 한도(연 900만원)를 먼저 채워, 올해 연말정산에서 최대 ${fmtKRW(maxRefund)}을 돌려받는 순서예요.`
       : `IRP의 안전자산 30% 제한을 피해 ISA를 먼저 채우는, 장기 복리 수익 극대화 순서예요. 세액공제(최대 ${fmtKRW(maxRefund)})는 그다음에 챙겨요.`;
   }, [taxPref, income]);
+
+  /* 설계 방식 — CUBE 추천(기본) vs 내 선호 반영(세부 조율).
+   * 저장된 값이 추천안과 다르면 재진입 시 '내 선호 반영'이 선택된 상태로 복원한다. */
+  const [custom, setCustom] = useState(taxPref !== CUBE_PICK.taxPref || isaRollover !== CUBE_PICK.isaRollover);
+  const selectCube = () => {
+    setCustom(false);
+    onTaxPref?.(CUBE_PICK.taxPref);
+    onIsaRollover?.(CUBE_PICK.isaRollover);
+  };
 
   // 일반계좌에 절세계좌로 옮기면 유리한 해외ETF 보유가 있으면 인사이트로 노출
   const relocate = useMemo(() => {
@@ -150,67 +163,116 @@ export function AccountsAnalysis({ mydata, manualAccounts, income, age, taxPref 
         </div>
       )}
 
-      {/* ── 내 선호 반영 — 1차 산정(상수) 아래에서 개인 변수를 조정한다 ── */}
+      {/* ── 설계 방식 — CUBE 추천(기본) 과 내 선호 반영을 동위 선택지로 제공 ── */}
       <div className={styles.prefSection}>
         <div className={styles.prefHead}>
           <SlidersHorizontal size={14} strokeWidth={2.4} />
-          <span>내 선호 반영</span>
+          <span>설계 방식</span>
         </div>
         <p className={styles.prefIntro}>
-          위 순서는 나이·소득 기준의 기본 산정이에요. 아래 선호를 고르면 납입 순서와 이후 단계의 금액 배분이 함께 조정돼요.
+          기본은 CUBE 추천이에요. 직접 조율하고 싶다면 내 선호 반영을 선택해 주세요.
         </p>
 
-        {/* 절세선호도 — 올해 세액공제 vs 장기 자산 증식 */}
-        <div className={styles.prefLabel}>
-          절세 선호도 <span className={styles.soon}>배분 결정</span>
-        </div>
-        <div className={styles.prefSeg} role="radiogroup" aria-label="절세 선호도">
-          {TAX_PREFS.map((p) => (
-            <button
-              key={p.id}
-              type="button"
-              role="radio"
-              aria-checked={taxPref === p.id}
-              className={cx(styles.prefBtn, taxPref === p.id && styles.prefBtnOn)}
-              onClick={() => onTaxPref?.(p.id)}
-            >
-              {p.label}
-            </button>
-          ))}
-        </div>
-        <p className={styles.prefDesc}>{prefSummary}</p>
+        <div className={styles.modeList} role="radiogroup" aria-label="설계 방식">
+          {/* CUBE 추천 — 시스템이 고른 단 하나의 설계안(장기투자·ISA 롤오버 중심) */}
+          <button
+            type="button"
+            role="radio"
+            aria-checked={!custom}
+            className={cx(styles.modeCard, !custom && styles.modeCardOn)}
+            onClick={selectCube}
+          >
+            <span className={styles.modeIcon}>
+              <Box size={17} strokeWidth={2.2} />
+            </span>
+            <span className={styles.modeText}>
+              <b className={styles.modeName}>
+                CUBE 추천 <em className={styles.modeBadge}>기본</em>
+              </b>
+              <span className={styles.modeDesc}>
+                장기 투자와 ISA 롤오버에 중점을 두고, 나이·소득을 종합 반영해 고른 단 하나의 최적 설계안이에요.
+              </span>
+            </span>
+            {!custom && <Check size={16} strokeWidth={2.8} className={styles.modeCheck} />}
+          </button>
 
-        {/* ISA 만기(3년) 출구 — 배분 금액에는 영향 없는 보조 설정(만기 자금의 행선지만 결정).
-         *  isa3(롤오버 없음)는 배분이 '올해 세액공제 우선'과 동치라 선택지에서 제외해 간소화했다. */}
-        <div className={styles.prefLabel}>
-          ISA 만기(3년) 출구 <span className={styles.soon}>배분 금액 동일</span>
+          {/* 내 선호 반영 — 세부(절세 선호·ISA 출구)를 직접 조율 */}
+          <button
+            type="button"
+            role="radio"
+            aria-checked={custom}
+            className={cx(styles.modeCard, custom && styles.modeCardOn)}
+            onClick={() => setCustom(true)}
+          >
+            <span className={styles.modeIcon}>
+              <SlidersHorizontal size={16} strokeWidth={2.2} />
+            </span>
+            <span className={styles.modeText}>
+              <b className={styles.modeName}>내 선호 반영</b>
+              <span className={styles.modeDesc}>추천안 대신 절세 선호와 ISA 만기 출구를 직접 골라 조율해요.</span>
+            </span>
+            {custom && <Check size={16} strokeWidth={2.8} className={styles.modeCheck} />}
+          </button>
         </div>
-        <div className={styles.prefSeg} role="radiogroup" aria-label="ISA 만기 출구">
-          {ISA_ROLLOVERS.filter((p) => p.id !== "isa3").map((p) => (
-            <button
-              key={p.id}
-              type="button"
-              role="radio"
-              aria-checked={isaRollover === p.id}
-              className={cx(styles.prefBtn, isaRollover === p.id && styles.prefBtnOn)}
-              onClick={() => onIsaRollover?.(p.id)}
-            >
-              {p.label}
-            </button>
-          ))}
-        </div>
-        <p className={styles.prefDesc}>
-          {ISA_ROLLOVERS.find((p) => p.id === isaRollover)?.desc} 매달 나눠 담는 금액은 위의 절세 선호도가 결정해요.
-        </p>
 
-        {/* 금융선호도 — 데이터·로직 미정의, 자리만 예고 */}
-        <div className={cx(styles.prefLabel, styles.prefLabelDim)}>
-          금융 선호도 <span className={styles.soon}>준비 중</span>
-        </div>
-        <div className={styles.prefSoonRow} aria-disabled="true">
-          <Lock size={13} strokeWidth={2.2} />
-          <span>선호 상품(ETF·국내/미국 등)에 따라 담을 수 있는 절세 계좌를 추려드릴 예정이에요.</span>
-        </div>
+        {!custom ? (
+          /* CUBE 추천 적용 상태 — 무엇이 적용됐는지 요약만 노출 */
+          <p className={styles.prefDesc}>{prefSummary}</p>
+        ) : (
+          <div className={styles.customPanel}>
+            {/* 절세선호도 — 올해 세액공제 vs 장기 자산 증식 */}
+            <div className={styles.prefLabel}>
+              절세 선호도 <span className={styles.soon}>배분 결정</span>
+            </div>
+            <div className={styles.prefSeg} role="radiogroup" aria-label="절세 선호도">
+              {TAX_PREFS.map((p) => (
+                <button
+                  key={p.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={taxPref === p.id}
+                  className={cx(styles.prefBtn, taxPref === p.id && styles.prefBtnOn)}
+                  onClick={() => onTaxPref?.(p.id)}
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
+            <p className={styles.prefDesc}>{prefSummary}</p>
+
+            {/* ISA 만기(3년) 출구 — 배분 금액에는 영향 없는 보조 설정(만기 자금의 행선지만 결정).
+             *  isa3(롤오버 없음)는 배분이 '올해 세액공제 우선'과 동치라 선택지에서 제외해 간소화했다. */}
+            <div className={styles.prefLabel}>
+              ISA 만기(3년) 출구 <span className={styles.soon}>배분 금액 동일</span>
+            </div>
+            <div className={styles.prefSeg} role="radiogroup" aria-label="ISA 만기 출구">
+              {ISA_ROLLOVERS.filter((p) => p.id !== "isa3").map((p) => (
+                <button
+                  key={p.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={isaRollover === p.id}
+                  className={cx(styles.prefBtn, isaRollover === p.id && styles.prefBtnOn)}
+                  onClick={() => onIsaRollover?.(p.id)}
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
+            <p className={styles.prefDesc}>
+              {ISA_ROLLOVERS.find((p) => p.id === isaRollover)?.desc} 매달 나눠 담는 금액은 위의 절세 선호도가 결정해요.
+            </p>
+
+            {/* 금융선호도 — 데이터·로직 미정의, 자리만 예고 */}
+            <div className={cx(styles.prefLabel, styles.prefLabelDim)}>
+              금융 선호도 <span className={styles.soon}>준비 중</span>
+            </div>
+            <div className={styles.prefSoonRow} aria-disabled="true">
+              <Lock size={13} strokeWidth={2.2} />
+              <span>선호 상품(ETF·국내/미국 등)에 따라 담을 수 있는 절세 계좌를 추려드릴 예정이에요.</span>
+            </div>
+          </div>
+        )}
       </div>
     </Pad>
   );
