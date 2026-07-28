@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { ExternalLink, Play, RefreshCw, Video } from "lucide-react";
+import { CubeLoader } from "../components/ui/CubeLoader.jsx";
 import { hasYoutube, createVideoFeed } from "../lib/youtube.js";
 import styles from "./VideoFeed.module.css";
 
@@ -61,7 +62,7 @@ export function VideoFeed() {
     <div className={styles.feed}>
       <header className={styles.head}>
         <h1 className={styles.title}>피드</h1>
-        <p className={styles.sub}>구독 채널의 새 영상을 모아 보여드려요.</p>
+        <p className={styles.sub}>절세와 투자 관련 정보를 참고하세요.</p>
       </header>
 
       {items.map((v) => (
@@ -116,7 +117,11 @@ export function VideoFeed() {
 
       {status === "loading" && (
         <div className={styles.state}>
-          <span className={styles.spinner} aria-hidden="true" /> 영상 불러오는 중
+          {/* 루빅스 큐브 로더 — 문구 위에 배치해 조립 애니메이션이 보이는 크기로 */}
+          <span className={styles.cubeSpin} aria-hidden="true">
+            <CubeLoader size={26} bare />
+          </span>
+          영상 불러오는 중
         </div>
       )}
       {status === "error" && (
