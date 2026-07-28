@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { ChromeBody } from "./components/layout/ChromeBody.jsx";
 import { PlainShell } from "./components/layout/PlainShell.jsx";
 import { PhoneShell } from "./components/layout/PhoneShell.jsx";
@@ -12,8 +12,11 @@ import {
   MYDATA_ACCOUNTS,
   MYDATA_PROFILE,
 } from "@devidend/core";
-import { onAuthChange, isReturningFromOAuth, logAuthDiagnostics, logout } from "./auth/google.js";
+import { onAuthChange, isReturningFromOAuth, isAuthPopup, logAuthDiagnostics, logout } from "./auth/google.js";
 import { usePlanStore } from "./lib/usePlanStore.js";
+import { loadSetup, saveSetup, hasAnySetup } from "./lib/setupStore.js";
+import { hasSupabase } from "./lib/supabase.js";
+import { getCurrentPlan, listAccounts } from "./lib/planRepo.js";
 import { Splash } from "./screens/Splash.jsx";
 import { Login } from "./screens/Login.jsx";
 import { Intro } from "./screens/Intro.jsx";
@@ -59,9 +62,94 @@ export default function App() {
   const [productAlloc, setProductAlloc] = useState({});
   // 매수 리듬(일/주/월) — 배분 화면(allocate)에서 결정, 확인 시트·메인 앱에 표시
   const [buyCycle, setBuyCycle] = useState("weekly");
+  // 메인 앱 진입 탭 — 최초 완주 직후엔 자산 탭, 설계를 마친 재로그인 복귀는 뉴스 홈
+  const [homeTab, setHomeTab] = useState("assets");
+  // 자산 탭 "다시 설계" — 마이데이터 단계에서 수기입력 폼을 강제하고 기존 값을 채워 보여준다
+  const [redesign, setRedesign] = useState(false);
   /* 계좌·플랜 저장소 — Supabase 미설정이거나 로그인 전이면 no-op.
    * (로그인 전 조회는 RLS·권한에 막혀 401 만 발생시키므로 아예 호출하지 않는다) */
   const store = usePlanStore({ enabled: !!user?.userId });
+
+  /* 완료 스냅샷 복원 — 저장해 둔 입력·배분 결과를 상태에 되살린다 (재로그인 직행용) */
+  const applySetup = (s) => {
+    setMydata(!!s.mydata);
+    if (s.manualAccounts) setManualAccounts(s.manualAccounts);
+    if (s.age) setAge(s.age);
+    if (s.income != null) setIncome(s.income);
+    if (s.finIncome != null) setFinIncome(s.finIncome);
+    if (s.monthlyGoal) setMonthlyGoal(s.monthlyGoal);
+    if (s.productAlloc) setProductAlloc(s.productAlloc);
+    if (s.buyCycle) setBuyCycle(s.buyCycle);
+  };
+
+  /* 서버에 저장된 최신 플랜(리비전) → 화면 상태 복원.
+   * 로컬 스냅샷이 없는 구글 로그인(다른 브라우저·기기, 스토리지 삭제)이라도
+   * 계정에 설계 이력이 있으면 메인 앱을 바로 그릴 수 있게 한다. */
+  const applyServerPlan = (plan, ledger) => {
+    const kindOf = new Map(ledger.map((a) => [a.id, a.kind]));
+    // 계좌 원장 잔고 → 수기입력 형태의 계좌 현황 (자산 합계·"다시 설계" 초기값)
+    if (ledger.length) {
+      const accounts = { isa: 0, pensionSavings: 0, irp: 0, general: 0 };
+      for (const a of ledger) if (a.kind in accounts) accounts[a.kind] = a.balance || 0;
+      setManualAccounts(accounts);
+    }
+    if (plan.monthly_goal_manwon) setMonthlyGoal(plan.monthly_goal_manwon);
+    // 매수 규칙 → 상품 배분({계좌: {상품코드: 월 배분액}})과 매수 주기
+    const PER_MONTH = { daily: 365 / 12, weekly: 52 / 12, monthly: 1, yearly: 1 / 12 };
+    const alloc = {};
+    let cycle = null;
+    for (const o of plan.orders ?? []) {
+      const kind = kindOf.get(o.account_id);
+      if (!kind) continue;
+      const monthly = Math.round((o.amount_per_order || 0) * (PER_MONTH[o.cycle] ?? 1));
+      if (monthly <= 0) continue;
+      (alloc[kind] ??= {})[o.product_code] = (alloc[kind][o.product_code] || 0) + monthly;
+      cycle ??= o.cycle;
+    }
+    if (Object.keys(alloc).length) setProductAlloc(alloc);
+    if (["daily", "weekly", "monthly"].includes(cycle)) setBuyCycle(cycle);
+  };
+
+  /* 로그인 완료 공통 진입점 — 최초의 미설계 상태가 아니라면 온보딩을 건너뛰고
+   * 곧바로 메인 앱 뉴스 홈으로 진입한다. 판별 순서:
+   *  ① 로컬 완료 스냅샷(데모·구글 공통, 같은 브라우저 재방문)
+   *  ② 구글 실계정 — 서버(Supabase)에 저장된 플랜 리비전 (다른 브라우저·기기)
+   * 둘 다 없으면(진짜 처음) 마이데이터 단계부터 시작한다. */
+  const enteringRef = useRef(false); // 팝업 완료 시 onNext·onAuthChange 가 겹쳐 불리는 중복 진입 방지
+  const enterAfterLogin = async (profile = null) => {
+    if (enteringRef.current) return;
+    enteringRef.current = true;
+    try {
+      const saved = loadSetup(profile?.userId ?? "demo");
+      if (saved) {
+        applySetup(saved);
+        setHomeTab("news");
+        go("portfolio");
+        return;
+      }
+      if (profile?.userId && hasSupabase) {
+        go("authWait"); // 서버 플랜 조회 동안 로딩 화면 유지
+        try {
+          const plan = await getCurrentPlan();
+          if (plan) {
+            applyServerPlan(plan, (await listAccounts()) ?? []);
+            setHomeTab("news");
+            go("portfolio");
+            return;
+          }
+        } catch {
+          /* 조회 실패 — 설계 여부를 알 수 없으니 안전하게 온보딩부터 */
+        }
+      }
+      go("mydata");
+    } finally {
+      enteringRef.current = false;
+    }
+  };
+
+  // onAuthChange 콜백(구독 시점 고정)에서 현재 단계를 읽기 위한 참조
+  const stepRef = useRef(step);
+  stepRef.current = step;
 
   /* 구글 SSO 세션 구독 — 초기 복원과 로그인 완료를 모두 통지받는다.
    * (getSession() 즉시 호출은 URL 해시 파싱 전이라 null 이 나올 수 있어 로그인 화면으로
@@ -69,9 +157,20 @@ export default function App() {
   useEffect(() => {
     logAuthDiagnostics(); // 콘솔에 복귀 상태 요약 (설정 점검용)
     const off = onAuthChange((profile) => {
+      // 구글 인증 팝업창 안이라면 — 세션은 스토리지/브로드캐스트로 본창에 전달되므로
+      // 이 창(팝업)은 할 일이 끝났다. 스스로 닫는다.
+      if (profile && isAuthPopup()) {
+        window.close();
+        return;
+      }
       setUser(profile);
-      // 인증 완료 → 대기/스플래시/인트로/로그인 어디에 있든 마이데이터 단계로 진입
-      if (profile) setStep((s) => (["authWait", "splash", "intro", "login"].includes(s) ? "mydata" : s));
+      // 인증 완료 → 대기/인트로/로그인에 있었다면 다음 목적지로
+      // (설계를 이미 마쳤으면 뉴스 홈 직행, 아니면 마이데이터 단계).
+      // 스플래시는 여기서 낚아채지 않는다 — 한 사이클을 끝까지 보여준 뒤
+      // Splash 의 onStart 가 user 유무를 보고 같은 분기를 태운다.
+      if (profile) {
+        if (["authWait", "intro", "login"].includes(stepRef.current)) enterAfterLogin(profile);
+      }
       // 세션이 없는데 복귀 대기 중이면(인증 취소·실패) 로그인 화면으로
       else setStep((s) => (s === "authWait" ? "login" : s));
     });
@@ -90,8 +189,18 @@ export default function App() {
    * (Supabase 미설정이면 logout 은 no-op이고, 그 경우 user 는 데모 로그인에서
    *  항상 null 로만 세팅되므로 별도 초기화가 필요 없다.) */
   useEffect(() => {
-    if (step === "login") logout();
+    if (step === "login") {
+      logout();
+      setRedesign(false); // 재설계 도중 로그인으로 돌아오면 강제 수기입력 모드 해제
+    }
   }, [step]);
+
+  /* 설계 완주 → 메인 앱 도달 시점의 입력·배분 결과를 스냅샷으로 저장.
+   * 이후 로그인은 이 스냅샷 덕에 온보딩을 건너뛰고 뉴스 홈으로 직행한다. */
+  useEffect(() => {
+    if (step !== "portfolio") return;
+    saveSetup(user?.userId ?? "demo", { mydata, manualAccounts, age, income, finIncome, monthlyGoal, productAlloc, buyCycle });
+  }, [step, user, mydata, manualAccounts, age, income, finIncome, monthlyGoal, productAlloc, buyCycle]);
 
   // 전략 화면의 마이데이터 연동 완료 → 프로필·시드 반영
   const linkMydata = () => {
@@ -128,6 +237,26 @@ export default function App() {
     () => Object.values(MYDATA_ACCOUNTS).reduce((s, a) => s + (a.balance || 0), 0),
     []
   );
+  /* "다시 설계" 시 수기입력 폼에 채워 줄 기존 값 — 수기 입력값이 있으면 그대로,
+   * 데모(마이데이터 연동)였다면 연동 잔고를 수기입력 계좌 형태로 옮겨 담는다 */
+  const manualInit = useMemo(
+    () => ({
+      accounts:
+        manualAccounts ??
+        (mydata
+          ? {
+              isa: MYDATA_ACCOUNTS.isa?.balance || 0,
+              pensionSavings: MYDATA_ACCOUNTS.pension?.balance || 0,
+              irp: MYDATA_ACCOUNTS.irp?.balance || 0,
+              general: MYDATA_ACCOUNTS.general?.balance || 0,
+            }
+          : null),
+      age,
+      income,
+    }),
+    [manualAccounts, mydata, age, income]
+  );
+
   /* 현재 보유 자산 — 수기 입력 합계 > 마이데이터 총액 > 기본 시드 */
   const currentAssets = useMemo(() => {
     if (manualAccounts) return Object.values(manualAccounts).reduce((s, v) => s + (v || 0), 0);
@@ -191,9 +320,15 @@ export default function App() {
     <ChromeBody stage={stage} onBack={back} contentKey={step}>
       {/* 구글 인증 복귀 대기 — onAuthChange 가 세션을 전달하면 즉시 온보딩으로 넘어간다 */}
       {step === "authWait" && <Simulating />}
-      {step === "splash" && <Splash onStart={() => go("intro")} />}
-      {/* 이미 로그인된 세션이면 로그인 화면을 건너뛴다 */}
-      {step === "intro" && <Intro onNext={() => go(user ? "mydata" : "login")} />}
+      {/* 스플래시는 무조건 한 사이클 완주 — 완주 시점에
+       *  · 세션이 이미 복원돼 있으면: 로그인 과정 없이 진입 분기(뉴스 홈 직행/온보딩)로
+       *  · 세션은 없지만 설계 완료 이력이 있으면: 인트로(서비스 소개)를 건너뛰고 로그인으로
+       *  · 진짜 처음이면: 인트로부터 */}
+      {step === "splash" && (
+        <Splash onStart={() => (user ? enterAfterLogin(user) : go(hasAnySetup() ? "login" : "intro"))} />
+      )}
+      {/* 이미 로그인된 세션이면 로그인 화면을 건너뛴다 (설계 완료자는 뉴스 홈 직행) */}
+      {step === "intro" && <Intro onNext={() => (user ? enterAfterLogin(user) : go("login"))} />}
       {/* 서비스 콘셉트 안내 후 로그인 → 회원가입은 건너뛰고 온보딩 훅 화면으로 진입 */}
       {/* 로그인 — 구글은 Supabase Auth 실연동(설정 시), 그 외/미설정은 데모 프로필 */}
       {step === "login" && (
@@ -202,7 +337,7 @@ export default function App() {
             // 데모 provider(네이버·카카오 등)는 프로필이 없다 → user 를 초기화해야
             // 이전 구글 로그인이 남긴 user 때문에 데모 분기(마이데이터 목업 연동)가 막히지 않는다.
             setUser(profile ?? null);
-            go("mydata");
+            enterAfterLogin(profile ?? null);
           }}
         />
       )}
@@ -214,11 +349,14 @@ export default function App() {
         <MydataStep
           isDemo={!user}
           name={user?.name || MYDATA_PROFILE.name}
+          forceManual={redesign}
+          initial={redesign ? manualInit : null}
           onDemoLink={() => {
             linkMydata();
             go("accountsAnalysis");
           }}
           onManualNext={({ accounts, age: inAge, income: inIncome }) => {
+            setMydata(false); // 수기 입력이 최신 — 이후 계산은 연동 목업 대신 이 값을 쓴다
             setManualAccounts(accounts);
             saveManualAccounts(accounts); // DB(user_accounts, source='manual') 반영
             setAge(inAge);
@@ -297,9 +435,20 @@ export default function App() {
           alloc={productAlloc}
           cycle={buyCycle}
           assets={currentAssets}
+          defaultTab={homeTab}
+          onLogout={async () => {
+            /* 세션·로그인 정보 flush — Supabase signOut 으로 로컬 인증 토큰을 지우고,
+             * 전체 리로드로 메모리에 남은 사용자 상태(계좌·배분 등)까지 완전히 비운다.
+             * (설계 완료 스냅샷은 계정 소유 데이터라 유지 — 재로그인 시 뉴스 홈 직행용) */
+            await logout();
+            window.location.replace("/");
+          }}
           onRestart={() => {
+            // "다시 설계" — 기존 입력값을 채운 수기입력 화면부터 플로우를 다시 밟는다
             setSelected([]);
-            go("splash");
+            setRedesign(true);
+            setHomeTab("assets"); // 재설계를 완주하면 원래처럼 자산 탭으로 진입
+            go("mydata");
           }}
         />
       )}

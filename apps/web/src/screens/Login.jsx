@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import BrandMark from "../components/ui/BrandMark.jsx";
-import { loginWithGoogle } from "../auth/google.js";
+import { loginWithGoogle, hasGoogleLayer, mountGoogleButton } from "../auth/google.js";
 import styles from "./Login.module.css";
 
 /* 로그인 — hpr Login과 동일한 구조(브랜드 헤더 · SSO 목록 · "또는" 구분 ·
@@ -13,6 +14,7 @@ export function Login({ onNext }) {
   const [busy, setBusy] = useState(null); // 진행 중인 provider
   const [err, setErr] = useState("");
   const [fallbackUrl, setFallbackUrl] = useState(""); // 자동 이동이 막혔을 때의 수동 링크
+  const [googleModal, setGoogleModal] = useState(false); // 구글 인증 레이어 모달
 
   const onPhone = (e) => {
     e.preventDefault();
@@ -23,14 +25,20 @@ export function Login({ onNext }) {
   const onGoogle = async () => {
     setErr("");
     setFallbackUrl("");
+    // 레이어 모달 사용 가능(VITE_GOOGLE_CLIENT_ID 설정) — 새 창(팝업) 대신
+    // 이 화면 위 모달 레이어에서 구글 계정 선택을 진행한다
+    if (hasGoogleLayer) {
+      setGoogleModal(true);
+      return;
+    }
     setBusy("google");
     try {
+      // 폴백: 팝업창에서 구글 인증 → 완료되면 프로필이 resolve 된다 (창 전환 없음)
       const profile = await loginWithGoogle();
-      // 실연동이면 구글로 이동되어 여기 도달하지 않는다(데모만 통과)
       onNext?.(profile);
     } catch (e) {
       setErr(e.message || "구글 로그인에 실패했습니다.");
-      if (e.url) setFallbackUrl(e.url); // 이동이 차단된 경우 수동 링크 제공
+      if (e.url) setFallbackUrl(e.url); // 팝업이 차단된 경우 수동 링크 제공
     } finally {
       setBusy(null);
     }
@@ -104,7 +112,60 @@ export function Login({ onNext }) {
           이미 PLUS CUBE 회원이신가요? <b>로그인하세요</b>
         </button>
       </div>
+
+      {googleModal && (
+        <GoogleLayerModal
+          onClose={() => setGoogleModal(false)}
+          onDone={(profile) => {
+            setGoogleModal(false);
+            onNext?.(profile);
+          }}
+          onError={(e) => {
+            setGoogleModal(false);
+            setErr(e.message || "구글 로그인에 실패했습니다.");
+          }}
+        />
+      )}
     </div>
+  );
+}
+
+/* 구글 인증 레이어 모달 — 새 창(팝업) 대신 로그인 화면 위 레이어로 노출.
+ * 구글 인증 페이지는 iframe 삽입이 차단되므로, 페이지 안에서 끝내려면
+ * 공식 GIS 버튼(+FedCM 브라우저 모달) 조합이 유일하다. 버튼은 GIS 가
+ * hostRef 요소 안에 직접 그린다. */
+function GoogleLayerModal({ onClose, onDone, onError }) {
+  const hostRef = useRef(null);
+  useEffect(() => {
+    let alive = true; // 모달이 닫힌 뒤 도착한 결과는 무시
+    mountGoogleButton(hostRef.current)
+      .then((p) => alive && onDone(p))
+      .catch((e) => alive && onError(e));
+    return () => {
+      alive = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return createPortal(
+    <div className={styles.gOverlay} onClick={onClose}>
+      <div
+        className={styles.gModal}
+        role="dialog"
+        aria-modal="true"
+        aria-label="구글 계정으로 로그인"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <span className={styles.gIcon}>{GOOGLE}</span>
+        <h2 className={styles.gTitle}>Google 계정으로 로그인</h2>
+        <p className={styles.gDesc}>아래 버튼을 누르면 새 창 없이 이 화면 위에서 계정 선택이 진행돼요.</p>
+        <div ref={hostRef} className={styles.gBtnHost} />
+        <button type="button" className={styles.gCancel} onClick={onClose}>
+          다른 방법으로 로그인
+        </button>
+      </div>
+    </div>,
+    document.body
   );
 }
 

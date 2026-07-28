@@ -372,3 +372,29 @@
   background: var(--jade-dim, #2c2409);
   border: 1px solid color-mix(in srgb, var(--jade) 35%, var(--line));
 }
+
+/* 로그아웃 — 자산 탭 맨 아래 보조 액션 (세션·로그인 정보 초기화) */
+.logoutBtn {
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 2px 0 10px;
+  padding: 9px 18px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--faint);
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+}
+.logoutBtn:hover {
+  color: var(--text);
+  background: color-mix(in srgb, var(--line) 35%, transparent);
+}
+.logoutBtn:active {
+  transform: scale(0.97);
+}

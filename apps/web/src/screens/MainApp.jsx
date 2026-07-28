@@ -13,6 +13,7 @@ import {
   CalendarClock,
   LayoutGrid,
   NotebookPen,
+  LogOut,
 } from "lucide-react";
 import { findProduct } from "@devidend/core";
 import { EtfBrandTile } from "../components/ui/EtfBrandTile.jsx";
@@ -63,7 +64,7 @@ const QUICK_MENU = [
 
 /* 투자 시작 이후의 메인 앱 — 뉴스 · 피드 · 자산 3탭.
  * 최종 진행 직후 '자산' 탭(홈)으로 진입해 내 투자 현황을 본다. */
-export function MainApp({ alloc = {}, cycle = "weekly", assets = 0, defaultTab = "assets", onRestart }) {
+export function MainApp({ alloc = {}, cycle = "weekly", assets = 0, defaultTab = "assets", onRestart, onLogout }) {
   const [tab, setTab] = useState(defaultTab);
   const [tour, setTour] = useState(shouldShowCoach);
   const activeIndex = Math.max(0, TABS.findIndex((t) => t.id === tab)); // 하이라이트 알약 위치
@@ -95,7 +96,15 @@ export function MainApp({ alloc = {}, cycle = "weekly", assets = 0, defaultTab =
     <div className={styles.wrap}>
       <div className={styles.body}>
         {tab === "assets" && (
-          <Home alloc={alloc} cycle={cycle} assets={assets} onRestart={onRestart} holdRef={holdRef} quickRef={quickRef} />
+          <Home
+            alloc={alloc}
+            cycle={cycle}
+            assets={assets}
+            onRestart={onRestart}
+            onLogout={onLogout}
+            holdRef={holdRef}
+            quickRef={quickRef}
+          />
         )}
         {tab === "news" && <NewsFeed />}
         {tab === "feed" && <Placeholder Icon={Rss} title="피드" desc="내 투자와 관심 종목 소식을 모아 보는 피드를 준비하고 있어요." />}
@@ -145,7 +154,7 @@ function nextBuyDate(cycle) {
 const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
 
 /* 자산 탭(홈) — 퀵메뉴 그리드 + 중앙 보유 ETF 현황 + 다음 자동 매수 */
-function Home({ alloc, cycle, assets, onRestart, holdRef, quickRef }) {
+function Home({ alloc, cycle, assets, onRestart, onLogout, holdRef, quickRef }) {
   const [divOpen, setDivOpen] = useState(false); // 배당 전환 화면
   const [prep, setPrep] = useState(false); // 미구현 메뉴 → 준비 중 모달
   // 보유 ETF — 계좌별 배분을 상품 행으로 평탄화 (계좌 라벨 포함)
@@ -249,6 +258,13 @@ function Home({ alloc, cycle, assets, onRestart, holdRef, quickRef }) {
             <span className={styles.nextDesc}>{fmtKRW(perBuy)}이 계좌 {acctCount}곳에 나눠 매수돼요.</span>
           </span>
         </section>
+      )}
+
+      {/* 로그아웃 — 세션·로그인 정보를 비우고 처음(스플래시)부터 다시 시작 */}
+      {onLogout && (
+        <button type="button" className={styles.logoutBtn} onClick={onLogout}>
+          <LogOut size={14} strokeWidth={2.2} /> 로그아웃
+        </button>
       )}
 
       {/* 배당달력 → 배당 전환 스크롤텔링 / 그 외 미구현 메뉴 → 준비 중 */}

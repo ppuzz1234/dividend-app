@@ -227,3 +227,82 @@
 .footLink b {
   color: var(--jade);
 }
+
+/* ── 구글 인증 레이어 모달 — 새 창(팝업) 대신 화면 위 레이어로 노출 ── */
+.gOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 110;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  animation: gFade 0.18s ease;
+}
+.gModal {
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+  padding: 26px 22px 18px;
+  border-radius: 18px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+  animation: gPop 0.22s cubic-bezier(0.22, 0.9, 0.3, 1.2);
+}
+.gIcon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: #fff;
+  margin-bottom: 6px;
+}
+.gTitle {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.gDesc {
+  margin: 0 0 14px;
+  font-size: 13px;
+  color: var(--sub);
+  line-height: 1.55;
+  word-break: keep-all;
+}
+.gBtnHost {
+  min-height: 44px;
+  display: flex;
+  justify-content: center;
+}
+.gCancel {
+  margin-top: 14px;
+  background: none;
+  border: none;
+  color: var(--sub);
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+}
+@keyframes gFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes gPop {
+  from { transform: scale(0.92); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gOverlay,
+  .gModal {
+    animation: none;
+  }
+}

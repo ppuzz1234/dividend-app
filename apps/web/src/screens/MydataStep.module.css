@@ -143,9 +143,13 @@
   font-variant-numeric: tabular-nums;
   outline: none;
 }
+/* 플레이스홀더는 '예시 안내'로 보이게 — 실제 입력값(굵고 진한 숫자)과 확실히 구분되도록
+ * 옅은 색·보통 굵기·살짝 작은 크기로 낮춰서 입력 완료 상태로 오인되지 않게 한다 */
 .input::placeholder {
-  color: var(--faint);
-  font-weight: 700;
+  color: color-mix(in srgb, var(--faint) 55%, transparent);
+  font-weight: 400;
+  font-size: 14px;
+  letter-spacing: 0;
 }
 .unit {
   flex-shrink: 0;

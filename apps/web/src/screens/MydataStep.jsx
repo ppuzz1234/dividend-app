@@ -21,21 +21,24 @@ const digits = (v) => Number(String(v).replace(/\D/g, "")) || 0;
 
 /* ② 마이데이터 동의 — 최적의 솔루션을 위해 마이데이터를 연동한다는 안내 화면.
  *  · 데모(네이버·카카오): 목업 마이데이터 연동(MydataConnect: 동의 시트 → 로딩 → 불러온 계좌)
- *  · 구글 실계정: 실제 데이터 입력이므로 '수기입력'(계좌 현황 + 나이 + 연소득)으로 진행 */
-export function MydataStep({ isDemo, name, onDemoLink, onManualNext }) {
+ *  · 구글 실계정: 실제 데이터 입력이므로 '수기입력'(계좌 현황 + 나이 + 연소득)으로 진행
+ *  · forceManual: 자산 탭 "다시 설계" 재진입 — 데모여도 수기입력 폼을 띄우고,
+ *    initial(기존 계좌·나이·연소득)을 채워 수정에서 시작하게 한다 */
+export function MydataStep({ isDemo, name, onDemoLink, onManualNext, forceManual = false, initial = null }) {
   // ── 데모: 목업 마이데이터 연동 (MydataConnect 가 화면 레이아웃을 직접 소유) ──
-  if (isDemo) {
+  if (isDemo && !forceManual) {
     return <MydataConnect onNext={onDemoLink} name={name} />;
   }
 
-  // ── 구글: 수기입력(계좌 + 나이 + 연소득) ──
-  return <ManualForm onNext={onManualNext} />;
+  // ── 구글 또는 재설계: 수기입력(계좌 + 나이 + 연소득) ──
+  return <ManualForm onNext={onManualNext} initial={initial} />;
 }
 
-function ManualForm({ onNext }) {
-  const [values, setValues] = useState({ isa: 0, pensionSavings: 0, irp: 0, general: 0 });
-  const [age, setAge] = useState("");
-  const [income, setIncome] = useState(""); // 연소득(만원)
+function ManualForm({ onNext, initial }) {
+  const [values, setValues] = useState({ isa: 0, pensionSavings: 0, irp: 0, general: 0, ...(initial?.accounts || {}) });
+  const [age, setAge] = useState(initial?.age ? String(initial.age) : "");
+  // 연소득(만원) — initial.income 은 원 단위라 만원으로 환산해 보여준다
+  const [income, setIncome] = useState(initial?.income ? String(Math.round(initial.income / 10_000)) : "");
   const set = (id, v) => setValues((s) => ({ ...s, [id]: v }));
   const total = Object.values(values).reduce((s, v) => s + v, 0);
   const owned = ACCOUNTS.filter((a) => values[a.id] > 0);
@@ -78,7 +81,7 @@ function ManualForm({ onNext }) {
               inputMode="numeric"
               value={age}
               onChange={(e) => setAge(String(digits(e.target.value) || ""))}
-              placeholder="45"
+              placeholder="예) 32"
             />
             <span className={styles.unit}>세</span>
           </div>
@@ -94,9 +97,11 @@ function ManualForm({ onNext }) {
             <input
               className={styles.input}
               inputMode="numeric"
-              value={income}
+              /* 표시만 천단위 콤마 — 상태(income)는 숫자 문자열 그대로 유지하고,
+               * onChange 의 digits() 가 콤마를 걷어내 파싱하므로 로직은 그대로다 */
+              value={income ? Number(income).toLocaleString() : ""}
               onChange={(e) => setIncome(String(digits(e.target.value) || ""))}
-              placeholder="9000"
+              placeholder="예) 9,000"
             />
             <span className={styles.unit}>만원</span>
           </div>
