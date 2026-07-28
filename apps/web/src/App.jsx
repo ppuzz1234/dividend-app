@@ -14,7 +14,7 @@ import {
 } from "@devidend/core";
 import { onAuthChange, isReturningFromOAuth, isAuthPopup, logAuthDiagnostics, logout } from "./auth/google.js";
 import { usePlanStore } from "./lib/usePlanStore.js";
-import { loadSetup, saveSetup, hasAnySetup } from "./lib/setupStore.js";
+import { loadSetup, saveSetup, hasSeenIntro, markIntroSeen } from "./lib/setupStore.js";
 import { hasSupabase } from "./lib/supabase.js";
 import { getCurrentPlan, listAccounts, getProfile } from "./lib/planRepo.js";
 import { Splash } from "./screens/Splash.jsx";
@@ -41,6 +41,9 @@ export default function App() {
   // /device 프레임 시뮬레이터의 iframe(?device=1)으로 임베드된 경우 —
   // 상단 콘텐츠(헤더·뒤로가기)가 다이나믹 아일랜드에 가리지 않도록 상단 인셋 적용.
   const deviceInset = params.has("device");
+  // 시연용 인트로 강제 노출(?intro=1) — 인트로는 원래 최초 설치 1회만 나온다.
+  // TODO: 데모 프로세스를 걷어낼 때 이 우회로도 함께 제거할 것.
+  const forceIntro = params.get("intro") === "1";
   // 구글 인증에서 막 돌아온 경우엔 스플래시·인트로를 건너뛰고 대기 화면에서 세션을 기다린다
   const [step, setStep] = useState(isReturningFromOAuth() ? "authWait" : "splash");
   const [selected, setSelected] = useState([]);
@@ -375,13 +378,21 @@ export default function App() {
       {step === "authWait" && <Simulating msgs={["로그인 확인 중", "내 정보 불러오는 중"]} />}
       {/* 스플래시는 무조건 한 사이클 완주 — 완주 시점에
        *  · 세션이 이미 복원돼 있으면: 로그인 과정 없이 진입 분기(뉴스 홈 직행/온보딩)로
-       *  · 세션은 없지만 설계 완료 이력이 있으면: 인트로(서비스 소개)를 건너뛰고 로그인으로
-       *  · 진짜 처음이면: 인트로부터 */}
+       *  · 세션은 없어도 인트로를 본 적 있으면(최초 설치 아님): 인트로 없이 로그인으로
+       *  · 진짜 처음(또는 ?intro=1 시연 모드)이면: 인트로부터 */}
       {step === "splash" && (
-        <Splash onStart={() => (user ? enterAfterLogin(user) : go(hasAnySetup() ? "login" : "intro"))} />
+        <Splash onStart={() => (user ? enterAfterLogin(user) : go(!forceIntro && hasSeenIntro() ? "login" : "intro"))} />
       )}
-      {/* 이미 로그인된 세션이면 로그인 화면을 건너뛴다 (설계 완료자는 뉴스 홈 직행) */}
-      {step === "intro" && <Intro onNext={() => (user ? enterAfterLogin(user) : go("login"))} />}
+      {/* 인트로 통과 = "최초 설치 1회" 소진 — 이후 방문부터는 인트로를 건너뛴다.
+       *  이미 로그인된 세션이면 로그인 화면도 건너뛴다 (설계 완료자는 뉴스 홈 직행) */}
+      {step === "intro" && (
+        <Intro
+          onNext={() => {
+            markIntroSeen();
+            user ? enterAfterLogin(user) : go("login");
+          }}
+        />
+      )}
       {/* 서비스 콘셉트 안내 후 로그인 → 회원가입은 건너뛰고 온보딩 훅 화면으로 진입 */}
       {/* 로그인 — 구글은 Supabase Auth 실연동(설정 시), 그 외/미설정은 데모 프로필 */}
       {step === "login" && (

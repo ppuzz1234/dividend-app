@@ -18,17 +18,26 @@ export function loadSetup(who = "demo") {
   }
 }
 
-/** 이 브라우저에 완료 스냅샷이 존재하는가.
- * 재방문 유저에게 서비스 소개(인트로)를 다시 보여주지 않기 위한 판단용 —
- * 실제 복원·직행 여부는 계정이 일치하는 loadSetup 결과로만 결정한다.
- * 데모("demo") 스냅샷은 무시한다 — 데모는 항상 첫 접속 시나리오를 타야 하므로
- * (현재는 데모 완주를 저장하지 않지만, 과거 버전이 남긴 스냅샷도 걸러낸다). */
-export function hasAnySetup() {
+/* ── 인트로(서비스 소개) 1회 노출 플래그 — "앱 최초 설치/실행" 판단 전용 ──
+ * 설계 완료 스냅샷과 관심사를 분리한다: 인트로는 설치 후 1회, 뉴스 홈 직행
+ * 여부는 계정이 일치하는 loadSetup/서버 플랜으로만 결정. */
+const INTRO_KEY = "pc_intro_seen_v1";
+
+/** 인트로를 끝까지 본 적이 있는가 — 있으면 재방문 시 인트로를 건너뛴다 */
+export function hasSeenIntro() {
   try {
-    const s = JSON.parse(localStorage.getItem(KEY) || "null");
-    return !!(s && s.done && s.who && s.who !== "demo");
+    return !!localStorage.getItem(INTRO_KEY);
   } catch {
     return false;
+  }
+}
+
+/** 인트로 통과 기록 (브라우저당 1회) */
+export function markIntroSeen() {
+  try {
+    localStorage.setItem(INTRO_KEY, "1");
+  } catch {
+    /* 저장 불가 환경 — 다음 방문에 인트로가 또 나올 뿐 */
   }
 }
 
