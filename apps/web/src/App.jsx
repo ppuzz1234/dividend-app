@@ -16,7 +16,7 @@ import { onAuthChange, isReturningFromOAuth, isAuthPopup, logAuthDiagnostics, lo
 import { usePlanStore } from "./lib/usePlanStore.js";
 import { loadSetup, saveSetup, hasAnySetup } from "./lib/setupStore.js";
 import { hasSupabase } from "./lib/supabase.js";
-import { getCurrentPlan, listAccounts } from "./lib/planRepo.js";
+import { getCurrentPlan, listAccounts, getProfile } from "./lib/planRepo.js";
 import { Splash } from "./screens/Splash.jsx";
 import { Login } from "./screens/Login.jsx";
 import { Intro } from "./screens/Intro.jsx";
@@ -85,7 +85,11 @@ export default function App() {
   /* 서버에 저장된 최신 플랜(리비전) → 화면 상태 복원.
    * 로컬 스냅샷이 없는 구글 로그인(다른 브라우저·기기, 스토리지 삭제)이라도
    * 계정에 설계 이력이 있으면 메인 앱을 바로 그릴 수 있게 한다. */
-  const applyServerPlan = (plan, ledger) => {
+  const applyServerPlan = (plan, ledger, profile = null) => {
+    // 프로필(나이·소득) — 세액공제율·투자기간(60−나이) 분기를 저장 당시 그대로 재현
+    if (profile?.age) setAge(profile.age);
+    if (profile?.total_income != null) setIncome(profile.total_income);
+    if (profile?.fin_income != null) setFinIncome(profile.fin_income);
     const kindOf = new Map(ledger.map((a) => [a.id, a.kind]));
     // 계좌 원장 잔고 → 수기입력 형태의 계좌 현황 (자산 합계·"다시 설계" 초기값)
     if (ledger.length) {
@@ -110,6 +114,34 @@ export default function App() {
     if (["daily", "weekly", "monthly"].includes(cycle)) setBuyCycle(cycle);
   };
 
+  /* 서버 플랜 프리페치 — 세션이 복원되는 즉시(대개 스플래시 재생 중) 미리 조회해
+   * 두면, 스플래시가 끝나는 시점엔 결과가 준비돼 있어 로딩 화면 없이 곧바로
+   * 목적지(뉴스 홈/온보딩)로 진입할 수 있다. */
+  const serverPlanRef = useRef(null); // { promise, settled, value: {plan, ledger}|null } | null
+  const prefetchServerPlan = (profile) => {
+    if (!profile?.userId || !hasSupabase) return null;
+    if (serverPlanRef.current) return serverPlanRef.current;
+    const entry = { settled: false, value: null };
+    entry.promise = (async () => {
+      try {
+        const plan = await getCurrentPlan();
+        if (plan) {
+          // 프로필(나이·소득)은 부가 정보 — 실패해도 플랜 복원 자체는 막지 않는다
+          const [ledger, profile] = await Promise.all([listAccounts(), getProfile().catch(() => null)]);
+          entry.value = { plan, ledger: ledger ?? [], profile };
+        } else {
+          entry.value = null;
+        }
+      } catch {
+        entry.value = null; // 조회 실패 — 설계 여부를 알 수 없으니 안전하게 온보딩부터
+      }
+      entry.settled = true;
+      return entry.value;
+    })();
+    serverPlanRef.current = entry;
+    return entry;
+  };
+
   /* 로그인 완료 공통 진입점 — 최초의 미설계 상태가 아니라면 온보딩을 건너뛰고
    * 곧바로 메인 앱 뉴스 홈으로 진입한다. 판별 순서:
    *  ① 로컬 완료 스냅샷(데모·구글 공통, 같은 브라우저 재방문)
@@ -128,17 +160,16 @@ export default function App() {
         return;
       }
       if (profile?.userId && hasSupabase) {
-        go("authWait"); // 서버 플랜 조회 동안 로딩 화면 유지
-        try {
-          const plan = await getCurrentPlan();
-          if (plan) {
-            applyServerPlan(plan, (await listAccounts()) ?? []);
-            setHomeTab("news");
-            go("portfolio");
-            return;
-          }
-        } catch {
-          /* 조회 실패 — 설계 여부를 알 수 없으니 안전하게 온보딩부터 */
+        /* 로딩 화면 없이 결정한다 — 프리페치(세션 복원 직후 시작)가 아직이면
+         * 현재 화면(로그인·스플래시)에 그대로 머문 채 잠깐(수백 ms) 기다렸다가
+         * 곧바로 목적지(뉴스 홈/온보딩)로 진입한다 */
+        const entry = prefetchServerPlan(profile);
+        const value = await entry.promise;
+        if (value) {
+          applyServerPlan(value.plan, value.ledger, value.profile);
+          setHomeTab("news");
+          go("portfolio");
+          return;
         }
       }
       go("mydata");
@@ -169,10 +200,15 @@ export default function App() {
       // 스플래시는 여기서 낚아채지 않는다 — 한 사이클을 끝까지 보여준 뒤
       // Splash 의 onStart 가 user 유무를 보고 같은 분기를 태운다.
       if (profile) {
+        // 완료 스냅샷이 없는 계정이면 서버 플랜을 지금 바로 미리 조회해 둔다
+        // (스플래시가 도는 동안 끝나므로, 완주 후 로딩 화면 없이 바로 진입)
+        if (!loadSetup(profile.userId ?? "demo")) prefetchServerPlan(profile);
         if (["authWait", "intro", "login"].includes(stepRef.current)) enterAfterLogin(profile);
+      } else {
+        serverPlanRef.current = null; // 로그아웃 — 다음 세션에서 새로 조회
+        // 세션이 없는데 복귀 대기 중이면(인증 취소·실패) 로그인 화면으로
+        setStep((s) => (s === "authWait" ? "login" : s));
       }
-      // 세션이 없는데 복귀 대기 중이면(인증 취소·실패) 로그인 화면으로
-      else setStep((s) => (s === "authWait" ? "login" : s));
     });
     return off;
   }, []);
@@ -318,8 +354,8 @@ export default function App() {
 
   const body = (
     <ChromeBody stage={stage} onBack={back} contentKey={step}>
-      {/* 구글 인증 복귀 대기 — onAuthChange 가 세션을 전달하면 즉시 온보딩으로 넘어간다 */}
-      {step === "authWait" && <Simulating />}
+      {/* 구글 인증 복귀·내 정보 확인 대기 — 주문 맥락 기본 문구 대신 로그인 맥락 문구로 */}
+      {step === "authWait" && <Simulating msgs={["로그인 확인 중", "내 정보 불러오는 중"]} />}
       {/* 스플래시는 무조건 한 사이클 완주 — 완주 시점에
        *  · 세션이 이미 복원돼 있으면: 로그인 과정 없이 진입 분기(뉴스 홈 직행/온보딩)로
        *  · 세션은 없지만 설계 완료 이력이 있으면: 인트로(서비스 소개)를 건너뛰고 로그인으로
@@ -359,6 +395,7 @@ export default function App() {
             setMydata(false); // 수기 입력이 최신 — 이후 계산은 연동 목업 대신 이 값을 쓴다
             setManualAccounts(accounts);
             saveManualAccounts(accounts); // DB(user_accounts, source='manual') 반영
+            store.saveProfile?.({ age: inAge, totalIncome: inIncome }); // profiles(age·total_income) 반영 — 미로그인·미설정은 no-op
             setAge(inAge);
             setIncome(inIncome);
             go("accountsAnalysis");

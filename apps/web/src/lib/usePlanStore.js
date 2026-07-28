@@ -8,6 +8,7 @@ import {
   savePlanRevision,
   syncMydataAccounts,
   syncManualAccounts,
+  updateProfile,
 } from "./planRepo.js";
 
 /* ------------------------------------------------------------------ *
@@ -70,6 +71,11 @@ export function usePlanStore({ enabled: signedIn = false } = {}) {
       }),
     [run]
   );
+
+  /* 수기 입력 나이·연소득 → profiles(age·total_income·fin_income) 반영.
+   * 다른 기기에서 서버 플랜으로 복원할 때 계좌 최적화 분기(세액공제율·투자기간)를
+   * 그대로 재현하기 위해 저장한다. */
+  const saveProfile = useCallback((p) => run(() => updateProfile(p)), [run]);
 
   /* 수기 입력 계좌 → 원장 동기화 (source='manual') */
   const syncManual = useCallback(
@@ -140,5 +146,5 @@ export function usePlanStore({ enabled: signedIn = false } = {}) {
     [run, refresh]
   );
 
-  return { enabled, accounts, plan, revisions, busy, error, save, restore, syncMydata, syncManual, refresh };
+  return { enabled, accounts, plan, revisions, busy, error, save, restore, syncMydata, syncManual, saveProfile, refresh };
 }

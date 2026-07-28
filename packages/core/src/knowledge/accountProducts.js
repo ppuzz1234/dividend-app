@@ -15,6 +15,8 @@
  *      desc  : 한줄 차별성/추천 사유
  *      yield : (선택) 연 배당수익률(0~1). 성장형 ETF 등 배당이 핵심이 아니면 생략.
  * ------------------------------------------------------------------ */
+import { ETF_BENCHMARKS } from "./etfBenchmarks.js";
+
 export const ACCOUNT_PRODUCTS = {
   // ISA — 국내상장 해외/배당 ETF 15.4% → 9.9% 절감, 만기 시 연금이전 추가 세액공제
   isa: {
@@ -73,13 +75,17 @@ export function recommendedProducts(accountId) {
   return ACCOUNT_PRODUCTS[accountId]?.products || [];
 }
 
-/** 상품 코드로 상품 정보 찾기 (전 계좌 통합 조회) */
+/** 상품 코드로 상품 정보 찾기 (전 계좌 통합 조회).
+ * 카탈로그에 없으면 ETF_BENCHMARKS 티커에서도 찾는다 — 전략 화면이 서버
+ * (plan_orders)에 저장하는 코드는 벤치마크 티커(예: 429760)라서, 서버 플랜
+ * 복원 화면에서 이름 대신 코드가 노출되는 것을 막는다. */
 export function findProduct(code) {
   for (const key of Object.keys(ACCOUNT_PRODUCTS)) {
     const p = ACCOUNT_PRODUCTS[key].products.find((x) => x.code === code);
     if (p) return p;
   }
-  return null;
+  const b = ETF_BENCHMARKS.find((e) => e.ticker === code);
+  return b ? { code, name: b.name, desc: b.desc, yield: b.yield } : null;
 }
 
 /** 계좌 id 의 전략 헤드라인/주석 */

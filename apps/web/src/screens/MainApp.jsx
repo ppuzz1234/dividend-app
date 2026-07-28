@@ -21,6 +21,7 @@ import { PrepModal } from "../components/ui/PrepModal.jsx";
 import { CoachTour } from "../components/ui/CoachTour.jsx";
 import { DividendSwitch } from "./DividendSwitch.jsx";
 import { NewsFeed } from "./NewsFeed.jsx";
+import { VideoFeed } from "./VideoFeed.jsx";
 import { fmtKRW } from "../lib/format.js";
 import { cx } from "../lib/cx.js";
 import styles from "./MainApp.module.css";
@@ -107,7 +108,7 @@ export function MainApp({ alloc = {}, cycle = "weekly", assets = 0, defaultTab =
           />
         )}
         {tab === "news" && <NewsFeed />}
-        {tab === "feed" && <Placeholder Icon={Rss} title="피드" desc="내 투자와 관심 종목 소식을 모아 보는 피드를 준비하고 있어요." />}
+        {tab === "feed" && <VideoFeed />}
       </div>
 
       <nav ref={tabRef} className={styles.tabBar} role="tablist" aria-label="메인 탭">
@@ -270,20 +271,6 @@ function Home({ alloc, cycle, assets, onRestart, onLogout, holdRef, quickRef }) 
       {/* 배당달력 → 배당 전환 스크롤텔링 / 그 외 미구현 메뉴 → 준비 중 */}
       {divOpen && <DividendSwitch assets={assets} onClose={() => setDivOpen(false)} />}
       {prep && <PrepModal onClose={() => setPrep(false)} />}
-    </div>
-  );
-}
-
-/* 피드 탭 — 추후 콘텐츠 정의 예정 */
-function Placeholder({ Icon, title, desc }) {
-  return (
-    <div className={styles.placeholder}>
-      <div className={styles.phIcon}>
-        <Icon size={30} strokeWidth={1.8} />
-      </div>
-      <div className={styles.phTitle}>{title}</div>
-      <p className={styles.phDesc}>{desc}</p>
-      <span className={styles.phSoon}>준비 중</span>
     </div>
   );
 }
