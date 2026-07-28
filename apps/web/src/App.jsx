@@ -11,6 +11,7 @@ import {
   ETF_BENCHMARKS,
   MYDATA_ACCOUNTS,
   MYDATA_PROFILE,
+  decodeStrategy,
 } from "@devidend/core";
 import { onAuthChange, isReturningFromOAuth, isAuthPopup, logAuthDiagnostics, logout } from "./auth/google.js";
 import { usePlanStore } from "./lib/usePlanStore.js";
@@ -65,6 +66,11 @@ export default function App() {
   const [productAlloc, setProductAlloc] = useState({});
   // 매수 리듬(일/주/월) — 배분 화면(allocate)에서 결정, 확인 시트·메인 앱에 표시
   const [buyCycle, setBuyCycle] = useState("weekly");
+  /* 절세선호도 — 계좌 배분 waterfall 우선순위 분기 (growth: 장기 증식 ISA 우선
+   * / refund: 올해 세액공제 IRP 우선). ③ 분석 화면에서 선택, 이후 전 단계에 반영 */
+  const [taxPref, setTaxPref] = useState("growth");
+  // ISA 만기(3년) 세부전략 — isa1: 연금저축 이전(추가공제) / isa2: 재가입 반복 / isa3: 롤오버 없음
+  const [isaRollover, setIsaRollover] = useState("isa1");
   // 메인 앱 진입 탭 — 최초 완주 직후엔 자산 탭, 설계를 마친 재로그인 복귀는 뉴스 홈
   const [homeTab, setHomeTab] = useState("assets");
   // 자산 탭 "다시 설계" — 마이데이터 단계에서 수기입력 폼을 강제하고 기존 값을 채워 보여준다
@@ -83,6 +89,8 @@ export default function App() {
     if (s.monthlyGoal) setMonthlyGoal(s.monthlyGoal);
     if (s.productAlloc) setProductAlloc(s.productAlloc);
     if (s.buyCycle) setBuyCycle(s.buyCycle);
+    if (s.taxPref) setTaxPref(s.taxPref);
+    if (s.isaRollover) setIsaRollover(s.isaRollover);
   };
 
   /* 서버에 저장된 최신 플랜(리비전) → 화면 상태 복원.
@@ -93,6 +101,12 @@ export default function App() {
     if (profile?.age) setAge(profile.age);
     if (profile?.total_income != null) setIncome(profile.total_income);
     if (profile?.fin_income != null) setFinIncome(profile.fin_income);
+    // 전략 코드 복원 — note 텍스트에 "strategy:growth-isa1" 형태로 실려 온다(스키마 변경 없이)
+    const st = decodeStrategy(/strategy:([a-z0-9-]+)/.exec(plan.note || "")?.[1]);
+    if (st) {
+      setTaxPref(st.taxPref);
+      setIsaRollover(st.isaRollover);
+    }
     const kindOf = new Map(ledger.map((a) => [a.id, a.kind]));
     // 계좌 원장 잔고 → 수기입력 형태의 계좌 현황 (자산 합계·"다시 설계" 초기값)
     if (ledger.length) {
@@ -124,6 +138,8 @@ export default function App() {
     setManualAccounts(null);
     setProductAlloc({});
     setBuyCycle("weekly");
+    setTaxPref("growth");
+    setIsaRollover("isa1");
     setMonthlyGoal(300);
     setAge(40);
     setIncome(50_000_000);
@@ -255,8 +271,8 @@ export default function App() {
    * 데모(네이버·카카오)는 저장하지 않는다 — 데모는 항상 첫 접속처럼 온보딩 전체를 탄다. */
   useEffect(() => {
     if (step !== "portfolio" || !user?.userId) return;
-    saveSetup(user.userId, { mydata, manualAccounts, age, income, finIncome, monthlyGoal, productAlloc, buyCycle });
-  }, [step, user, mydata, manualAccounts, age, income, finIncome, monthlyGoal, productAlloc, buyCycle]);
+    saveSetup(user.userId, { mydata, manualAccounts, age, income, finIncome, monthlyGoal, productAlloc, buyCycle, taxPref, isaRollover });
+  }, [step, user, mydata, manualAccounts, age, income, finIncome, monthlyGoal, productAlloc, buyCycle, taxPref, isaRollover]);
 
   // 전략 화면의 마이데이터 연동 완료 → 프로필·시드 반영
   const linkMydata = () => {
@@ -443,6 +459,11 @@ export default function App() {
           mydata={mydata}
           manualAccounts={manualAccounts}
           income={income}
+          age={age}
+          taxPref={taxPref}
+          onTaxPref={setTaxPref}
+          isaRollover={isaRollover}
+          onIsaRollover={setIsaRollover}
           onNext={() => go("passiveGoal")}
         />
       )}
@@ -463,7 +484,7 @@ export default function App() {
         <Accounts
           mode="allocation"
           nextLabel="배분 방식 정하기"
-          {...{ years, mydata, manualAccounts, answers, monthly, monthlyGoal, finIncome, income, age, store, onLinked: linkMydata, onNext: () => go("allocate") }}
+          {...{ years, mydata, manualAccounts, answers, monthly, monthlyGoal, finIncome, income, age, taxPref, isaRollover, store, onLinked: linkMydata, onNext: () => go("allocate") }}
         />
       )}
       {/* ⑦ 정기적 투자금 배분 방식 — 추천 상품 자동배정 + 매수 주기(일/주/월) 게이미피케이션 */}
@@ -471,6 +492,9 @@ export default function App() {
         <AllocationPlan
           manualAccounts={manualAccounts}
           income={income}
+          age={age}
+          taxPref={taxPref}
+          isaRollover={isaRollover}
           monthlyContribution={scenario.gap > 0 ? requiredMonthly : 0}
           years={years}
           initialAlloc={productAlloc}
@@ -494,6 +518,8 @@ export default function App() {
           monthlyGoal={monthlyGoal}
           manualAccounts={manualAccounts}
           income={income}
+          taxPref={taxPref}
+          isaRollover={isaRollover}
           monthlyContribution={scenario.gap > 0 ? requiredMonthly : 0}
           existingAssets={currentAssets}
           productAlloc={productAlloc}

@@ -1,6 +1,6 @@
 import { useMemo } from "react";
-import { ArrowRight, ArrowDown, Sparkles } from "lucide-react";
-import { buildAccountRooms } from "@devidend/core";
+import { ArrowRight, ArrowDown, Sparkles, SlidersHorizontal, Lock } from "lucide-react";
+import { buildAccountRooms, deductionRate, TAX_PREFS, ISA_ROLLOVERS } from "@devidend/core";
 import { Pad } from "../components/layout/Pad.jsx";
 import { Heading } from "../components/layout/Heading.jsx";
 import { Button } from "../components/ui/Button.jsx";
@@ -8,14 +8,9 @@ import { fmtKRW } from "../lib/format.js";
 import { cx } from "../lib/cx.js";
 import styles from "./AccountsAnalysis.module.css";
 
-/* 납입 우선순위(3종) — 세후 시뮬레이션 검증 결과: 연금저축 → ISA → IRP */
-const PRIORITY = ["pensionSavings", "isa", "irp"];
+/* 납입 우선순위는 엔진(buildAccountRooms)의 priority 를 그대로 따른다 —
+ * 절세선호도(taxPref)에 따라 growth: 연금저축→ISA→IRP / refund: 연금저축→IRP→ISA */
 const SHORT = { pensionSavings: "연금", isa: "ISA", irp: "IRP" };
-const WHY = {
-  pensionSavings: "세제 운용 효율이 가장 높아 1순위로 채워요",
-  isa: "전액 주식 투자·3년 롤오버로 2순위예요",
-  irp: "안전자산 30% 제한이 있어 3순위예요",
-};
 const LEVEL_TAG = { good: "양호", warn: "개선 여지", act: "조치 필요" };
 
 /* 계좌별 신호등 상태 도출 — 남은 여력이 아니라 '이 계좌로 달성 가능한 총 납입금(연 한도)과
@@ -51,24 +46,33 @@ function analyze(r) {
   return { level, note };
 }
 
-/* ③ 3종 계좌 최적화 분석 — 어떤 계좌부터 납입할지(우선순위)와 각 계좌가 지금
- *  잘 관리되고 있는지를 신호등 색으로 직관적으로 보여주고, 옆에 짧은 설명을 단다.
- *  (첨부 이미지의 '흐름'만 참조 — 디자인은 신규) */
-export function AccountsAnalysis({ mydata, manualAccounts, income, onNext }) {
-  const { rooms } = useMemo(
-    () => buildAccountRooms({ mydata, manual: manualAccounts, income, monthlyContribution: 0 }),
-    [mydata, manualAccounts, income]
+/* ③ 3종 계좌 최적화 분석 — 상수(나이·소득) 기반 1차 산정을 상단에 보여주고,
+ *  하단에서 개인 선호(절세선호도)를 고르면 납입 우선순위가 즉시 재정렬된다.
+ *  여기서 고른 선호는 이후 단계(솔루션·배분·실행)의 금액 배분에도 그대로 반영된다. */
+export function AccountsAnalysis({ mydata, manualAccounts, income, age, taxPref = "growth", onTaxPref, isaRollover = "isa1", onIsaRollover, onNext }) {
+  const { rooms, priority } = useMemo(
+    () => buildAccountRooms({ mydata, manual: manualAccounts, income, age, monthlyContribution: 0, taxPref, isaRollover }),
+    [mydata, manualAccounts, income, age, taxPref, isaRollover]
   );
 
   const items = useMemo(
     () =>
-      PRIORITY.map((id, i) => {
+      priority.map((id, i) => {
         const r = rooms.find((x) => x.id === id) || { id };
         const pct = Math.max(0, Math.min(100, r.pct ?? 0));
-        return { id, rank: i + 1, name: r.name ?? SHORT[id], pct, held: r.held ?? null, ...analyze(r) };
+        return { id, rank: i + 1, name: r.name ?? SHORT[id], why: r.priorityReason, pct, held: r.held ?? null, ...analyze(r) };
       }),
-    [rooms]
+    [rooms, priority]
   );
+
+  /* 선호 선택 효과 요약 — 소득 기준 공제율을 반영한 구체 수치로 */
+  const prefSummary = useMemo(() => {
+    const rate = deductionRate(income);
+    const maxRefund = Math.round(9_000_000 * rate); // 연금저축600+IRP300 공제 한도 총환급
+    return taxPref === "refund"
+      ? `연금저축·IRP 세액공제 한도(연 900만원)를 먼저 채워, 올해 연말정산에서 최대 ${fmtKRW(maxRefund)}을 돌려받는 순서예요.`
+      : `IRP의 안전자산 30% 제한을 피해 ISA를 먼저 채우는, 장기 복리 수익 극대화 순서예요. 세액공제(최대 ${fmtKRW(maxRefund)})는 그다음에 챙겨요.`;
+  }, [taxPref, income]);
 
   // 일반계좌에 절세계좌로 옮기면 유리한 해외ETF 보유가 있으면 인사이트로 노출
   const relocate = useMemo(() => {
@@ -102,11 +106,12 @@ export function AccountsAnalysis({ mydata, manualAccounts, income, onNext }) {
         </span>
       </div>
 
-      {/* 우선순위 흐름 — 노드(신호등) + 오른쪽 설명 */}
+      {/* 우선순위 흐름 — 노드(신호등) + 오른쪽 설명.
+       *  key 에 taxPref 를 넣어 선호 변경 시 등장 애니메이션이 다시 재생되며 재정렬을 보여준다 */}
       <div className={styles.flow}>
         {items.map((it, i) => {
           return (
-            <div key={it.id} className={styles.row} style={{ animationDelay: `${i * 130}ms` }}>
+            <div key={`${taxPref}-${isaRollover}-${it.id}`} className={styles.row} style={{ animationDelay: `${i * 130}ms` }}>
               <div className={styles.nodeCol}>
                 {/* 진행 링 — 계좌 한도 소진율(pct)을 노드 테두리에 원형 게이지로 */}
                 <span className={cx(styles.ring, styles[`ring_${it.level}`])} style={{ "--deg": `${it.pct * 3.6}deg` }}>
@@ -127,7 +132,7 @@ export function AccountsAnalysis({ mydata, manualAccounts, income, onNext }) {
                   <span className={styles.name}>{it.name}</span>
                   <span className={cx(styles.tag, styles[`tag_${it.level}`])}>{LEVEL_TAG[it.level]}</span>
                 </div>
-                <p className={styles.why}>{WHY[it.id]}</p>
+                <p className={styles.why}>{it.why}</p>
                 <p className={styles.note}>{it.note}</p>
               </div>
             </div>
@@ -144,6 +149,69 @@ export function AccountsAnalysis({ mydata, manualAccounts, income, onNext }) {
           </span>
         </div>
       )}
+
+      {/* ── 내 선호 반영 — 1차 산정(상수) 아래에서 개인 변수를 조정한다 ── */}
+      <div className={styles.prefSection}>
+        <div className={styles.prefHead}>
+          <SlidersHorizontal size={14} strokeWidth={2.4} />
+          <span>내 선호 반영</span>
+        </div>
+        <p className={styles.prefIntro}>
+          위 순서는 나이·소득 기준의 기본 산정이에요. 아래 선호를 고르면 납입 순서와 이후 단계의 금액 배분이 함께 조정돼요.
+        </p>
+
+        {/* 절세선호도 — 올해 세액공제 vs 장기 자산 증식 */}
+        <div className={styles.prefLabel}>
+          절세 선호도 <span className={styles.soon}>배분 결정</span>
+        </div>
+        <div className={styles.prefSeg} role="radiogroup" aria-label="절세 선호도">
+          {TAX_PREFS.map((p) => (
+            <button
+              key={p.id}
+              type="button"
+              role="radio"
+              aria-checked={taxPref === p.id}
+              className={cx(styles.prefBtn, taxPref === p.id && styles.prefBtnOn)}
+              onClick={() => onTaxPref?.(p.id)}
+            >
+              {p.label}
+            </button>
+          ))}
+        </div>
+        <p className={styles.prefDesc}>{prefSummary}</p>
+
+        {/* ISA 만기(3년) 출구 — 배분 금액에는 영향 없는 보조 설정(만기 자금의 행선지만 결정).
+         *  isa3(롤오버 없음)는 배분이 '올해 세액공제 우선'과 동치라 선택지에서 제외해 간소화했다. */}
+        <div className={styles.prefLabel}>
+          ISA 만기(3년) 출구 <span className={styles.soon}>배분 금액 동일</span>
+        </div>
+        <div className={styles.prefSeg} role="radiogroup" aria-label="ISA 만기 출구">
+          {ISA_ROLLOVERS.filter((p) => p.id !== "isa3").map((p) => (
+            <button
+              key={p.id}
+              type="button"
+              role="radio"
+              aria-checked={isaRollover === p.id}
+              className={cx(styles.prefBtn, isaRollover === p.id && styles.prefBtnOn)}
+              onClick={() => onIsaRollover?.(p.id)}
+            >
+              {p.label}
+            </button>
+          ))}
+        </div>
+        <p className={styles.prefDesc}>
+          {ISA_ROLLOVERS.find((p) => p.id === isaRollover)?.desc} 매달 나눠 담는 금액은 위의 절세 선호도가 결정해요.
+        </p>
+
+        {/* 금융선호도 — 데이터·로직 미정의, 자리만 예고 */}
+        <div className={cx(styles.prefLabel, styles.prefLabelDim)}>
+          금융 선호도 <span className={styles.soon}>준비 중</span>
+        </div>
+        <div className={styles.prefSoonRow} aria-disabled="true">
+          <Lock size={13} strokeWidth={2.2} />
+          <span>선호 상품(ETF·국내/미국 등)에 따라 담을 수 있는 절세 계좌를 추려드릴 예정이에요.</span>
+        </div>
+      </div>
     </Pad>
   );
 }

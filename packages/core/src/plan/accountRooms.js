@@ -75,26 +75,208 @@ const ROOM_DEFS = [
   },
 ];
 
-/* 월 불입 배분 우선순위 — 20년 세후 시뮬레이션 검증 결과
- * (연금저축 공제분 → ISA → IRP → 연금저축 비공제 추가납입 → 일반):
- * · 연금저축 공제분(600만): 원금의 16.5% 즉시 환급 + 100% 주식 가능 → 압도적 1순위
- * · ISA(2,000만): 3년 만기마다 연금저축으로 대량 이전(+이전액 10% 추가공제),
- *   전액 주식 투자 가능 — IRP의 안전자산 30% 의무로 인한 수익률 드래그(장기 복리)가
- *   세액공제 300만의 이점을 상쇄하므로, 주식 기대수익 연 9%+ 가정에선 ISA가 IRP보다 앞선다
- * · IRP(300만): 세액공제는 받되 위험자산 70% 제한 → ISA 다음
+/* 월 불입 배분 우선순위 — 절세선호도(taxPref)에 따라 두 갈래.
+ *
+ * · growth(장기 자산 증식 우선, 기본) — 20년 세후 시뮬레이션 검증 결과:
+ *   연금저축 공제분 → ISA → IRP → 연금저축 비공제 추가납입 → 일반.
+ *   IRP의 안전자산 30% 의무로 인한 수익률 드래그(장기 복리)가 세액공제 300만의
+ *   이점을 상쇄하므로, 주식 기대수익 연 9%+ 가정에선 ISA가 IRP보다 앞선다.
+ * · refund(올해 세액공제 최우선):
+ *   연금저축 공제분 → IRP → ISA → 연금저축 비공제 추가납입 → 일반.
+ *   공제 한도 900만(연금저축 600 + IRP 300)을 먼저 소진해 올해 연말정산
+ *   환급을 최대로 확보한 뒤 비과세(ISA)를 채운다.
+ * 공통:
+ * · 연금저축 공제분(600만): 원금의 최대 16.5% 즉시 환급 + 100% 주식 가능 → 항상 1순위
  * · 연금저축 비공제 추가납입: 연금계좌 합산 납입한도(연 1,800만)의 잔여분 —
- *   세액공제는 없지만 과세이연·저율과세·건보료 차단은 동일하고 원금은 인출 시 비과세.
- *   은퇴 후 연금계좌 안에서 고배당 ETF 배당을 받는 전략의 래퍼 유입을 최대화한다
+ *   세액공제는 없지만 과세이연·저율과세·건보료 차단은 동일하고 원금은 인출 시 비과세
  * 각 계좌의 "올해 남은 여력(연)"을 한도로 흘려 담는다. */
-const PLAN_ORDER = ["pensionSavings", "isa", "irp"];
+const PLAN_ORDERS = {
+  growth: ["pensionSavings", "isa", "irp"],
+  refund: ["pensionSavings", "irp", "isa"],
+};
 const PENSION_DEPOSIT_LIMIT = 18_000_000; // 연금계좌(연금저축+IRP) 합산 연 납입한도
 const PLAN_REASONS = {
-  pensionSavings: "세액공제 환급률이 가장 높아 1순위로 채워요.",
-  isa: "전액 주식 투자가 가능하고, 3년 만기마다 연금저축으로 이전하며 추가 세액공제(이전액 10%)까지 받아 IRP보다 유리해요.",
-  irp: "안전자산 30% 의무로 장기 기대수익이 낮아져, 세액공제 한도(300만)는 ISA 다음에 채워요.",
-  pensionExtra: "세액공제는 없지만 연금계좌 납입한도(연 1,800만)까지 더 채우면 과세이연·건보료 차단 혜택을 받고, 원금은 인출 시 비과세예요.",
-  general: "절세계좌·연금 납입한도를 모두 채우고 남는 금액만 담아요.",
+  growth: {
+    pensionSavings: "세액공제 환급률이 가장 높아 1순위로 채워요.",
+    isa: "전액 주식 투자가 가능하고, 3년 만기마다 연금저축으로 이전하며 추가 세액공제(이전액 10%)까지 받아 IRP보다 유리해요.",
+    irp: "안전자산 30% 의무로 장기 기대수익이 낮아져, 세액공제 한도(300만)는 ISA 다음에 채워요.",
+  },
+  refund: {
+    pensionSavings: "세액공제 환급률이 가장 높아 1순위로 채워요.",
+    irp: "세액공제 한도(연금저축과 합산 900만)를 마저 채워 올해 연말정산 환급을 극대화해요.",
+    isa: "공제 한도를 다 채운 뒤, 비과세·손익통산 한도를 채워요.",
+  },
+  common: {
+    pensionExtra: "세액공제는 없지만 연금계좌 납입한도(연 1,800만)까지 더 채우면 과세이연·건보료 차단 혜택을 받고, 원금은 인출 시 비과세예요.",
+    general: "절세계좌·연금 납입한도를 모두 채우고 남는 금액만 담아요.",
+  },
 };
+
+/* 절세선호도 선택지 메타 — 분석 화면의 선호 선택 UI 가 그대로 렌더한다 */
+export const TAX_PREFS = [
+  {
+    id: "growth",
+    label: "장기 자산 증식 우선",
+    desc: "IRP의 안전자산 30% 제한을 피해 ISA를 먼저 채워, 장기 복리 수익을 극대화해요.",
+  },
+  {
+    id: "refund",
+    label: "올해 세액공제 우선",
+    desc: "연금저축·IRP 공제 한도(연 900만원)부터 채워, 올해 연말정산 환급을 최대로 확보해요.",
+  },
+];
+
+/* ── ISA 만기(3년) 세부전략 — 넘버링 코드(isa1~3)로 식별 ──
+ * DB 스키마를 바꾸지 않기 위해 코드 문자열로 관리하고, 절세선호도와 합쳐
+ * "growth-isa1" 같은 단일 전략 코드(encodeStrategy)로 직렬화한다.
+ * isa3(롤오버 없음)는 배분이 refund(공제 우선)와 동치라 선택 UI 에서는
+ * 제외됐다(간소화) — 저장된 과거 코드 호환을 위해 엔진 지원은 유지한다. */
+export const ISA_ROLLOVERS = [
+  {
+    id: "isa1",
+    label: "연금저축 이전",
+    desc: "3년 만기마다 연금저축으로 이전해요. 이전액 10%(최대 300만원) 추가 세액공제를 받는 표준 전략이에요.",
+  },
+  {
+    id: "isa2",
+    label: "재가입 반복",
+    desc: "만기 자금으로 ISA를 재가입해 비과세·손익통산 한도를 새 사이클로 반복 활용해요. 자금이 연금계좌에 잠기지 않아요.",
+  },
+  {
+    id: "isa3",
+    label: "롤오버 없음",
+    desc: "만기 후 자금을 자유 운용해요. 유동성은 가장 높지만 장기 절세 효과가 줄어, IRP 세액공제를 ISA보다 먼저 채우도록 순서가 조정돼요.",
+  },
+];
+
+/* growth 프리셋에서 ISA 를 IRP 보다 앞세우는 근거 — 롤오버 세부전략에 따라 문구가 달라진다
+ * (isa1 의 '이전 추가공제'는 다른 전략에선 성립하지 않으므로) */
+const ISA_REASON_GROWTH = {
+  isa1: "전액 주식 투자가 가능하고, 3년 만기마다 연금저축으로 이전하며 추가 세액공제(이전액 10%)까지 받아 IRP보다 유리해요.",
+  isa2: "전액 주식 투자가 가능하고, 3년 만기마다 재가입해 비과세·손익통산 한도를 반복 활용해요.",
+  isa3: "전액 주식 투자가 가능하고 비과세·손익통산 혜택이 있어, 안전자산 30% 의무가 있는 IRP보다 유리해요.",
+};
+
+/** 전략 코드 직렬화 — 절세선호도 + ISA 세부전략을 한 문자열로 (예: "growth-isa1").
+ * plan_revisions.note 등 기존 text 필드에 그대로 실을 수 있다(스키마 변경 불요). */
+export function encodeStrategy({ taxPref = "growth", isaRollover = "isa1" } = {}) {
+  return `${taxPref}-${isaRollover}`;
+}
+
+/** 전략 코드 역직렬화 — 형식이 아니면 null (과거 데이터·자유 텍스트 안전) */
+export function decodeStrategy(code) {
+  const m = /^(growth|refund)-(isa[123])$/.exec(String(code || "").trim());
+  return m ? { taxPref: m[1], isaRollover: m[2] } : null;
+}
+
+/* 입력 정규화 — 평면(구버전) 시그니처와 그룹형(profile/ledger/strategy/contribution)
+ * 시그니처를 모두 받아 내부 표준형으로 변환한다. 호출부의 점진 이행용. */
+function normalizeRoomsInput(o = {}) {
+  const grouped = o.profile || o.ledger || o.strategy || o.contribution;
+  const flat = grouped
+    ? {
+        mydata: o.ledger?.source === "mydata",
+        manual: o.ledger?.accounts ?? null,
+        income: o.profile?.income,
+        age: o.profile?.age,
+        monthlyContribution: o.contribution?.monthly,
+        taxPref: o.strategy?.taxPref,
+        isaRollover: o.strategy?.isaRollover,
+        priorityOverride: o.strategy?.priorityOverride,
+        perAccount: o.strategy?.perAccount,
+        liquidity: o.strategy?.liquidity,
+      }
+    : o;
+  return {
+    mydata: flat.mydata ?? false,
+    manual: flat.manual ?? null,
+    income: flat.income ?? 50_000_000,
+    age: flat.age ?? null,
+    monthlyContribution: flat.monthlyContribution ?? 0,
+    taxPref: flat.taxPref ?? "growth",
+    isaRollover: flat.isaRollover ?? "isa1",
+    priorityOverride: flat.priorityOverride ?? null,
+    perAccount: flat.perAccount ?? null,
+    liquidity: flat.liquidity ?? null,
+  };
+}
+
+/* 수동 순위 오버라이드 정리 — 유효한 절세계좌 id 만 취하고, 빠진 계좌는 기본 순서로 뒤에 붙인다 */
+function sanitizeOrder(override, baseOrder) {
+  if (!Array.isArray(override)) return baseOrder;
+  const valid = override.filter((id) => baseOrder.includes(id));
+  if (!valid.length) return baseOrder;
+  return [...valid, ...baseOrder.filter((id) => !valid.includes(id))];
+}
+
+/* ── 동적 우선순위 산정 — 고정 프리셋 대신 요소별 점수 합산 ──
+ * 연금저축 1순위 고정 없이, 아래 요소가 모두 순서에 관여한다:
+ *  · 환급 효율: 세액공제율(16.5/13.2%) — refund 선호면 가중 ×3, 공제 실효가
+ *    없으면(소득이 면세점 부근 이하) 0. ISA 는 isa1(만기 이전 10% 추가공제)일 때만 소액.
+ *  · 성장 효율: 주식 노출·과세혜택 — growth 선호면 가중 ×3.
+ *    연금저축 100(과세이연·100% 주식) / ISA 90(비과세, isa3 는 60으로 약화) / IRP 70(안전자산 30% 드래그)
+ *  · 잠김 페널티: 공제 효과가 없으면 55세까지 잠기는 연금계좌(연금저축·IRP)를 감점 —
+ *    55세 이상이면 잠김 부담이 사실상 없어 페널티 0.
+ *  · 유동성 선호(liquidity === "short", 3~5년 내 목돈 계획): ISA 가점, 연금계좌 감점.
+ *  · 한도 소진: 올해 여력(room)이 0이면 최하위로 — 표시 순서가 실질 납입 순서와 일치한다.
+ * 가중치는 기본 케이스에서 기존 프리셋 순서(growth: 연금저축→ISA→IRP,
+ * refund: 연금저축→IRP→ISA)를 정확히 재현하도록 보정된 휴리스틱 값이다. */
+const EFFECTIVE_DEDUCT_INCOME_MIN = 15_000_000; // 결정세액 근사 — 이하면 공제 환급 실효 없음(근로소득 면세점 부근)
+
+function scorePriority({ rooms, taxPref, isaRollover, income, age, liquidity }) {
+  const rate = deductionRate(income);
+  const noTaxBenefit = (income || 0) < EFFECTIVE_DEDUCT_INCOME_MIN;
+  const wRefund = taxPref === "refund" ? 3 : 1;
+  const wGrowth = taxPref === "refund" ? 1 : 3;
+  const locked = age != null && age >= 55 ? 0 : 1; // 55세 이상이면 연금계좌 잠김 부담 없음
+
+  const factors = {
+    pensionSavings: {
+      refund: noTaxBenefit ? 0 : rate * 100,
+      growth: 100,
+      lock: noTaxBenefit ? -40 * locked : 0,
+    },
+    isa: {
+      refund: !noTaxBenefit && isaRollover === "isa1" ? 5 : 0, // 만기 이전 10% 추가공제의 연 환산 근사
+      growth: ({ isa1: 90, isa2: 90, isa3: 60 })[isaRollover] ?? 90,
+      lock: 0,
+    },
+    irp: {
+      refund: noTaxBenefit ? 0 : rate * 100,
+      growth: 70,
+      lock: noTaxBenefit ? -40 * locked : 0,
+    },
+  };
+  if (liquidity === "short") {
+    factors.isa.lock += 30;
+    factors.pensionSavings.lock -= 30 * locked;
+    factors.irp.lock -= 30 * locked;
+  }
+
+  const base = PLAN_ORDERS[taxPref] ?? PLAN_ORDERS.growth; // 동점 시 프리셋 순서 유지
+  const roomOf = (id) => rooms.find((r) => r.id === id)?.room ?? 0;
+  const scores = Object.fromEntries(
+    base.map((id) => {
+      const f = factors[id];
+      const s = f.refund * wRefund + f.growth * wGrowth + f.lock;
+      return [id, roomOf(id) > 0 ? s : s - 1000]; // 한도 소진 → 최하위
+    })
+  );
+  const order = [...base].sort((a, b) => scores[b] - scores[a] || base.indexOf(a) - base.indexOf(b));
+  return { order, scores, noTaxBenefit };
+}
+
+/* 순위 근거 문구 — 동적 상황(한도 소진·공제 실효 없음)이 프리셋 문구보다 우선 */
+function priorityReasonFor(id, { rooms, reasons, noTaxBenefit }) {
+  const r = rooms.find((x) => x.id === id);
+  if (r && r.roomType !== "none" && (r.room ?? 0) <= 0) return "올해 납입 한도를 모두 채워서, 남은 계좌부터 담아요.";
+  if (noTaxBenefit) {
+    if (id === "isa") return "세액공제와 무관한 비과세 계좌라, 공제 효과가 없는 상황에서 가장 유리해요.";
+    if (id === "pensionSavings" || id === "irp")
+      return "소득이 적어 세액공제 환급 효과가 없어요 — 55세까지 잠기는 부담을 고려해 후순위로 둬요.";
+  }
+  return reasons[id];
+}
 
 /**
  * @param {object} p
@@ -105,9 +287,33 @@ const PLAN_REASONS = {
  * @param {number} [p.income]  전년도 총소득 — 세액공제 환급률(16.5%/13.2%) 분기
  * @param {number} [p.monthlyContribution=0]  매달 투자할 금액(원) — 전달 시 계좌별
  *   월 납입 추천(planMonthly/planAnnual/planShare/planReason)을 함께 산출
- * @returns 4계좌 room 목록 + 요약
+ * @param {"growth"|"refund"} [p.taxPref="growth"]  절세선호도 — 배분 우선순위 분기
+ *   (growth: 장기 증식 우선 ISA→IRP / refund: 올해 세액공제 우선 IRP→ISA)
+ * @param {"isa1"|"isa2"|"isa3"} [p.isaRollover="isa1"]  ISA 만기 세부전략(ISA_ROLLOVERS)
+ * @param {string[]} [p.priorityOverride]  절세계좌 순위 수동 오버라이드 — 선호 프리셋보다 우선
+ * @param {object} [p.perAccount]  계좌별 우선납입·상한(월 원 단위) — { [id]: { monthlyMin?, monthlyMax? } }
+ *   monthlyMin 은 waterfall 전에 우선 확보, monthlyMax 는 그 계좌 배분 상한(초과분은 다음 순위로)
+ *
+ * 그룹형 시그니처도 지원: { profile:{age,income}, ledger:{source,accounts},
+ *   strategy:{taxPref,isaRollover,priorityOverride,perAccount}, contribution:{monthly} }
+ * @returns 4계좌 room 목록 + 요약 (+ priority: 우선순위 id 배열, strategyCode: "growth-isa1" 형식)
  */
-export function buildAccountRooms({ mydata = false, manual = null, income = 50_000_000, monthlyContribution = 0 } = {}) {
+export function buildAccountRooms(input = {}) {
+  const { mydata, manual, income, age, liquidity, monthlyContribution, taxPref, isaRollover, priorityOverride, perAccount } =
+    normalizeRoomsInput(input);
+  /* 프리셋 문구(선호·ISA 세부전략 반영) — 순서 자체는 rooms 산출 뒤
+   * scorePriority 가 요소별 점수로 동적으로 계산한다(연금저축 1순위 고정 없음). */
+  const reasons = { ...PLAN_REASONS.common, ...(PLAN_REASONS[taxPref] ?? PLAN_REASONS.growth) };
+  if (taxPref === "growth") {
+    if (isaRollover === "isa3") {
+      // 롤오버 없음 — ISA 장기 우위 논거 소멸 (점수에서도 growth 90→60 으로 약화)
+      reasons.irp = "롤오버 없는 ISA는 장기 우위가 약해져, 세액공제 한도(300만)를 먼저 확보해요.";
+      reasons.isa = "공제 계좌를 채운 뒤, 한 사이클(3년)의 비과세·손익통산 한도를 활용해요.";
+    } else {
+      // growth 의 ISA 근거는 롤오버 세부전략에 맞는 문구로 교체
+      reasons.isa = ISA_REASON_GROWTH[isaRollover] ?? reasons.isa;
+    }
+  }
   const DEDUCT_RATE = deductionRate(income); // 총급여 5,500만 이하 16.5%, 초과 13.2%
   // 수기 입력값 정규화 — 숫자면 {당해 기납 = 평가액} 으로 간주
   const norm = (v) =>
@@ -168,22 +374,49 @@ export function buildAccountRooms({ mydata = false, manual = null, income = 50_0
     };
   });
 
+  /* 동적 우선순위 — 선호·소득(공제 실효)·나이(잠김)·유동성·한도 소진을 점수로 합산.
+   * 수동 오버라이드(priorityOverride)가 있으면 그것이 최우선. */
+  const scored = scorePriority({ rooms, taxPref, isaRollover, income, age, liquidity });
+  const order = priorityOverride ? sanitizeOrder(priorityOverride, scored.order) : scored.order;
+  const reasonFor = (id) => priorityReasonFor(id, { rooms, reasons, noTaxBenefit: scored.noTaxBenefit });
+
   // 월 불입 배분 — 우선순위대로 남은 여력(연)까지 waterfall 로 흘려 담는다
   if (monthlyContribution > 0) {
     const annual = monthlyContribution * 12;
     const get = (id) => rooms.find((x) => x.id === id);
     let rem = annual;
 
-    // 1~3단계: 연금저축 공제분 → ISA → IRP (각 남은 여력까지)
-    for (const id of PLAN_ORDER) {
+    /* 계좌별 연간 하한/상한 — perAccount(월 원 단위)를 연 단위로 환산 */
+    const capOf = (id) => {
+      const c = perAccount?.[id];
+      return {
+        min: Math.max(0, Math.round((c?.monthlyMin || 0) * 12)),
+        max: c?.monthlyMax != null ? Math.max(0, Math.round(c.monthlyMax * 12)) : Infinity,
+      };
+    };
+
+    // 0단계: 우선납입(하한) 확보 — 순위순, 각 계좌의 여력·상한·잔여 내에서
+    for (const id of order) {
       const r = get(id);
       if (!r) continue;
-      const put = Math.max(0, Math.min(rem, r.room));
+      const { min, max } = capOf(id);
+      const put = Math.max(0, Math.min(rem, r.room, min, max));
       r.planAnnual = put;
-      r.planReason = PLAN_REASONS[id];
-      // ISA 배분이 있으면 3년 만기 롤오버(연금저축 대량 이전 + 추가 세액공제) 전망 첨부
-      if (id === "isa" && put > 0) {
-        r.rollover = projectIsaRollover({ isaAnnual: put, deductRate: DEDUCT_RATE, cagr: PLAN_CAGR });
+      rem -= put;
+    }
+
+    // 1~3단계: 절세계좌 3종을 우선순위대로 잔여 여력까지 (상한 초과분은 다음 순위로 흘림)
+    for (const id of order) {
+      const r = get(id);
+      if (!r) continue;
+      const { max } = capOf(id);
+      const already = r.planAnnual || 0;
+      const put = Math.max(0, Math.min(rem, r.room - already, max - already));
+      r.planAnnual = already + put;
+      r.planReason = reasonFor(id);
+      // ISA 롤오버 전망 — 연금저축 이전 전략(isa1)일 때만 첨부 (이전 추가공제가 전제)
+      if (id === "isa" && r.planAnnual > 0 && isaRollover === "isa1") {
+        r.rollover = projectIsaRollover({ isaAnnual: r.planAnnual, deductRate: DEDUCT_RATE, cagr: PLAN_CAGR });
       }
       rem -= put;
     }
@@ -196,7 +429,7 @@ export function buildAccountRooms({ mydata = false, manual = null, income = 50_0
     const extra = Math.max(0, Math.min(rem, extraRoom));
     if (ps && extra > 0) {
       ps.planExtraAnnual = extra;
-      ps.planExtraReason = PLAN_REASONS.pensionExtra;
+      ps.planExtraReason = reasons.pensionExtra;
     }
     rem -= extra;
 
@@ -204,7 +437,7 @@ export function buildAccountRooms({ mydata = false, manual = null, income = 50_0
     const gen = get("general");
     if (gen) {
       gen.planAnnual = rem;
-      gen.planReason = PLAN_REASONS.general;
+      gen.planReason = reasons.general;
     }
 
     // 월·비중 확정 — 연금저축은 공제분 + 비공제 추가납입 합산
@@ -213,15 +446,30 @@ export function buildAccountRooms({ mydata = false, manual = null, income = 50_0
       r.planTotalAnnual = total;
       r.planMonthly = total / 12;
       r.planShare = total / annual;
-      if (!r.planReason) r.planReason = PLAN_REASONS[r.id];
+      if (!r.planReason) r.planReason = reasons[r.id];
     }
   }
+
+  // 우선순위 근거 — 금액(monthlyContribution) 유무와 무관하게 항상 부여
+  // (③ 분석 화면이 금액 없이 순서·이유만 보여줄 때 사용. 동적 상황이 프리셋 문구보다 우선)
+  for (const r of rooms) r.priorityReason = reasonFor(r.id);
 
   const totalRefund = rooms.reduce((s, r) => s + (r.estRefund || 0), 0);
   // 개설 추천 대상 — 연동됐으나 미보유(held===false)인 절세계좌 (일반계좌는 제외)
   const openable = rooms.filter((r) => r.held === false && r.recommend).map((r) => r.name);
 
-  return { rooms, totalRefund, openable, mydata, monthlyContribution };
+  return {
+    rooms,
+    totalRefund,
+    openable,
+    mydata,
+    monthlyContribution,
+    taxPref,
+    isaRollover,
+    strategyCode: encodeStrategy({ taxPref, isaRollover }),
+    priority: order,
+    priorityScores: scored.scores, // 요소별 합산 점수 — 순위 산출 근거(디버그·설명용)
+  };
 }
 
 export default buildAccountRooms;
