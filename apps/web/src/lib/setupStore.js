@@ -18,13 +18,15 @@ export function loadSetup(who = "demo") {
   }
 }
 
-/** 이 브라우저에 완료 스냅샷이 존재하는가(계정 무관).
+/** 이 브라우저에 완료 스냅샷이 존재하는가.
  * 재방문 유저에게 서비스 소개(인트로)를 다시 보여주지 않기 위한 판단용 —
- * 실제 복원·직행 여부는 계정이 일치하는 loadSetup 결과로만 결정한다. */
+ * 실제 복원·직행 여부는 계정이 일치하는 loadSetup 결과로만 결정한다.
+ * 데모("demo") 스냅샷은 무시한다 — 데모는 항상 첫 접속 시나리오를 타야 하므로
+ * (현재는 데모 완주를 저장하지 않지만, 과거 버전이 남긴 스냅샷도 걸러낸다). */
 export function hasAnySetup() {
   try {
     const s = JSON.parse(localStorage.getItem(KEY) || "null");
-    return !!(s && s.done);
+    return !!(s && s.done && s.who && s.who !== "demo");
   } catch {
     return false;
   }

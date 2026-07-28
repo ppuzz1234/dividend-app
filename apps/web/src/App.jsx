@@ -114,6 +114,22 @@ export default function App() {
     if (["daily", "weekly", "monthly"].includes(cycle)) setBuyCycle(cycle);
   };
 
+  /* 데모 진입 리셋 — 같은 페이지 세션에서 이전 로그인·설계가 남긴 상태를 모두
+   * 지워 항상 "첫 접속"과 동일한 온보딩 시나리오를 보여준다 (시연용) */
+  const resetDemoState = () => {
+    setMydata(false);
+    setManualAccounts(null);
+    setProductAlloc({});
+    setBuyCycle("weekly");
+    setMonthlyGoal(300);
+    setAge(40);
+    setIncome(50_000_000);
+    setFinIncome(0);
+    setSelected([]);
+    setRedesign(false);
+    setHomeTab("assets");
+  };
+
   /* 서버 플랜 프리페치 — 세션이 복원되는 즉시(대개 스플래시 재생 중) 미리 조회해
    * 두면, 스플래시가 끝나는 시점엔 결과가 준비돼 있어 로딩 화면 없이 곧바로
    * 목적지(뉴스 홈/온보딩)로 진입할 수 있다. */
@@ -232,10 +248,11 @@ export default function App() {
   }, [step]);
 
   /* 설계 완주 → 메인 앱 도달 시점의 입력·배분 결과를 스냅샷으로 저장.
-   * 이후 로그인은 이 스냅샷 덕에 온보딩을 건너뛰고 뉴스 홈으로 직행한다. */
+   * 이후 로그인은 이 스냅샷 덕에 온보딩을 건너뛰고 뉴스 홈으로 직행한다.
+   * 데모(네이버·카카오)는 저장하지 않는다 — 데모는 항상 첫 접속처럼 온보딩 전체를 탄다. */
   useEffect(() => {
-    if (step !== "portfolio") return;
-    saveSetup(user?.userId ?? "demo", { mydata, manualAccounts, age, income, finIncome, monthlyGoal, productAlloc, buyCycle });
+    if (step !== "portfolio" || !user?.userId) return;
+    saveSetup(user.userId, { mydata, manualAccounts, age, income, finIncome, monthlyGoal, productAlloc, buyCycle });
   }, [step, user, mydata, manualAccounts, age, income, finIncome, monthlyGoal, productAlloc, buyCycle]);
 
   // 전략 화면의 마이데이터 연동 완료 → 프로필·시드 반영
@@ -373,7 +390,14 @@ export default function App() {
             // 데모 provider(네이버·카카오 등)는 프로필이 없다 → user 를 초기화해야
             // 이전 구글 로그인이 남긴 user 때문에 데모 분기(마이데이터 목업 연동)가 막히지 않는다.
             setUser(profile ?? null);
-            enterAfterLogin(profile ?? null);
+            if (profile) {
+              enterAfterLogin(profile);
+            } else {
+              // 데모 — 저장된 스냅샷·세션과 무관하게 항상 첫 접속처럼
+              // 온보딩 전체 시나리오(마이데이터 연동부터)를 처음부터 노출한다
+              resetDemoState();
+              go("mydata");
+            }
           }}
         />
       )}
