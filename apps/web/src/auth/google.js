@@ -83,13 +83,19 @@ async function makeNoncePair() {
 }
 
 /**
- * 앱 안 레이어 모달에 공식 "Google로 계속하기" 버튼을 렌더.
- * 버튼 클릭 시 FedCM 지원 브라우저에선 새 창 없이 브라우저 모달로 계정 선택이
- * 진행되고(미지원 브라우저는 GIS 가 스스로 팝업으로 폴백), 받은 ID 토큰으로
- * Supabase 세션을 만든 뒤 프로필을 resolve 한다.
+ * 앱 안 레이어 모달에서 구글 인증을 진행 — 전 과정이 페이지 안에서 끝나도록
+ * 두 경로를 동시에 건다.
+ *  · One Tap 프롬프트: 브라우저에 구글 계정이 로그인돼 있으면 즉시 계정 선택
+ *    레이어(모바일=바텀시트, 크롬=FedCM 모달, 그 외=iframe 카드)가 떠서
+ *    새 창 없이 그 자리에서 완료된다. 구글이 임베드를 허용하는 유일한 위젯이다.
+ *  · 공식 버튼(폴백): One Tap 이 안 뜨는 상황(브라우저에 구글 미로그인·쿨다운 등)
+ *    을 위해 container 에 함께 렌더. FedCM 지원 브라우저에선 브라우저 모달로,
+ *    미지원(iOS 등)에선 GIS 가 스스로 새 창을 열어 진행한다 — 구글 인증 입력
+ *    페이지는 iframe 삽입이 차단돼 있어 이 경우의 새 창은 피할 수 없다.
+ * 어느 경로든 받은 ID 토큰으로 Supabase 세션을 만든 뒤 프로필을 resolve 한다.
  * 사용자가 모달을 닫아 인증을 끝내지 않으면 promise 는 settle 되지 않는다 —
  * 호출측(레이어 모달)이 언마운트 시 결과를 무시하면 된다.
- * @param {HTMLElement} container 버튼을 그릴 요소
+ * @param {HTMLElement} container 폴백 버튼을 그릴 요소
  * @returns {Promise<object>} 로그인 프로필
  */
 export async function mountGoogleButton(container) {
@@ -115,6 +121,8 @@ export async function mountGoogleButton(container) {
       },
       use_fedcm_for_prompt: true,
       use_fedcm_for_button: true, // 버튼 플로우도 팝업창 대신 브라우저 모달(FedCM)로
+      itp_support: true, // Safari 등 ITP 브라우저에서도 One Tap 이 뜰 수 있게
+      cancel_on_tap_outside: false, // 모달 조작 중 실수로 닫혀 쿨다운 걸리는 것 방지
     });
     window.google.accounts.id.renderButton(container, {
       type: "standard",
@@ -125,6 +133,10 @@ export async function mountGoogleButton(container) {
       logo_alignment: "left",
       width: 268,
     });
+    /* One Tap 즉시 시도 — 표시되면 사용자는 버튼을 누를 필요 없이 레이어에서
+     * 계정 선택으로 끝난다. 표시 불가(미로그인·쿨다운)면 조용히 무시되고
+     * 위에 렌더한 버튼이 폴백으로 남는다. */
+    window.google.accounts.id.prompt();
   });
 }
 

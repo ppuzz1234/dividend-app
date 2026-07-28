@@ -158,7 +158,9 @@ function GoogleLayerModal({ onClose, onDone, onError }) {
       >
         <span className={styles.gIcon}>{GOOGLE}</span>
         <h2 className={styles.gTitle}>Google 계정으로 로그인</h2>
-        <p className={styles.gDesc}>아래 버튼을 누르면 새 창 없이 이 화면 위에서 계정 선택이 진행돼요.</p>
+        <p className={styles.gDesc}>
+          잠시 후 화면에 계정 선택이 떠요. 나타나지 않으면 아래 버튼으로 계속해 주세요.
+        </p>
         <div ref={hostRef} className={styles.gBtnHost} />
         <button type="button" className={styles.gCancel} onClick={onClose}>
           다른 방법으로 로그인
