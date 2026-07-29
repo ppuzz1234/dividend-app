@@ -1,5 +1,7 @@
-import { useMemo, useState } from "react";
-import { ArrowRight, ArrowDown, Sparkles, SlidersHorizontal, Lock, Box, Check } from "lucide-react";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { ArrowRight, ArrowDown, SlidersHorizontal, Lock, Check, X } from "lucide-react";
+import { CubeLoader } from "../components/ui/CubeLoader.jsx";
 import { buildAccountRooms, deductionRate, TAX_PREFS, ISA_ROLLOVERS } from "@devidend/core";
 import { Pad } from "../components/layout/Pad.jsx";
 import { Heading } from "../components/layout/Heading.jsx";
@@ -14,7 +16,7 @@ const SHORT = { pensionSavings: "연금", isa: "ISA", irp: "IRP" };
 const LEVEL_TAG = { good: "양호", warn: "개선 여지", act: "조치 필요" };
 
 /* CUBE 추천 — 시스템이 고르는 단 하나의 설계안. 장기 투자와 ISA 롤오버(연금 이전)에
- * 중점을 두며, 나이·소득은 엔진(scorePriority)이 자동 반영한다. */
+ * 중점을 두며, 나이·소득은 엔진(scorePriority)이 자동 반영한다. 계좌별 한도도 미설정. */
 const CUBE_PICK = { taxPref: "growth", isaRollover: "isa1" };
 
 /* 계좌별 신호등 상태 도출 — 남은 여력이 아니라 '이 계좌로 달성 가능한 총 납입금(연 한도)과
@@ -53,7 +55,7 @@ function analyze(r) {
 /* ③ 3종 계좌 최적화 분석 — 상수(나이·소득) 기반 1차 산정을 상단에 보여주고,
  *  하단에서 개인 선호(절세선호도)를 고르면 납입 우선순위가 즉시 재정렬된다.
  *  여기서 고른 선호는 이후 단계(솔루션·배분·실행)의 금액 배분에도 그대로 반영된다. */
-export function AccountsAnalysis({ mydata, manualAccounts, income, age, taxPref = "growth", onTaxPref, isaRollover = "isa1", onIsaRollover, onNext }) {
+export function AccountsAnalysis({ mydata, manualAccounts, income, age, taxPref = "growth", onTaxPref, isaRollover = "isa1", onIsaRollover, perAccount = null, onPerAccount, onNext }) {
   const { rooms, priority } = useMemo(
     () => buildAccountRooms({ mydata, manual: manualAccounts, income, age, monthlyContribution: 0, taxPref, isaRollover }),
     [mydata, manualAccounts, income, age, taxPref, isaRollover]
@@ -80,19 +82,45 @@ export function AccountsAnalysis({ mydata, manualAccounts, income, age, taxPref 
 
   /* 설계 방식 — CUBE 추천(기본) vs 내 선호 반영(세부 조율).
    * 저장된 값이 추천안과 다르면 재진입 시 '내 선호 반영'이 선택된 상태로 복원한다. */
-  const [custom, setCustom] = useState(taxPref !== CUBE_PICK.taxPref || isaRollover !== CUBE_PICK.isaRollover);
+  const [custom, setCustom] = useState(
+    taxPref !== CUBE_PICK.taxPref || isaRollover !== CUBE_PICK.isaRollover || !!perAccount
+  );
+  // 설계 방식 엣지 패널 — 우측 "계좌 전략" 탭으로 열고 닫는다 (본문 스크롤과 무관)
+  const [panelOpen, setPanelOpen] = useState(false);
   const selectCube = () => {
     setCustom(false);
     onTaxPref?.(CUBE_PICK.taxPref);
     onIsaRollover?.(CUBE_PICK.isaRollover);
+    onPerAccount?.(null); // 과거 데이터에 남은 수동 한도가 있어도 추천안으로 초기화
   };
 
-  // 일반계좌에 절세계좌로 옮기면 유리한 해외ETF 보유가 있으면 인사이트로 노출
-  const relocate = useMemo(() => {
-    const gen = rooms.find((r) => r.id === "general");
-    const foreign = gen?.holdings?.find((h) => h.productType === "foreignEtf" && (h.value || 0) > 0);
-    return foreign ? { name: foreign.name, value: foreign.value } : null;
-  }, [rooms]);
+  /* 우선순위 재정렬 FLIP — 행을 remount 하지 않고(key 고정) DOM 순서만 바뀌므로,
+   * 이전 위치에서 새 위치로 translateY 슬라이드시켜 상하 교체를 자연스럽게 보여준다.
+   * remount 가 없어 등장 애니메이션 재생(깜빡임)도, 스크롤 앵커 이탈(최상단 점프)도 없다. */
+  const flowRef = useRef(null);
+  const rowTopsRef = useRef(new Map());
+  useLayoutEffect(() => {
+    const flow = flowRef.current;
+    if (!flow) return;
+    const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    const flowTop = flow.getBoundingClientRect().top;
+    const prev = rowTopsRef.current;
+    const next = new Map();
+    for (const el of flow.children) {
+      const id = el.dataset.acct;
+      if (!id) continue;
+      const top = el.getBoundingClientRect().top - flowTop; // 컨테이너 기준(스크롤 무관)
+      next.set(id, top);
+      const old = prev.get(id);
+      if (!reduce && old != null && Math.abs(old - top) > 1) {
+        el.animate(
+          [{ transform: `translateY(${old - top}px)` }, { transform: "translateY(0)" }],
+          { duration: 340, easing: "cubic-bezier(0.22, 0.61, 0.36, 1)" }
+        );
+      }
+    }
+    rowTopsRef.current = next;
+  });
 
   return (
     <Pad
@@ -120,11 +148,11 @@ export function AccountsAnalysis({ mydata, manualAccounts, income, age, taxPref 
       </div>
 
       {/* 우선순위 흐름 — 노드(신호등) + 오른쪽 설명.
-       *  key 에 taxPref 를 넣어 선호 변경 시 등장 애니메이션이 다시 재생되며 재정렬을 보여준다 */}
-      <div className={styles.flow}>
+       *  key 는 계좌 id 로 고정(remount 금지) — 재정렬은 위 FLIP 이 슬라이드로 표현한다 */}
+      <div className={styles.flow} ref={flowRef}>
         {items.map((it, i) => {
           return (
-            <div key={`${taxPref}-${isaRollover}-${it.id}`} className={styles.row} style={{ animationDelay: `${i * 130}ms` }}>
+            <div key={it.id} data-acct={it.id} className={styles.row} style={{ animationDelay: `${i * 130}ms` }}>
               <div className={styles.nodeCol}>
                 {/* 진행 링 — 계좌 한도 소진율(pct)을 노드 테두리에 원형 게이지로 */}
                 <span className={cx(styles.ring, styles[`ring_${it.level}`])} style={{ "--deg": `${it.pct * 3.6}deg` }}>
@@ -153,27 +181,40 @@ export function AccountsAnalysis({ mydata, manualAccounts, income, age, taxPref 
         })}
       </div>
 
-      {/* 일반계좌 → 절세계좌 이동 인사이트 */}
-      {relocate && (
-        <div className={styles.insight}>
-          <Sparkles size={15} strokeWidth={2.6} />
-          <span>
-            일반계좌의 <b>{relocate.name}</b>({fmtKRW(relocate.value)})를 절세계좌로 옮기면 배당세·건강보험료 부담을 줄일 수 있어요.
-          </span>
-        </div>
-      )}
+      {/* ── 설계 방식 — 우측 엣지 패널로 제공 (본문 스크롤 아래로 밀지 않는다) ──
+       *  · 닫힘: 우측 모서리의 "계좌 전략" 세로 탭
+       *  · 열림: 노드 열(신호등 흐름)은 가리지 않는 폭까지만 좌측으로 슬라이드,
+       *    패널은 항상 마운트된 채 transform 만 바뀌므로 전략 변경 시 깜빡임이 없다 */}
+      {createPortal(
+        <>
+          <button
+            type="button"
+            className={cx(styles.edgeTab, panelOpen && styles.edgeTabHidden)}
+            onClick={() => setPanelOpen(true)}
+            aria-expanded={panelOpen}
+            aria-label="계좌 전략 설계 방식 열기"
+          >
+            <SlidersHorizontal size={14} strokeWidth={2.4} />
+            <span className={styles.edgeTabLabel}>계좌 전략</span>
+          </button>
 
-      {/* ── 설계 방식 — CUBE 추천(기본) 과 내 선호 반영을 동위 선택지로 제공 ── */}
-      <div className={styles.prefSection}>
-        <div className={styles.prefHead}>
-          <SlidersHorizontal size={14} strokeWidth={2.4} />
-          <span>설계 방식</span>
-        </div>
-        <p className={styles.prefIntro}>
-          기본은 CUBE 추천이에요. 직접 조율하고 싶다면 내 선호 반영을 선택해 주세요.
-        </p>
+          {panelOpen && <div className={styles.panelBackdrop} onClick={() => setPanelOpen(false)} aria-hidden="true" />}
 
-        <div className={styles.modeList} role="radiogroup" aria-label="설계 방식">
+          <aside className={cx(styles.panel, panelOpen && styles.panelOn)} aria-label="설계 방식" aria-hidden={!panelOpen}>
+            <div className={styles.panelHead}>
+              <SlidersHorizontal size={14} strokeWidth={2.4} />
+              <span>설계 방식</span>
+              <button type="button" className={styles.panelClose} onClick={() => setPanelOpen(false)} aria-label="닫기">
+                <X size={16} strokeWidth={2.4} />
+              </button>
+            </div>
+
+            <div className={styles.panelBody}>
+              <p className={styles.prefIntro}>
+                기본은 CUBE 추천이에요. 직접 조율하고 싶다면 내 선호 반영을 선택해 주세요. 선택하면 왼쪽 흐름도가 바로 바뀌어요.
+              </p>
+
+              <div className={styles.modeList} role="radiogroup" aria-label="설계 방식">
           {/* CUBE 추천 — 시스템이 고른 단 하나의 설계안(장기투자·ISA 롤오버 중심) */}
           <button
             type="button"
@@ -182,8 +223,9 @@ export function AccountsAnalysis({ mydata, manualAccounts, income, age, taxPref 
             className={cx(styles.modeCard, !custom && styles.modeCardOn)}
             onClick={selectCube}
           >
-            <span className={styles.modeIcon}>
-              <Box size={17} strokeWidth={2.2} />
+            {/* 브랜드 큐브 — CUBE 추천의 정체성. 조립되며 도는 미니 루빅스 큐브 */}
+            <span className={cx(styles.modeIcon, styles.modeIconCube)} aria-hidden="true">
+              <CubeLoader size={15} bare />
             </span>
             <span className={styles.modeText}>
               <b className={styles.modeName}>
@@ -201,7 +243,7 @@ export function AccountsAnalysis({ mydata, manualAccounts, income, age, taxPref 
             type="button"
             role="radio"
             aria-checked={custom}
-            className={cx(styles.modeCard, custom && styles.modeCardOn)}
+            className={cx(styles.modeCard, custom && styles.modeCardAltOn)}
             onClick={() => setCustom(true)}
           >
             <span className={styles.modeIcon}>
@@ -273,7 +315,11 @@ export function AccountsAnalysis({ mydata, manualAccounts, income, age, taxPref 
             </div>
           </div>
         )}
-      </div>
+            </div>
+          </aside>
+        </>,
+        document.body
+      )}
     </Pad>
   );
 }

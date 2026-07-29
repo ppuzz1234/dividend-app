@@ -12,7 +12,7 @@ import { fmtKRW } from "../lib/format.js";
 import { cx } from "../lib/cx.js";
 import styles from "./Result.module.css";
 
-export function Result({ sim, allocation, chosen, years, reinvest, age, goalNestEgg, monthlyGoal, manualAccounts, income = 50_000_000, taxPref = "growth", isaRollover = "isa1", monthlyContribution = 0, existingAssets = 0, productAlloc = {}, cycle = "weekly", onNext }) {
+export function Result({ sim, allocation, chosen, years, reinvest, age, goalNestEgg, monthlyGoal, manualAccounts, income = 50_000_000, taxPref = "growth", isaRollover = "isa1", perAccount = null, monthlyContribution = 0, existingAssets = 0, productAlloc = {}, cycle = "weekly", onNext }) {
   /* 기존 보유자산은 현재가치로(성장 없이) 목표에 합산한다 —
    * 시뮬(sim)은 월 납입 성장분만 담고 있어(App 에서 시드 0), 이중 성장을 피한다.
    * → 최종 평가금액 = 기존 자산(정적) + 월 납입 성장분. */
@@ -37,7 +37,7 @@ export function Result({ sim, allocation, chosen, years, reinvest, age, goalNest
    *  ISA: 순이익 200만원 비과세 상당액(estSaving)을 보유/배분이 있을 때만 반영. */
   const deductRate = deductionRate(income);
   const taxSaving = useMemo(() => {
-    const { rooms } = buildAccountRooms({ mydata: true, manual: manualAccounts, income, age, monthlyContribution, taxPref, isaRollover });
+    const { rooms } = buildAccountRooms({ mydata: true, manual: manualAccounts, income, age, monthlyContribution, taxPref, isaRollover, perAccount });
     const rows = rooms
       .map((r) => {
         // 올해 공제 대상 납입액 = 기납 + 배분 공제분 (세액공제 한도 내). 기납+배분이 한도를 넘지 않도록 clamp.
@@ -53,7 +53,7 @@ export function Result({ sim, allocation, chosen, years, reinvest, age, goalNest
       .filter((r) => r.benefit > 0);
     const total = rows.reduce((s, r) => s + r.benefit, 0);
     return { rows, total };
-  }, [manualAccounts, income, age, monthlyContribution, deductRate, taxPref, isaRollover]);
+  }, [manualAccounts, income, age, monthlyContribution, deductRate, taxPref, isaRollover, perAccount]);
 
   return (
     <Pad footer={<Button onClick={() => setConfirmOpen(true)} variant="primary" icon={ArrowRight}>배분 · 투자하기</Button>}>

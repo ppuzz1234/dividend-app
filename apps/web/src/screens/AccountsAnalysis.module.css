@@ -463,3 +463,168 @@
     animation: none;
   }
 }
+
+/* ── 설계 방식 엣지 패널 — 우측 "계좌 전략" 탭에서 좌측으로 슬라이드 ── */
+.edgeTab {
+  position: fixed;
+  right: 0;
+  top: 50%;
+  z-index: 103;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  padding: 13px 8px 13px 10px;
+  border: 1px solid color-mix(in srgb, var(--jade) 45%, var(--line));
+  border-right: none;
+  border-radius: 14px 0 0 14px;
+  background: color-mix(in srgb, var(--jade) 13%, var(--card));
+  color: var(--jade);
+  cursor: pointer;
+  box-shadow: -6px 0 20px rgba(0, 0, 0, 0.3);
+  transform: translateY(-50%);
+  transition: transform 0.26s cubic-bezier(0.22, 0.61, 0.36, 1), opacity 0.2s;
+}
+.edgeTab:active {
+  transform: translateY(-50%) scale(0.97);
+}
+.edgeTabHidden {
+  transform: translateY(-50%) translateX(110%);
+  opacity: 0;
+  pointer-events: none;
+}
+.edgeTabLabel {
+  writing-mode: vertical-rl;
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  color: var(--text);
+}
+
+/* 열림 시 바깥(노드 영역) 탭으로 닫기 위한 투명 캐처 — 딤 없음(흐름도 확인 가능) */
+.panelBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 104;
+  background: transparent;
+}
+
+.panel {
+  position: fixed;
+  top: 50%;
+  right: 0;
+  z-index: 105;
+  /* 노드 열(신호등 흐름, 약 88px)+여백은 가리지 않는다 — 설명 영역까지만 펼침 */
+  width: min(calc(100vw - 96px), 340px);
+  max-height: min(620px, calc(100dvh - 48px));
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--line);
+  border-right: none;
+  border-radius: 18px 0 0 18px;
+  background: var(--card);
+  box-shadow: -18px 0 48px rgba(0, 0, 0, 0.45);
+  transform: translateY(-50%) translateX(calc(100% + 14px));
+  visibility: hidden;
+  transition: transform 0.26s cubic-bezier(0.22, 0.61, 0.36, 1), visibility 0s 0.26s;
+}
+.panelOn {
+  transform: translateY(-50%) translateX(0);
+  visibility: visible;
+  transition: transform 0.26s cubic-bezier(0.22, 0.61, 0.36, 1), visibility 0s;
+}
+.panelHead {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 14px 12px 10px 17px;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+.panelHead svg:first-child {
+  color: var(--jade);
+}
+.panelClose {
+  margin-left: auto;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--faint);
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+}
+.panelClose:hover {
+  color: var(--text);
+  background: color-mix(in srgb, var(--line) 35%, transparent);
+}
+.panelBody {
+  padding: 0 16px 16px;
+  overflow-y: auto; /* 내용이 길면 패널 안쪽만 스크롤 — 본문 스크롤 불변 */
+  overscroll-behavior: contain;
+}
+@media (prefers-reduced-motion: reduce) {
+  .edgeTab,
+  .panel,
+  .panelOn {
+    transition: none;
+  }
+}
+
+/* ── 엣지 패널 디테일 개선 ── */
+
+/* CUBE 추천 아이콘 — 회전·조립되는 미니 루빅스 큐브(브랜드 마크) */
+.modeIconCube {
+  overflow: hidden;
+  background: color-mix(in srgb, var(--jade) 9%, transparent);
+}
+
+/* "내 선호 반영" 선택 상태 — jade 대신 뉴트럴 스틸 톤(수동 조정 도구의 성격).
+ * 브랜드 추천(jade)과 시각적으로 역할이 구분된다 */
+.modeCardAltOn {
+  border-color: color-mix(in srgb, var(--text) 36%, var(--line));
+  background: color-mix(in srgb, var(--text) 6%, transparent);
+  color: var(--text);
+}
+.modeCardAltOn .modeIcon {
+  color: var(--text);
+  background: color-mix(in srgb, var(--text) 10%, transparent);
+}
+.modeCardAltOn .modeCheck {
+  color: var(--text);
+}
+.modeCardAltOn .modeDesc {
+  color: var(--sub);
+}
+
+/* 세부 조율 패널의 선택 상태도 뉴트럴 톤으로 통일 (jade·노랑 과다 제거) */
+.customPanel .prefBtnOn {
+  border-color: color-mix(in srgb, var(--text) 42%, var(--line));
+  background: color-mix(in srgb, var(--text) 7%, transparent);
+  color: var(--text);
+}
+
+/* 패널 내부 스크롤바 — 얇고 둥근 커스텀 바(트랙 투명) */
+.panelBody {
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: color-mix(in srgb, var(--faint) 45%, transparent) transparent;
+}
+.panelBody::-webkit-scrollbar {
+  width: 5px;
+}
+.panelBody::-webkit-scrollbar-track {
+  background: transparent;
+}
+.panelBody::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--faint) 40%, transparent);
+}
+.panelBody::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--faint) 65%, transparent);
+}

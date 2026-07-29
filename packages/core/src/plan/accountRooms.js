@@ -134,13 +134,13 @@ export const TAX_PREFS = [
 export const ISA_ROLLOVERS = [
   {
     id: "isa1",
-    label: "연금저축 이전",
-    desc: "3년 만기마다 연금저축으로 이전해요. 이전액 10%(최대 300만원) 추가 세액공제를 받는 표준 전략이에요.",
+    label: "연금저축 롤오버",
+    desc: "3년 만기마다 목돈을 연금저축으로 이전해요. 만기 특례로 한도 없이 전액 인정되고, 이전액 10%(최대 300만원) 추가 세액공제도 받아요. 노후 목적 자금이면 항상 유리한 표준 전략이에요. 연금저축 공제분(연 600만)은 직접 납입 공제가 더 커서 그래도 먼저 채워요.",
   },
   {
     id: "isa2",
-    label: "재가입 반복",
-    desc: "만기 자금으로 ISA를 재가입해 비과세·손익통산 한도를 새 사이클로 반복 활용해요. 자금이 연금계좌에 잠기지 않아요.",
+    label: "자금 유동성 확보",
+    desc: "만기 목돈으로 ISA를 재가입해 비과세를 반복해요. 55세 전에 쓸 계획이 있는 중기 자금에 맞는 선택이에요. 재가입 한도(연 2,000만·총 1억) 때문에 목돈이 크면 일부는 일반계좌에서 대기하고, 다음 만기에 연금저축 이전을 다시 선택할 수도 있어요.",
   },
   {
     id: "isa3",
@@ -167,6 +167,29 @@ export function encodeStrategy({ taxPref = "growth", isaRollover = "isa1" } = {}
 export function decodeStrategy(code) {
   const m = /^(growth|refund)-(isa[123])$/.exec(String(code || "").trim());
   return m ? { taxPref: m[1], isaRollover: m[2] } : null;
+}
+
+/** 계좌별 월 납입 한도 직렬화 — "isa=100,irp=0" (만원 단위, monthlyMax 만).
+ * 전략 코드처럼 note 텍스트에 실어 스키마 변경 없이 저장/복원한다. */
+export function encodePerAccount(perAccount) {
+  if (!perAccount) return "";
+  const parts = [];
+  for (const id of ["pensionSavings", "isa", "irp"]) {
+    const max = perAccount[id]?.monthlyMax;
+    if (max != null) parts.push(`${id}=${Math.round(max / 10_000)}`);
+  }
+  return parts.join(",");
+}
+
+/** 계좌별 월 납입 한도 역직렬화 — 형식이 아니면 null */
+export function decodePerAccount(str) {
+  if (!str) return null;
+  const out = {};
+  for (const part of String(str).split(",")) {
+    const m = /^(pensionSavings|isa|irp)=(\d+)$/.exec(part.trim());
+    if (m) out[m[1]] = { monthlyMax: Number(m[2]) * 10_000 };
+  }
+  return Object.keys(out).length ? out : null;
 }
 
 /* 입력 정규화 — 평면(구버전) 시그니처와 그룹형(profile/ledger/strategy/contribution)
@@ -273,9 +296,28 @@ function priorityReasonFor(id, { rooms, reasons, noTaxBenefit }) {
   if (noTaxBenefit) {
     if (id === "isa") return "세액공제와 무관한 비과세 계좌라, 공제 효과가 없는 상황에서 가장 유리해요.";
     if (id === "pensionSavings" || id === "irp")
-      return "소득이 적어 세액공제 환급 효과가 없어요 — 55세까지 잠기는 부담을 고려해 후순위로 둬요.";
+      return "소득이 적어 세액공제 환급이 없어요. 55세까지 잠기는 부담만 남아 지금은 담지 않아요.";
   }
   return reasons[id];
+}
+
+/* ── 상황 기반 자동 금액 조절 — 사용자 입력이 아니라 엔진이 판단한다 ──
+ * 핵심 질문: "이 돈을 55세까지 잠가도 되는가".
+ *  · 공제 슬라이스(연금저축 600만·IRP 300만): 즉시 환급(13.2~16.5%)이 잠김을
+ *    보상하므로 원칙 허용. 단 공제 실효가 없으면(저소득 근사 + 55세 미만)
+ *    보상이 없어 담지 않는다(0원).
+ *  · 비공제 연금 추가납입(4단계): 과세이연뿐이라 보상이 약함 — 55세까지 남은
+ *    기간이 짧을수록 많이 허용한다(≤5년 전액 / ≤10년 절반 / ≤15년 1/4 / 그 외 0).
+ *    유동성 단기 선호(liquidity==="short")면 0. 넘치는 금액은 ISA·일반으로 흐른다. */
+function deriveAutoLimits({ age, noTaxBenefit, liquidity }) {
+  const t = age == null ? 15 : Math.max(0, 55 - age); // 나이 미상 → 40세 상당으로 보수 추정
+  const lockedNoReward = noTaxBenefit && t > 0; // 공제 보상 없이 잠김만 남는 상황
+  const extraFactor =
+    liquidity === "short" || lockedNoReward ? 0 : t <= 5 ? 1 : t <= 10 ? 0.5 : t <= 15 ? 0.25 : 0;
+  return {
+    allowDeduct: !lockedNoReward, // false 면 연금저축·IRP 공제 슬라이스도 담지 않는다
+    extraFactor, // 비공제 추가납입 허용 비율(잔여 납입한도 대비)
+  };
 }
 
 /**
@@ -312,6 +354,13 @@ export function buildAccountRooms(input = {}) {
     } else {
       // growth 의 ISA 근거는 롤오버 세부전략에 맞는 문구로 교체
       reasons.isa = ISA_REASON_GROWTH[isaRollover] ?? reasons.isa;
+    }
+    /* 연금 이전(isa1) 전략에서 "그럼 ISA 가 1순위 아닌가?"라는 자연스러운 의문에 답하는 근거 —
+     * 직접 납입 공제(최대 16.5%)가 만기 이전 추가공제(이전액의 10%만 공제 대상, 실효 약 1.65%)
+     * 보다 10배 크고, 공제 한도는 매년 소멸하므로 연 600만원만 먼저 챙기고 ISA 로 보낸다. */
+    if (isaRollover === "isa1") {
+      reasons.pensionSavings =
+        "매년 소멸하는 세액공제 한도(연 600만)만 먼저 채워요. 직접 납입 공제(최대 16.5%)가 ISA 만기 이전 추가공제(실효 약 1.65%)보다 10배 커서, 나머지는 전부 ISA로 보내요.";
     }
   }
   const DEDUCT_RATE = deductionRate(income); // 총급여 5,500만 이하 16.5%, 초과 13.2%
@@ -379,6 +428,8 @@ export function buildAccountRooms(input = {}) {
   const scored = scorePriority({ rooms, taxPref, isaRollover, income, age, liquidity });
   const order = priorityOverride ? sanitizeOrder(priorityOverride, scored.order) : scored.order;
   const reasonFor = (id) => priorityReasonFor(id, { rooms, reasons, noTaxBenefit: scored.noTaxBenefit });
+  // 상황 기반 자동 금액 한도 — 순서와 함께 "각 계좌에 얼마까지"도 엔진이 판단
+  const auto = deriveAutoLimits({ age, noTaxBenefit: scored.noTaxBenefit, liquidity });
 
   // 월 불입 배분 — 우선순위대로 남은 여력(연)까지 waterfall 로 흘려 담는다
   if (monthlyContribution > 0) {
@@ -386,12 +437,15 @@ export function buildAccountRooms(input = {}) {
     const get = (id) => rooms.find((x) => x.id === id);
     let rem = annual;
 
-    /* 계좌별 연간 하한/상한 — perAccount(월 원 단위)를 연 단위로 환산 */
+    /* 계좌별 연간 하한/상한 — 자동 판단(auto)과 프로그램적 perAccount(월 원 단위)를 병합.
+     * 공제 보상이 없는 상황(allowDeduct=false)이면 연금저축·IRP 는 금액 자체를 0으로 막는다 */
     const capOf = (id) => {
       const c = perAccount?.[id];
+      const userMax = c?.monthlyMax != null ? Math.max(0, Math.round(c.monthlyMax * 12)) : Infinity;
+      const autoMax = (id === "pensionSavings" || id === "irp") && !auto.allowDeduct ? 0 : Infinity;
       return {
         min: Math.max(0, Math.round((c?.monthlyMin || 0) * 12)),
-        max: c?.monthlyMax != null ? Math.max(0, Math.round(c.monthlyMax * 12)) : Infinity,
+        max: Math.min(userMax, autoMax),
       };
     };
 
@@ -421,15 +475,20 @@ export function buildAccountRooms(input = {}) {
       rem -= put;
     }
 
-    // 4단계: 연금저축 비공제 추가납입 — 연금계좌 합산 납입한도(1,800만)의 잔여분까지
+    // 4단계: 연금저축 비공제 추가납입 — 연금계좌 합산 납입한도(1,800만) 잔여분에
+    // 상황 기반 허용 비율(auto.extraFactor: 55세까지 남은 기간·유동성 반영)을 곱해 담는다
     const ps = get("pensionSavings");
     const irp = get("irp");
     const depositUsed = pensionContributed + (ps?.planAnnual || 0) + (irp?.planAnnual || 0);
     const extraRoom = Math.max(0, PENSION_DEPOSIT_LIMIT - depositUsed);
-    const extra = Math.max(0, Math.min(rem, extraRoom));
+    const extraAllowed = Math.round(extraRoom * auto.extraFactor);
+    const extra = Math.max(0, Math.min(rem, extraAllowed));
     if (ps && extra > 0) {
       ps.planExtraAnnual = extra;
-      ps.planExtraReason = reasons.pensionExtra;
+      ps.planExtraReason =
+        auto.extraFactor < 1
+          ? `${reasons.pensionExtra} 55세까지 잠기는 기간을 고려해 잔여 한도의 일부만 담아요.`
+          : reasons.pensionExtra;
     }
     rem -= extra;
 
@@ -469,6 +528,7 @@ export function buildAccountRooms(input = {}) {
     strategyCode: encodeStrategy({ taxPref, isaRollover }),
     priority: order,
     priorityScores: scored.scores, // 요소별 합산 점수 — 순위 산출 근거(디버그·설명용)
+    autoLimits: auto, // 상황 기반 자동 금액 판단(allowDeduct·extraFactor) — 설명 UI 용
   };
 }
 

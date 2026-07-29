@@ -36,7 +36,15 @@ export { allocate } from "./taxopt/optimizer.js";
 /* ⑤ 배분 제안 (plan) */
 export { buildStrategy, STRATEGY_PLAYBOOK } from "./plan/strategy.js";
 export { recommendByAccount, chosenCategories } from "./plan/assetLocation.js";
-export { buildAccountRooms, TAX_PREFS, ISA_ROLLOVERS, encodeStrategy, decodeStrategy } from "./plan/accountRooms.js";
+export {
+  buildAccountRooms,
+  TAX_PREFS,
+  ISA_ROLLOVERS,
+  encodeStrategy,
+  decodeStrategy,
+  encodePerAccount,
+  decodePerAccount,
+} from "./plan/accountRooms.js";
 export { projectIsaRollover } from "./plan/isaRollover.js";
 export { buildStrategyComparison, PRODUCT_GROUP_LABELS } from "./plan/strategyTable.js";
 

@@ -12,6 +12,7 @@ import {
   MYDATA_ACCOUNTS,
   MYDATA_PROFILE,
   decodeStrategy,
+  decodePerAccount,
 } from "@devidend/core";
 import { onAuthChange, isReturningFromOAuth, isAuthPopup, logAuthDiagnostics, logout } from "./auth/google.js";
 import { usePlanStore } from "./lib/usePlanStore.js";
@@ -69,8 +70,11 @@ export default function App() {
   /* 절세선호도 — 계좌 배분 waterfall 우선순위 분기 (growth: 장기 증식 ISA 우선
    * / refund: 올해 세액공제 IRP 우선). ③ 분석 화면에서 선택, 이후 전 단계에 반영 */
   const [taxPref, setTaxPref] = useState("growth");
-  // ISA 만기(3년) 세부전략 — isa1: 연금저축 이전(추가공제) / isa2: 재가입 반복 / isa3: 롤오버 없음
+  // ISA 만기(3년) 세부전략 — isa1: 연금저축 롤오버(추가공제) / isa2: 재가입 반복 / isa3: 롤오버 없음
   const [isaRollover, setIsaRollover] = useState("isa1");
+  /* 계좌별 월 납입 한도 — { [계좌id]: { monthlyMax } } 또는 null(한도 없음).
+   * "내 선호 반영"에서 직접 설정하며, 한도를 넘는 금액은 다음 순위 계좌로 흘러간다 */
+  const [perAccount, setPerAccount] = useState(null);
   // 메인 앱 진입 탭 — 최초 완주 직후엔 자산 탭, 설계를 마친 재로그인 복귀는 뉴스 홈
   const [homeTab, setHomeTab] = useState("assets");
   // 자산 탭 "다시 설계" — 마이데이터 단계에서 수기입력 폼을 강제하고 기존 값을 채워 보여준다
@@ -91,6 +95,7 @@ export default function App() {
     if (s.buyCycle) setBuyCycle(s.buyCycle);
     if (s.taxPref) setTaxPref(s.taxPref);
     if (s.isaRollover) setIsaRollover(s.isaRollover);
+    if (s.perAccount) setPerAccount(s.perAccount);
   };
 
   /* 서버에 저장된 최신 플랜(리비전) → 화면 상태 복원.
@@ -101,12 +106,14 @@ export default function App() {
     if (profile?.age) setAge(profile.age);
     if (profile?.total_income != null) setIncome(profile.total_income);
     if (profile?.fin_income != null) setFinIncome(profile.fin_income);
-    // 전략 코드 복원 — note 텍스트에 "strategy:growth-isa1" 형태로 실려 온다(스키마 변경 없이)
+    // 전략 코드 복원 — note 텍스트에 "strategy:growth-isa1 caps:isa=100" 형태로 실려 온다(스키마 변경 없이)
     const st = decodeStrategy(/strategy:([a-z0-9-]+)/.exec(plan.note || "")?.[1]);
     if (st) {
       setTaxPref(st.taxPref);
       setIsaRollover(st.isaRollover);
     }
+    const caps = decodePerAccount(/caps:([A-Za-z0-9=,]+)/.exec(plan.note || "")?.[1]);
+    if (caps) setPerAccount(caps);
     const kindOf = new Map(ledger.map((a) => [a.id, a.kind]));
     // 계좌 원장 잔고 → 수기입력 형태의 계좌 현황 (자산 합계·"다시 설계" 초기값)
     if (ledger.length) {
@@ -140,6 +147,7 @@ export default function App() {
     setBuyCycle("weekly");
     setTaxPref("growth");
     setIsaRollover("isa1");
+    setPerAccount(null);
     setMonthlyGoal(300);
     setAge(40);
     setIncome(50_000_000);
@@ -271,8 +279,8 @@ export default function App() {
    * 데모(네이버·카카오)는 저장하지 않는다 — 데모는 항상 첫 접속처럼 온보딩 전체를 탄다. */
   useEffect(() => {
     if (step !== "portfolio" || !user?.userId) return;
-    saveSetup(user.userId, { mydata, manualAccounts, age, income, finIncome, monthlyGoal, productAlloc, buyCycle, taxPref, isaRollover });
-  }, [step, user, mydata, manualAccounts, age, income, finIncome, monthlyGoal, productAlloc, buyCycle, taxPref, isaRollover]);
+    saveSetup(user.userId, { mydata, manualAccounts, age, income, finIncome, monthlyGoal, productAlloc, buyCycle, taxPref, isaRollover, perAccount });
+  }, [step, user, mydata, manualAccounts, age, income, finIncome, monthlyGoal, productAlloc, buyCycle, taxPref, isaRollover, perAccount]);
 
   // 전략 화면의 마이데이터 연동 완료 → 프로필·시드 반영
   const linkMydata = () => {
@@ -464,6 +472,8 @@ export default function App() {
           onTaxPref={setTaxPref}
           isaRollover={isaRollover}
           onIsaRollover={setIsaRollover}
+          perAccount={perAccount}
+          onPerAccount={setPerAccount}
           onNext={() => go("passiveGoal")}
         />
       )}
@@ -484,7 +494,7 @@ export default function App() {
         <Accounts
           mode="allocation"
           nextLabel="배분 방식 정하기"
-          {...{ years, mydata, manualAccounts, answers, monthly, monthlyGoal, finIncome, income, age, taxPref, isaRollover, store, onLinked: linkMydata, onNext: () => go("allocate") }}
+          {...{ years, mydata, manualAccounts, answers, monthly, monthlyGoal, finIncome, income, age, taxPref, isaRollover, perAccount, store, onLinked: linkMydata, onNext: () => go("allocate") }}
         />
       )}
       {/* ⑦ 정기적 투자금 배분 방식 — 추천 상품 자동배정 + 매수 주기(일/주/월) 게이미피케이션 */}
@@ -495,6 +505,7 @@ export default function App() {
           age={age}
           taxPref={taxPref}
           isaRollover={isaRollover}
+          perAccount={perAccount}
           monthlyContribution={scenario.gap > 0 ? requiredMonthly : 0}
           years={years}
           initialAlloc={productAlloc}
@@ -520,6 +531,7 @@ export default function App() {
           income={income}
           taxPref={taxPref}
           isaRollover={isaRollover}
+          perAccount={perAccount}
           monthlyContribution={scenario.gap > 0 ? requiredMonthly : 0}
           existingAssets={currentAssets}
           productAlloc={productAlloc}
