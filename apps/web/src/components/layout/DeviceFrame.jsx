@@ -39,7 +39,17 @@ export function DeviceFrame() {
         <div className={styles.device}>
           <div className={styles.screen}>
             <div className={styles.island} />
-            <iframe className={styles.frameEmbed} src="/?device=1" title="PLUS CUBE" />
+            {/* 시연용 인트로 강제(?intro=1)는 iframe 안의 앱까지 전달해야 동작한다.
+                TODO: 데모 프로세스를 걷어낼 때 이 전달 로직도 함께 제거할 것. */}
+            <iframe
+              className={styles.frameEmbed}
+              src={
+                new URLSearchParams(window.location.search).get("intro") === "1"
+                  ? "/?device=1&intro=1"
+                  : "/?device=1"
+              }
+              title="PLUS CUBE"
+            />
           </div>
           <span className={`${styles.btn} ${styles.bAction}`} />
           <span className={`${styles.btn} ${styles.bVolup}`} />
