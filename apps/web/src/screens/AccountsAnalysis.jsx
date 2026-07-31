@@ -1,6 +1,6 @@
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { ArrowRight, ArrowDown, SlidersHorizontal, Lock, Check, X } from "lucide-react";
+import { ArrowRight, ArrowDown, ChevronDown, SlidersHorizontal, Lock, Check, X } from "lucide-react";
 import { CubeLoader } from "../components/ui/CubeLoader.jsx";
 import { buildAccountRooms, deductionRate, TAX_PREFS, ISA_ROLLOVERS } from "@devidend/core";
 import { Pad } from "../components/layout/Pad.jsx";
@@ -15,9 +15,10 @@ import styles from "./AccountsAnalysis.module.css";
 const SHORT = { pensionSavings: "연금", isa: "ISA", irp: "IRP" };
 const LEVEL_TAG = { good: "양호", warn: "개선 여지", act: "조치 필요" };
 
-/* CUBE 추천 — 시스템이 고르는 단 하나의 설계안. 장기 투자와 ISA 롤오버(연금 이전)에
- * 중점을 두며, 나이·소득은 엔진(scorePriority)이 자동 반영한다. 계좌별 한도도 미설정. */
-const CUBE_PICK = { taxPref: "growth", isaRollover: "isa1" };
+/* CUBE 추천 — 시스템이 고르는 단 하나의 설계안. 올해 연말정산 세액공제
+ * (연금저축600→IRP300)를 먼저 확보하고 추가 투자금은 ISA로 보내는 순서(refund)이며,
+ * 나이·소득은 엔진(scorePriority)이 자동 반영한다. 계좌별 한도도 미설정. */
+const CUBE_PICK = { taxPref: "refund", isaRollover: "isa1" };
 
 /* 계좌별 신호등 상태 도출 — 남은 여력이 아니라 '이 계좌로 달성 가능한 총 납입금(연 한도)과
  *  그에 따른 총 환급 예상액(한도 × 세액공제율)'을 기준으로 표기한다.
@@ -50,6 +51,32 @@ function analyze(r) {
           ? `비과세 한도의 절반 이상을 채웠어요. 남은 ${fmtKRW(r.room)}까지 더 담으면 순이익 200만원을 비과세로 받아요.`
           : `이 계좌로 연 ${fmtKRW(r.limit)}까지 담아 순이익 200만원을 비과세로 받을 수 있어요.`;
   return { level, note };
+}
+
+/* 혜택 증식 vs 패널티 — 세액공제 환급과 그 운용수익(복리)이 시간이 갈수록
+ * 중도인출 패널티(기타소득세 16.5%, 납입 누계 비례) 위로 벌어지는 개념 곡선.
+ * 정확한 수치 시뮬이 아니라 "이미 받은 혜택의 증식이 패널티를 상쇄한다"는 구조 설명용 */
+function PenaltyOffsetChart() {
+  return (
+    <div className={styles.worryChartWrap}>
+      <svg className={styles.worryChart} viewBox="0 0 320 132" fill="none" aria-hidden="true">
+        <line x1="6" y1="120" x2="314" y2="120" stroke="var(--line2)" strokeWidth="1" />
+        {/* 패널티 — 납입 누계에 비례해 완만히 오르는 점선 */}
+        <path
+          d="M 6 120 C 92 113, 204 102, 314 90"
+          stroke="var(--line2)"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeDasharray="4 6"
+        />
+        {/* 혜택 증식 — 환급 즉시 효과에 복리가 붙어 가속 */}
+        <path d="M 6 120 C 82 100, 182 70, 314 18" stroke="var(--jade)" strokeWidth="3" strokeLinecap="round" />
+        <circle cx="314" cy="18" r="5" fill="var(--jade)" />
+      </svg>
+      <span className={styles.worryLabelHi}>받은 혜택의 증식</span>
+      <span className={styles.worryLabelLo}>중도인출 패널티</span>
+    </div>
+  );
 }
 
 /* ③ 3종 계좌 최적화 분석 — 상수(나이·소득) 기반 1차 산정을 상단에 보여주고,
@@ -87,6 +114,8 @@ export function AccountsAnalysis({ mydata, manualAccounts, income, age, taxPref 
   );
   // 설계 방식 엣지 패널 — 우측 "계좌 전략" 탭으로 열고 닫는다 (본문 스크롤과 무관)
   const [panelOpen, setPanelOpen] = useState(false);
+  // 중도인출 반론 해소 카드 — 연금저축·IRP 추천을 본 직후의 "돈이 묶인다" 걱정을 그 자리에서 다룬다
+  const [worryOpen, setWorryOpen] = useState(false);
   const selectCube = () => {
     setCustom(false);
     onTaxPref?.(CUBE_PICK.taxPref);
@@ -181,6 +210,42 @@ export function AccountsAnalysis({ mydata, manualAccounts, income, age, taxPref 
         })}
       </div>
 
+      {/* 반론 해소(멘트①②) — 55세 인출 제한 걱정을 추천 직후에 정면으로 다룬다 */}
+      <div className={styles.worry}>
+        <button
+          type="button"
+          className={styles.worryHead}
+          onClick={() => setWorryOpen((o) => !o)}
+          aria-expanded={worryOpen}
+        >
+          <span>55세까지 묶이는 돈이라 망설여지시나요?</span>
+          <ChevronDown size={16} strokeWidth={2.6} className={cx(styles.worryChev, worryOpen && styles.worryChevOn)} />
+        </button>
+        {worryOpen && (
+          <div className={styles.worryBody}>
+            <p className={styles.worryLine}>
+              미래의 일은 알 수 없어요. 불확실한 중도 인출 걱정보다,{" "}
+              <b>지금 확실한 세액공제 혜택을 최대한 받는 것</b>이 먼저예요.
+            </p>
+            <PenaltyOffsetChart />
+            <p className={styles.worryLine}>
+              중도에 인출하게 되더라도, 이미 받은 세금 혜택이 만들어 낸{" "}
+              <b>자산 증식이 패널티(기타소득세 16.5%)를 상쇄</b>해요.
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* 큐브의 약속(멘트⑥) — 세 계좌 최적화의 마무리 선언, 다음 CTA(목표)로 잇는다 */}
+      <div className={styles.promise}>
+        <span className={styles.promiseIcon} aria-hidden="true">
+          <CubeLoader size={18} bare />
+        </span>
+        <p className={styles.promiseText}>
+          플러스 큐브가 세 가지 계좌의 <b>최적화 솔루션</b>을 설계하고, 실행을 <b>최대한 자동화</b>해요.
+        </p>
+      </div>
+
       {/* ── 설계 방식 — 우측 엣지 패널로 제공 (본문 스크롤 아래로 밀지 않는다) ──
        *  · 닫힘: 우측 모서리의 "계좌 전략" 세로 탭
        *  · 열림: 노드 열(신호등 흐름)은 가리지 않는 폭까지만 좌측으로 슬라이드,
@@ -232,7 +297,7 @@ export function AccountsAnalysis({ mydata, manualAccounts, income, age, taxPref 
                 CUBE 추천 <em className={styles.modeBadge}>기본</em>
               </b>
               <span className={styles.modeDesc}>
-                장기 투자와 ISA 롤오버에 중점을 두고, 나이·소득을 종합 반영해 고른 단 하나의 최적 설계안이에요.
+                올해 연말정산 세액공제부터 최대로 확보하도록, 나이·소득을 종합 반영해 고른 단 하나의 최적 설계안이에요.
               </span>
             </span>
             {!custom && <Check size={16} strokeWidth={2.8} className={styles.modeCheck} />}

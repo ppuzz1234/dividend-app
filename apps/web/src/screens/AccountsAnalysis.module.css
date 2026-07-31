@@ -256,6 +256,113 @@
   font-weight: 800;
 }
 
+/* ── 반론 해소(멘트①②) — 중도인출 걱정 접이식 카드 ── */
+.worry {
+  margin-top: 14px;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: var(--card);
+  overflow: hidden;
+}
+.worryHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  padding: 14px 16px;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  text-align: left;
+  word-break: keep-all;
+}
+.worryChev {
+  flex-shrink: 0;
+  color: var(--sub);
+  transition: transform 0.25s ease;
+}
+.worryChevOn {
+  transform: rotate(180deg);
+}
+.worryBody {
+  padding: 0 16px 16px;
+  animation: aaRise 0.4s ease both;
+}
+.worryLine {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--sub);
+  word-break: keep-all;
+}
+.worryLine b {
+  color: var(--text);
+  font-weight: 700;
+}
+.worryChartWrap {
+  position: relative;
+  margin: 14px 0;
+}
+.worryChart {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.worryLabelHi,
+.worryLabelLo {
+  position: absolute;
+  font-size: 11px;
+  font-weight: 700;
+}
+.worryLabelHi {
+  top: 0;
+  right: 24px;
+  color: var(--jade);
+}
+.worryLabelLo {
+  bottom: 30px;
+  right: 24px;
+  color: var(--faint);
+}
+@media (prefers-reduced-motion: reduce) {
+  .worryBody {
+    animation: none;
+  }
+  .worryChev {
+    transition: none;
+  }
+}
+
+/* ── 큐브의 약속(멘트⑥) — 계좌 최적화 마무리 선언 스트립 ── */
+.promise {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--jade) 32%, transparent);
+  background: color-mix(in srgb, var(--jade) 9%, transparent);
+}
+.promiseIcon {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.promiseText {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text);
+  word-break: keep-all;
+}
+.promiseText b {
+  font-weight: 800;
+}
+
 /* ── 내 선호 반영 — 1차 산정 하단의 개인 변수 조정 섹션 ── */
 .prefSection {
   margin-top: 18px;

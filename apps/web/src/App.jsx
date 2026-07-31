@@ -68,8 +68,9 @@ export default function App() {
   // 매수 리듬(일/주/월) — 배분 화면(allocate)에서 결정, 확인 시트·메인 앱에 표시
   const [buyCycle, setBuyCycle] = useState("weekly");
   /* 절세선호도 — 계좌 배분 waterfall 우선순위 분기 (growth: 장기 증식 ISA 우선
-   * / refund: 올해 세액공제 IRP 우선). ③ 분석 화면에서 선택, 이후 전 단계에 반영 */
-  const [taxPref, setTaxPref] = useState("growth");
+   * / refund: 올해 세액공제 IRP 우선). ③ 분석 화면에서 선택, 이후 전 단계에 반영.
+   * 기본 추천(CUBE)은 refund — 연말정산 세액공제(연금저축600→IRP300)부터 확보하는 내러티브 */
+  const [taxPref, setTaxPref] = useState("refund");
   // ISA 만기(3년) 세부전략 — isa1: 연금저축 롤오버(추가공제) / isa2: 재가입 반복 / isa3: 롤오버 없음
   const [isaRollover, setIsaRollover] = useState("isa1");
   /* 계좌별 월 납입 한도 — { [계좌id]: { monthlyMax } } 또는 null(한도 없음).
@@ -145,7 +146,7 @@ export default function App() {
     setManualAccounts(null);
     setProductAlloc({});
     setBuyCycle("weekly");
-    setTaxPref("growth");
+    setTaxPref("refund");
     setIsaRollover("isa1");
     setPerAccount(null);
     setMonthlyGoal(300);

@@ -84,10 +84,12 @@ function DivergingChart({ play }) {
   );
 }
 
+/* 절세 계좌 우선순위 — 기본 추천(refund)과 같은 순서로 소개한다:
+ * 연말정산 세액공제(연금저축600→IRP300)부터, 추가 투자금은 ISA로 */
 const ACCOUNTS = [
-  { name: "ISA", note: "비과세·분리과세로 먼저 채우기" },
-  { name: "연금저축", note: "세액공제 한도까지 납입" },
-  { name: "IRP", note: "추가 공제·과세이연 활용" },
+  { name: "연금저축", note: "연말정산 세액공제, 연 600만원부터" },
+  { name: "IRP", note: "공제 한도 900만원까지 마저 채우기" },
+  { name: "ISA", note: "추가 투자금은 배당소득세 절세 운용" },
 ];
 
 export function Intro({ onNext }) {
@@ -256,6 +258,10 @@ export function Intro({ onNext }) {
             </li>
           ))}
         </ol>
+        <p className={cx(styles.howNote, styles.rise)} style={{ "--i": 4 }}>
+          이 세 계좌는 지금의 세금은 물론, 은퇴 후 배당 소득에 붙는
+          <b> 소득세와 건강보험료까지 최적화</b>할 수 있는 <b>유일한 수단</b>이에요.
+        </p>
       </section>
 
       {/* 5) 실행 — 발산 곡선 + CTA */}

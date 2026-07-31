@@ -396,6 +396,19 @@
   color: var(--sub);
   word-break: keep-all;
 }
+/* 멘트⑤ — 세 계좌가 배당소득세·건보료까지 잡는 유일한 수단이라는 명분 선언 */
+.howNote {
+  margin: 24px 0 0;
+  max-width: 400px;
+  font-size: 15px;
+  line-height: 1.62;
+  color: var(--sub);
+  word-break: keep-all;
+}
+.howNote b {
+  color: var(--text);
+  font-weight: 700;
+}
 
 /* ---------------- 4) 실행 · CTA ---------------- */
 .sceneCta {

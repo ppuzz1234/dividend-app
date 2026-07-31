@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ChevronDown } from "lucide-react";
 import { buildAccountRooms, recommendedProducts, findProduct } from "@devidend/core";
 import { Pad } from "../components/layout/Pad.jsx";
 import { Heading } from "../components/layout/Heading.jsx";
@@ -8,6 +8,7 @@ import { EtfBrandTile } from "../components/ui/EtfBrandTile.jsx";
 import { fmtKRW } from "../lib/format.js";
 import { cx } from "../lib/cx.js";
 import styles from "./AllocationPlan.module.css";
+import ob from "./Onboarding.module.css";
 
 const ACCT_LABELS = { isa: "ISA", pensionSavings: "연금저축", irp: "IRP", general: "일반" };
 const STEP = 10_000;
@@ -70,6 +71,8 @@ export function AllocationPlan({ manualAccounts, income, age, taxPref = "growth"
   );
   const totalMonthly = lines.reduce((s, l) => s + l.amt, 0);
 
+  // 전환 히어로(멘트⑦) — 계좌 최적화 완료 선언 → 30년 데이터 기반 투자 솔루션 제안으로 전환
+  const [stage, setStage] = useState("hero"); // hero → main
   const [cycle, setCycle] = useState("weekly");
   const active = CYCLES.find((c) => c.id === cycle) || CYCLES[1];
   const perBuy = Math.round(((totalMonthly * 12) / active.perYear) / 1000) * 1000;
@@ -80,11 +83,38 @@ export function AllocationPlan({ manualAccounts, income, age, taxPref = "growth"
   return (
     <Pad
       footer={
-        <Button onClick={() => onNext?.(alloc, cycle)} icon={ArrowRight} disabled={totalMonthly <= 0}>
-          이 방식으로 최종 점검하기
-        </Button>
+        stage === "main" ? (
+          <Button onClick={() => onNext?.(alloc, cycle)} icon={ArrowRight} disabled={totalMonthly <= 0}>
+            이 방식으로 최종 점검하기
+          </Button>
+        ) : null
       }
     >
+      {/* 전환 히어로 — 최적화된 세 계좌 세팅 완료 → 30년 데이터 기반 투자 솔루션 선택 제안 */}
+      {stage === "hero" && (
+        <div className={ob.heroStage}>
+          <div className={ob.hero}>
+            <h1 className={ob.heroTitle}>
+              최적화된 세 가지 계좌,
+              <br />
+              세팅이 끝났어요.
+            </h1>
+            <p className={ob.heroSub}>
+              이제 30년 넘는 시장의 성장률과 구조를 분석해
+              <br />
+              플러스 큐브가 제안하는 투자 솔루션으로,
+              <br />
+              미래를 위한 투자를 간편하게 실행해볼까요?
+            </p>
+          </div>
+          <button type="button" className={ob.stepNext} aria-label="다음 단계" onClick={() => setStage("main")}>
+            <ChevronDown size={26} strokeWidth={2.6} />
+          </button>
+        </div>
+      )}
+
+      {stage === "main" && (
+        <>
       <Heading sub="추천 상품에는 자동으로 배분했어요. 꾸준히 모을 나만의 매수 리듬만 골라주세요.">
         정기 투자 리듬 정하기
       </Heading>
@@ -161,6 +191,8 @@ export function AllocationPlan({ manualAccounts, income, age, taxPref = "growth"
           ))
         )}
       </div>
+        </>
+      )}
     </Pad>
   );
 }
