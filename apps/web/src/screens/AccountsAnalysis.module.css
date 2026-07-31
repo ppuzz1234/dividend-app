@@ -407,33 +407,6 @@
   color: var(--faint);
   background: color-mix(in srgb, var(--line) 45%, transparent);
 }
-/* 절세선호도 세그먼트 — 2택, 선택 즉시 상단 우선순위가 재정렬된다 */
-.prefSeg {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-.prefBtn {
-  padding: 11px 8px;
-  border-radius: 12px;
-  border: 1px solid var(--line);
-  background: transparent;
-  color: var(--sub);
-  font-family: var(--font-sans);
-  font-size: 12.5px;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  cursor: pointer;
-  transition: border-color 0.15s, color 0.15s, background 0.15s;
-}
-.prefBtn:active {
-  transform: scale(0.98);
-}
-.prefBtnOn {
-  border-color: color-mix(in srgb, var(--jade) 55%, var(--line));
-  background: color-mix(in srgb, var(--jade) 10%, transparent);
-  color: var(--text);
-}
 .prefDesc {
   margin: 9px 2px 0;
   font-size: 12px;
@@ -459,16 +432,7 @@
   margin-top: 2px;
 }
 
-/* ISA 세부전략 — 3택 세그먼트 */
-.prefSeg3 {
-  grid-template-columns: repeat(3, 1fr);
-}
-.prefSeg3 .prefBtn {
-  padding: 10px 4px;
-  font-size: 12px;
-}
-
-/* ── 설계 방식 선택 — CUBE 추천(기본) / 내 선호 반영, 동위 라디오 카드 ── */
+/* ── 계좌 전략 3택 1 — 단일 라디오 카드 리스트 (1번 = CUBE 추천 강조) ── */
 .modeList {
   display: flex;
   flex-direction: column;
@@ -519,14 +483,15 @@
   gap: 3px;
 }
 .modeName {
-  display: flex;
-  align-items: center;
-  gap: 6px;
   font-size: 13.5px;
   font-weight: 800;
   letter-spacing: -0.01em;
+  word-break: keep-all; /* 좁은 폭에서도 단어 중간("우/선") 개행 금지 */
 }
+/* CUBE 추천 뱃지 — 제목 위 독립 줄(모드텍스트 컬럼의 첫 요소). 통짜 유지 */
 .modeBadge {
+  align-self: flex-start;
+  white-space: nowrap;
   font-style: normal;
   padding: 2px 7px;
   border-radius: 999px;
@@ -550,27 +515,6 @@
   align-self: center;
   color: var(--jade);
 }
-/* 내 선호 반영 패널 — 카드 선택 아래로 펼쳐지는 세부 조율 */
-.customPanel {
-  margin-top: 2px;
-  animation: aaPanelIn 0.22s ease;
-}
-@keyframes aaPanelIn {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .customPanel {
-    animation: none;
-  }
-}
-
 /* ── 설계 방식 엣지 패널 — 우측 "계좌 전략" 탭에서 좌측으로 슬라이드 ── */
 .edgeTab {
   position: fixed;
@@ -692,29 +636,19 @@
   background: color-mix(in srgb, var(--jade) 9%, transparent);
 }
 
-/* "내 선호 반영" 선택 상태 — jade 대신 뉴트럴 스틸 톤(수동 조정 도구의 성격).
- * 브랜드 추천(jade)과 시각적으로 역할이 구분된다 */
-.modeCardAltOn {
-  border-color: color-mix(in srgb, var(--text) 36%, var(--line));
-  background: color-mix(in srgb, var(--text) 6%, transparent);
+/* CUBE 추천 카드 — 기본 전략의 존재감 강조: jade 틴트 보더 + 은은한 그라데이션.
+ * 선택 상태(.modeCardOn)가 겹치면 기존 jade 강조가 그 위에 더해져 한층 진해진다 */
+.modeCardCube {
+  padding: 15px 14px;
+  border-color: color-mix(in srgb, var(--jade) 36%, var(--line));
+  background: linear-gradient(160deg, color-mix(in srgb, var(--jade) 7%, transparent), transparent 65%);
+}
+.modeCardCube .modeName {
+  font-size: 14.5px;
   color: var(--text);
 }
-.modeCardAltOn .modeIcon {
-  color: var(--text);
-  background: color-mix(in srgb, var(--text) 10%, transparent);
-}
-.modeCardAltOn .modeCheck {
-  color: var(--text);
-}
-.modeCardAltOn .modeDesc {
-  color: var(--sub);
-}
-
-/* 세부 조율 패널의 선택 상태도 뉴트럴 톤으로 통일 (jade·노랑 과다 제거) */
-.customPanel .prefBtnOn {
-  border-color: color-mix(in srgb, var(--text) 42%, var(--line));
-  background: color-mix(in srgb, var(--text) 7%, transparent);
-  color: var(--text);
+.modeCardCube.modeCardOn {
+  background: linear-gradient(160deg, color-mix(in srgb, var(--jade) 13%, transparent), color-mix(in srgb, var(--jade) 5%, transparent));
 }
 
 /* 패널 내부 스크롤바 — 얇고 둥근 커스텀 바(트랙 투명) */

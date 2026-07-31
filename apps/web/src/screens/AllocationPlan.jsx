@@ -40,10 +40,10 @@ function buyDaysOfMonth(cycleId) {
 /* ⑦ 정기적 투자금 배분 방식 결정 — 상품 선택보다 '매수 리듬(일/주/월)'을 고른다.
  *  추천 상품은 계좌별 월 투자금에 자동 배분하고, 사용자는 주기만 선택한다.
  *  결과(productAlloc)는 기존 종목 화면과 동일한 형식이라 확인 시트·주문에 그대로 이어진다. */
-export function AllocationPlan({ manualAccounts, income, age, taxPref = "growth", isaRollover = "isa1", perAccount = null, monthlyContribution = 0, years = 20, initialAlloc, onNext }) {
+export function AllocationPlan({ manualAccounts, income, age, taxPref = "growth", isaRollover = "isa1", liquidity = null, perAccount = null, monthlyContribution = 0, years = 20, initialAlloc, onNext }) {
   const { rooms } = useMemo(
-    () => buildAccountRooms({ mydata: true, manual: manualAccounts, income, age, monthlyContribution, taxPref, isaRollover, perAccount }),
-    [manualAccounts, income, age, monthlyContribution, taxPref, isaRollover, perAccount]
+    () => buildAccountRooms({ mydata: true, manual: manualAccounts, income, age, monthlyContribution, taxPref, isaRollover, liquidity, perAccount }),
+    [manualAccounts, income, age, monthlyContribution, taxPref, isaRollover, liquidity, perAccount]
   );
 
   // 추천 상품 자동 배분 — 계좌별 월 투자금을 그 계좌의 대표 추천 상품에 전액 배정

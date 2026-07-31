@@ -35,7 +35,7 @@ const MYDATA_LIST = Object.entries(MYDATA_ACCOUNTS).map(([engineId, a]) => ({
  * 사용자 변수(성향·월 불입·나이·전년도 금융/총소득)를 백엔드 전략 엔진
  * (POST /api/strategy, 파일 DB 기반 HPR)에 태워 결과를 렌더링한다.
  * 엔진 미기동 시에는 로컬(@devidend/core) 추정으로 폴백. */
-export function Accounts({ mode, nextLabel, years = 20, mydata, manualAccounts, answers, monthly, monthlyGoal, finIncome, income, age, taxPref = "growth", isaRollover = "isa1", perAccount = null, store, onLinked, onNext }) {
+export function Accounts({ mode, nextLabel, years = 20, mydata, manualAccounts, answers, monthly, monthlyGoal, finIncome, income, age, taxPref = "growth", isaRollover = "isa1", liquidity = null, perAccount = null, store, onLinked, onNext }) {
   const [view, setView] = useState("current");
   const [remote, setRemote] = useState(null);
   /* 마이데이터 연동은 이제 앞 단계(mydata)에서 끝나므로 여기선 두 가지 모드로만 쓰인다.
@@ -122,7 +122,7 @@ export function Accounts({ mode, nextLabel, years = 20, mydata, manualAccounts, 
   const saveAndNext = async () => {
     const contribution = scenario.gap > 0 ? requiredMonthly : 0;
     if (store?.enabled && contribution > 0) {
-      const { rooms, strategyCode } = buildAccountRooms({ mydata: true, manual: manualAccounts, income, age, monthlyContribution: contribution, taxPref, isaRollover, perAccount });
+      const { rooms, strategyCode } = buildAccountRooms({ mydata: true, manual: manualAccounts, income, age, monthlyContribution: contribution, taxPref, isaRollover, liquidity, perAccount });
       const byKind = rooms
         .filter((r) => (r.planMonthly || 0) > 0)
         .map((r) => {
@@ -288,6 +288,7 @@ export function Accounts({ mode, nextLabel, years = 20, mydata, manualAccounts, 
               age={age}
               taxPref={taxPref}
               isaRollover={isaRollover}
+              liquidity={liquidity}
               perAccount={perAccount}
               monthlyContribution={scenario.gap > 0 ? requiredMonthly : 0}
               etf={etf}

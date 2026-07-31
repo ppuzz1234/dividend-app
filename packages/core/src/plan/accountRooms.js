@@ -157,16 +157,18 @@ const ISA_REASON_GROWTH = {
   isa3: "전액 주식 투자가 가능하고 비과세·손익통산 혜택이 있어, 안전자산 30% 의무가 있는 IRP보다 유리해요.",
 };
 
-/** 전략 코드 직렬화 — 절세선호도 + ISA 세부전략을 한 문자열로 (예: "growth-isa1").
+/** 전략 코드 직렬화 — 절세선호도 + ISA 세부전략(+유동성)을 한 문자열로
+ * (예: "growth-isa1", 유동성 확보 전략은 "growth-isa2-liq").
  * plan_revisions.note 등 기존 text 필드에 그대로 실을 수 있다(스키마 변경 불요). */
-export function encodeStrategy({ taxPref = "growth", isaRollover = "isa1" } = {}) {
-  return `${taxPref}-${isaRollover}`;
+export function encodeStrategy({ taxPref = "growth", isaRollover = "isa1", liquidity = null } = {}) {
+  return `${taxPref}-${isaRollover}${liquidity === "short" ? "-liq" : ""}`;
 }
 
-/** 전략 코드 역직렬화 — 형식이 아니면 null (과거 데이터·자유 텍스트 안전) */
+/** 전략 코드 역직렬화 — 형식이 아니면 null (과거 데이터·자유 텍스트 안전).
+ * "-liq" 접미사가 없는 과거 코드는 liquidity:null 로 복원된다(하위 호환). */
 export function decodeStrategy(code) {
-  const m = /^(growth|refund)-(isa[123])$/.exec(String(code || "").trim());
-  return m ? { taxPref: m[1], isaRollover: m[2] } : null;
+  const m = /^(growth|refund)-(isa[123])(-liq)?$/.exec(String(code || "").trim());
+  return m ? { taxPref: m[1], isaRollover: m[2], liquidity: m[3] ? "short" : null } : null;
 }
 
 /** 계좌별 월 납입 한도 직렬화 — "isa=100,irp=0" (만원 단위, monthlyMax 만).
@@ -363,6 +365,14 @@ export function buildAccountRooms(input = {}) {
         "매년 소멸하는 세액공제 한도(연 600만)만 먼저 채워요. 직접 납입 공제(최대 16.5%)가 ISA 만기 이전 추가공제(실효 약 1.65%)보다 10배 커서, 나머지는 전부 ISA로 보내요.";
     }
   }
+  /* 자금 유동성 확보 전략 — scorePriority 의 liquidity 가중(ISA +30 / 연금계좌 −30)으로
+   * ISA 가 1순위로 올라오므로, 사유 문구도 유동성 관점으로 교체한다 */
+  if (liquidity === "short") {
+    reasons.isa =
+      "55세 전에 쓸 계획이 있는 자금이라, 언제든 인출할 수 있는 ISA부터 채워요. 만기 목돈은 재가입으로 비과세를 반복해요.";
+    reasons.pensionSavings = "세액공제 환급은 그대로 챙기되, 55세까지 잠기는 계좌라 ISA 다음에 채워요.";
+    reasons.irp = "안전자산 30% 의무에 55세 잠김까지 겹쳐, 세액공제 한도(300만)는 마지막에 채워요.";
+  }
   const DEDUCT_RATE = deductionRate(income); // 총급여 5,500만 이하 16.5%, 초과 13.2%
   // 수기 입력값 정규화 — 숫자면 {당해 기납 = 평가액} 으로 간주
   const norm = (v) =>
@@ -525,7 +535,7 @@ export function buildAccountRooms(input = {}) {
     monthlyContribution,
     taxPref,
     isaRollover,
-    strategyCode: encodeStrategy({ taxPref, isaRollover }),
+    strategyCode: encodeStrategy({ taxPref, isaRollover, liquidity }),
     priority: order,
     priorityScores: scored.scores, // 요소별 합산 점수 — 순위 산출 근거(디버그·설명용)
     autoLimits: auto, // 상황 기반 자동 금액 판단(allowDeduct·extraFactor) — 설명 UI 용
