@@ -45,6 +45,7 @@ export {
   encodePerAccount,
   decodePerAccount,
 } from "./plan/accountRooms.js";
+export { accountEligibility } from "./plan/eligibility.js";
 export { projectIsaRollover } from "./plan/isaRollover.js";
 export { buildStrategyComparison, PRODUCT_GROUP_LABELS } from "./plan/strategyTable.js";
 

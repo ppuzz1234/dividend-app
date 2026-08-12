@@ -34,8 +34,12 @@ export const MYDATA_ACCOUNTS = {
 export const MYDATA_PROFILE = {
   name: "고객", // 데모(목업) 사용자 닉네임 — 실 로그인 시 프로필 이름으로 대체됨
   age: 35,
-  financialIncomePrevYear: 10_000_000, // 전년도 금융소득
-  totalIncomePrevYear: 90_000_000, // 전년도 총소득
+  /* 소득 '종류' 분리 — 계좌 가입자격 판정에 필요:
+   * ISA 15~19세는 근로소득만 인정(사업·배당 불인정), IRP는 근로·사업소득 필요 */
+  earnedIncomePrevYear: 80_000_000, // 전년도 근로소득
+  businessIncomePrevYear: 0, // 전년도 사업소득
+  financialIncomePrevYear: 10_000_000, // 전년도 금융소득(이자+배당)
+  totalIncomePrevYear: 90_000_000, // 전년도 총소득 (= 근로 + 사업 + 금융)
 };
 
 /* (Phase 2) 실 마이데이터 응답 → 스냅샷 정규화 자리

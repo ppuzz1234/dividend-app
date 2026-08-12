@@ -35,7 +35,12 @@ export const DIVIDEND_TAX_CONST = {
   privatePensionSeparateRate: 0.165, // 사적연금 분리과세(지방 포함)
   privatePensionThreshold: 15_000_000, // 사적연금 연 1,500만 초과 시 종합과세/분리과세 선택
   pensionLowRate: 0.055, // 1,500만 이하 연금소득세(저율, 55~70세)
-  healthDependentIncomeLimit: 10_000_000, // 피부양자 소득요건: 연 1,000만 초과 시 지역가입자 전환
+  /* 피부양자 판정은 2단계 구조 —
+   * ① 산입 임계: 금융소득 연 1,000만 초과 시 '전액'이 소득에 산입 (이하면 0으로 침)
+   * ② 상실 임계: 산입된 종합소득 합계가 연 2,000만 초과 시 피부양자 자격 상실 → 지역가입자 전환 */
+  healthFinIncomeIncludeLimit: 10_000_000, // ① 금융소득 전액 산입 임계
+  healthDependentLossLimit: 20_000_000, // ② 피부양자 소득요건(상실 임계)
+  healthDependentIncomeLimit: 10_000_000, // (구 명칭 호환 — ①과 동일 값. 신규 코드는 위 두 키 사용)
   healthRegionalRate: 0.08, // 지역가입자 소득보험료+장기요양 합산 근사 요율
 };
 
@@ -66,10 +71,13 @@ function pensionIncomeTax(annual) {
   return Math.round(annual * C.privatePensionSeparateRate);
 }
 
-/** 지역가입자 건강보험료 추정 (소득 기준) */
+/** 지역가입자 건강보험료 추정 (소득 기준) — 다른 소득 없는 은퇴자(피부양자) 가정.
+ *  금융소득 1,000만 이하: 산입 자체가 안 되어 피부양자 유지(보험료 0)
+ *  1,000만~2,000만: 전액 산입되지만 소득요건(2,000만) 이내라 피부양자 유지(보험료 0)
+ *  2,000만 초과: 피부양자 상실 → 지역가입자 전환, 배당 전액에 약 8% 부과 */
 function generalHealthPremium(annual) {
   const C = DIVIDEND_TAX_CONST;
-  if (annual <= C.healthDependentIncomeLimit) return 0;
+  if (annual <= C.healthDependentLossLimit) return 0;
   return Math.round(annual * C.healthRegionalRate);
 }
 
@@ -104,7 +112,7 @@ export function compareDividendTax({ annualDividend = 0, age = 65 } = {}) {
     incomeTax: gIncomeTax,
     incomeTaxNote: overComp ? "금융소득종합과세(누진세율)" : "15.4% 분리과세",
     health: gHealth,
-    healthNote: gHealth > 0 ? "지역가입자 전환 · 소득 100% 반영" : "부과 없음",
+    healthNote: gHealth > 0 ? "피부양자 상실 · 지역가입자 전환" : "부과 없음 (피부양자 유지)",
     total: gTotal,
     net: gNet,
     effectiveRate: annual > 0 ? gTotal / annual : 0,
@@ -113,8 +121,10 @@ export function compareDividendTax({ annualDividend = 0, age = 65 } = {}) {
       ? "연 배당이 2,000만원을 넘으면 금융소득종합과세 대상이에요. 2,000만원까지는 14%(지방 포함 15.4%) 원천징수로 유지되지만, 초과분은 근로·사업 등 다른 소득과 합산되어 6~45% 누진세율로 과세되고 배당가산(Gross-up 11%)까지 붙어요. 소득이 커질수록 최고 49.5%(지방세 포함)까지 올라갈 수 있어요."
       : "연 2,000만원 이하 배당은 15.4%(소득세 14% + 지방소득세 1.4%) 원천징수로 분리과세돼요. 종합소득에 합산되지 않아 세율이 고정되고, 별도 신고 없이 정산이 끝나요.",
     healthLaw: gHealth > 0
-      ? "연 소득 1,000만원(피부양자 소득요건)을 넘으면 건강보험 피부양자 자격을 잃고 지역가입자로 전환돼요. 이때 배당소득 100%가 보험료 부과 대상이 되어, 소득보험료+장기요양보험료 합산 약 8%가 매년 추가로 부과돼요."
-      : "연 소득 1,000만원 이하라 건강보험 피부양자 자격이 유지돼, 배당에 대한 별도 건강보험료 부담이 없어요.",
+      ? "피부양자 소득요건은 2단계예요. 금융소득이 연 1,000만원을 넘으면 전액이 소득에 산입되고, 산입된 소득 합계가 2,000만원을 넘으면 피부양자 자격을 잃어 지역가입자로 전환돼요. 이때 배당소득 100%가 보험료 부과 대상이 되어 소득보험료+장기요양 합산 약 8%가 매년 추가로 부과돼요."
+      : annual > DIVIDEND_TAX_CONST.healthFinIncomeIncludeLimit
+        ? "금융소득이 연 1,000만원을 넘어 전액이 소득에 산입되지만, 합계가 피부양자 소득요건(연 2,000만원) 이내라 자격은 유지돼요. 단 다른 소득이 더해져 2,000만원을 넘는 순간 지역가입자로 전환되니 여유가 크지 않아요."
+        : "금융소득이 연 1,000만원 이하면 건보 소득 산정에 아예 잡히지 않아, 피부양자 자격이 안전하게 유지돼요.",
     savingPoint: "배당이 발생하는 시점에 즉시 과세되고 건보료까지 얹혀, 배당 규모가 커질수록 실효 부담이 가파르게 오르는 구조예요.",
   };
   const pension = {

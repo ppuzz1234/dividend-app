@@ -39,6 +39,9 @@ function ManualForm({ onNext, initial }) {
   const [age, setAge] = useState(initial?.age ? String(initial.age) : "");
   // 연소득(만원) — initial.income 은 원 단위라 만원으로 환산해 보여준다
   const [income, setIncome] = useState(initial?.income ? String(Math.round(initial.income / 10_000)) : "");
+  /* 금융소득(만원, 선택) — ISA 가입 제한(금소세)·피부양자 방어 판정에 쓰인다.
+   * 미입력은 0(금융소득 없음)으로 처리한다 */
+  const [finIncome, setFinIncome] = useState(initial?.finIncome ? String(Math.round(initial.finIncome / 10_000)) : "");
   const set = (id, v) => setValues((s) => ({ ...s, [id]: v }));
   const total = Object.values(values).reduce((s, v) => s + v, 0);
   const owned = ACCOUNTS.filter((a) => values[a.id] > 0);
@@ -46,10 +49,14 @@ function ManualForm({ onNext, initial }) {
 
   const submit = () => {
     if (!ready) return;
+    // 금융소득은 총소득을 넘을 수 없다 — 초과 입력은 총소득으로 클램프
+    const incomeWon = digits(income) * 10_000;
+    const finWon = Math.min(digits(finIncome) * 10_000, incomeWon);
     onNext?.({
       accounts: values,
       age: digits(age),
-      income: digits(income) * 10_000, // 만원 → 원
+      income: incomeWon, // 만원 → 원
+      finIncome: finWon,
     });
   };
 
@@ -106,9 +113,27 @@ function ManualForm({ onNext, initial }) {
             <span className={styles.unit}>만원</span>
           </div>
         </label>
+        <label className={cx(styles.field, finIncome.trim() !== "" && styles.fieldOn)}>
+          <span className={styles.fieldK}>
+            이 중 금융소득 (이자·배당, 선택)
+            <span className={styles.editBadge} aria-hidden="true">
+              <Pencil size={11} strokeWidth={2.6} />
+            </span>
+          </span>
+          <div className={styles.inputWrap}>
+            <input
+              className={styles.input}
+              inputMode="numeric"
+              value={finIncome ? Number(finIncome).toLocaleString() : ""}
+              onChange={(e) => setFinIncome(String(digits(e.target.value) || ""))}
+              placeholder="없으면 비워두세요"
+            />
+            <span className={styles.unit}>만원</span>
+          </div>
+        </label>
       </div>
       <p className={styles.hint2}>
-        <BadgeCheck size={12} /> 총급여 5,500만원 이하면 연금 세액공제율이 16.5%로 높아져요. 은퇴 정년은 60세로 계산돼요.
+        <BadgeCheck size={12} /> 총급여 5,500만원 이하면 연금 세액공제율이 16.5%로 높아져요. 금융소득이 연 2,000만원을 넘으면 ISA 가입이 제한돼요.
       </p>
 
       {/* 계좌 현황 — 올해 납입액(=현재 평가액 가정) */}

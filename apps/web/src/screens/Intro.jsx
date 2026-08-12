@@ -196,7 +196,7 @@ export function Intro({ onNext }) {
         className={cx(styles.scene, styles.sceneGoal, isIn(1) && styles.in)}
         style={sceneStyle}
       >
-        <p className={cx(styles.label, styles.labelGoal, styles.rise)} style={{ "--i": 0 }}>고객님의 목표 · 월 현금흐름</p>
+        <p className={cx(styles.label, styles.labelGoal, styles.rise)} style={{ "--i": 0 }}>나의 목표 · 월 현금흐름</p>
         <div className={cx(styles.figure, styles.rise)} style={{ "--i": 1 }}>
           <span className={styles.won}>월</span>
           <span className={styles.amount}>{amount.toLocaleString("ko-KR")}</span>

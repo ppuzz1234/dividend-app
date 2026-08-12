@@ -74,8 +74,8 @@ function analyze(r) {
       : filled
         ? `연 ${fmtKRW(r.limit)} 비과세 한도를 모두 활용하고 있어요.`
         : half
-          ? `비과세 한도의 절반 이상을 채웠어요. 남은 ${fmtKRW(r.room)}까지 더 담으면 순이익 200만원을 비과세로 받아요.`
-          : `이 계좌로 연 ${fmtKRW(r.limit)}까지 담아 순이익 200만원을 비과세로 받을 수 있어요.`;
+          ? `비과세 한도의 절반 이상을 채웠어요. 남은 ${fmtKRW(r.room)}까지 더 담으면 순이익 ${fmtKRW(r.taxFreeLimit ?? 2_000_000)}을 비과세로 받아요.`
+          : `이 계좌로 연 ${fmtKRW(r.limit)}까지 담아 순이익 ${fmtKRW(r.taxFreeLimit ?? 2_000_000)}을 비과세로 받을 수 있어요.`;
   return { level, note };
 }
 
@@ -108,10 +108,10 @@ function PenaltyOffsetChart() {
 /* ③ 3종 계좌 최적화 분석 — 상수(나이·소득) 기반 1차 산정을 상단에 보여주고,
  *  하단에서 개인 선호(절세선호도)를 고르면 납입 우선순위가 즉시 재정렬된다.
  *  여기서 고른 선호는 이후 단계(솔루션·배분·실행)의 금액 배분에도 그대로 반영된다. */
-export function AccountsAnalysis({ mydata, manualAccounts, income, age, taxPref = "growth", onTaxPref, isaRollover = "isa1", onIsaRollover, liquidity = null, onLiquidity, onPerAccount, onNext }) {
+export function AccountsAnalysis({ mydata, manualAccounts, income, finIncome = 0, age, taxPref = "growth", onTaxPref, isaRollover = "isa1", onIsaRollover, liquidity = null, onLiquidity, onPerAccount, onNext }) {
   const { rooms, priority } = useMemo(
-    () => buildAccountRooms({ mydata, manual: manualAccounts, income, age, monthlyContribution: 0, taxPref, isaRollover, liquidity }),
-    [mydata, manualAccounts, income, age, taxPref, isaRollover, liquidity]
+    () => buildAccountRooms({ mydata, manual: manualAccounts, income, finIncome, age, monthlyContribution: 0, taxPref, isaRollover, liquidity }),
+    [mydata, manualAccounts, income, finIncome, age, taxPref, isaRollover, liquidity]
   );
 
   const items = useMemo(

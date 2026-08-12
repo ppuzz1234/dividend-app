@@ -340,8 +340,9 @@ export default function App() {
           : null),
       age,
       income,
+      finIncome,
     }),
-    [manualAccounts, mydata, age, income]
+    [manualAccounts, mydata, age, income, finIncome]
   );
 
   /* 현재 보유 자산 — 수기 입력 합계 > 마이데이터 총액 > 기본 시드 */
@@ -457,13 +458,14 @@ export default function App() {
             linkMydata();
             go("accountsAnalysis");
           }}
-          onManualNext={({ accounts, age: inAge, income: inIncome }) => {
+          onManualNext={({ accounts, age: inAge, income: inIncome, finIncome: inFin = 0 }) => {
             setMydata(false); // 수기 입력이 최신 — 이후 계산은 연동 목업 대신 이 값을 쓴다
             setManualAccounts(accounts);
             saveManualAccounts(accounts); // DB(user_accounts, source='manual') 반영
-            store.saveProfile?.({ age: inAge, totalIncome: inIncome }); // profiles(age·total_income) 반영 — 미로그인·미설정은 no-op
+            store.saveProfile?.({ age: inAge, totalIncome: inIncome, finIncome: inFin }); // profiles 반영 — 미로그인·미설정은 no-op
             setAge(inAge);
             setIncome(inIncome);
+            setFinIncome(inFin); // 가입자격 게이트(금소세)·피부양자 방어 판정에 쓰인다
             go("accountsAnalysis");
           }}
         />
@@ -474,6 +476,7 @@ export default function App() {
           mydata={mydata}
           manualAccounts={manualAccounts}
           income={income}
+          finIncome={finIncome}
           age={age}
           taxPref={taxPref}
           onTaxPref={setTaxPref}
@@ -511,6 +514,7 @@ export default function App() {
         <AllocationPlan
           manualAccounts={manualAccounts}
           income={income}
+          finIncome={finIncome}
           age={age}
           taxPref={taxPref}
           isaRollover={isaRollover}
@@ -539,6 +543,7 @@ export default function App() {
           monthlyGoal={monthlyGoal}
           manualAccounts={manualAccounts}
           income={income}
+          finIncome={finIncome}
           taxPref={taxPref}
           isaRollover={isaRollover}
           liquidity={liquidity}

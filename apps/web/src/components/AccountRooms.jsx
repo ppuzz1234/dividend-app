@@ -57,8 +57,8 @@ const PLAN_VIEW_ORDER = TAB_ORDER;
  * 개설 안내) 내용을 합쳐 간결하게 재구성했다.
  * monthlyContribution 전달 시 — 절세 한도 waterfall 배분으로 "어느 계좌에 매달
  * 얼마를 납입할지"를 상단 스트립과 각 탭의 추천 카드로 보여준다. */
-export function AccountRooms({ mydata, manual, income, age, monthlyContribution = 0, taxPref = "growth", isaRollover = "isa1", liquidity = null, perAccount = null }) {
-  const { rooms, openable } = buildAccountRooms({ mydata, manual, income, age, monthlyContribution, taxPref, isaRollover, liquidity, perAccount });
+export function AccountRooms({ mydata, manual, income, finIncome = 0, age, monthlyContribution = 0, taxPref = "growth", isaRollover = "isa1", liquidity = null, perAccount = null }) {
+  const { rooms, openable } = buildAccountRooms({ mydata, manual, income, finIncome, age, monthlyContribution, taxPref, isaRollover, liquidity, perAccount });
   const ordered = TAB_ORDER.map((id) => rooms.find((r) => r.id === id)).filter(Boolean);
   const [tab, setTab] = useState(ordered[0].id);
   const room = ordered.find((r) => r.id === tab) || ordered[0];

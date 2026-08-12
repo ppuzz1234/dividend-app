@@ -122,7 +122,7 @@ export function Accounts({ mode, nextLabel, years = 20, mydata, manualAccounts, 
   const saveAndNext = async () => {
     const contribution = scenario.gap > 0 ? requiredMonthly : 0;
     if (store?.enabled && contribution > 0) {
-      const { rooms, strategyCode } = buildAccountRooms({ mydata: true, manual: manualAccounts, income, age, monthlyContribution: contribution, taxPref, isaRollover, liquidity, perAccount });
+      const { rooms, strategyCode } = buildAccountRooms({ mydata: true, manual: manualAccounts, income, finIncome, age, monthlyContribution: contribution, taxPref, isaRollover, liquidity, perAccount });
       const byKind = rooms
         .filter((r) => (r.planMonthly || 0) > 0)
         .map((r) => {
@@ -285,6 +285,7 @@ export function Accounts({ mode, nextLabel, years = 20, mydata, manualAccounts, 
               mydata
               manual={manualAccounts}
               income={income}
+              finIncome={finIncome}
               age={age}
               taxPref={taxPref}
               isaRollover={isaRollover}

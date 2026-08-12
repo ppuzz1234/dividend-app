@@ -7,10 +7,11 @@
  *  · 한도·세액공제 파라미터는 accountProfiles(ACCOUNT_PROFILES) 기준
  *  · 보유·납입 현황은 MYDATA_ACCOUNTS(engine id: general/isa/pension)에서 매핑
  * ------------------------------------------------------------------ */
-import { MYDATA_ACCOUNTS } from "../holdings/snapshot.js";
+import { MYDATA_ACCOUNTS, MYDATA_PROFILE } from "../holdings/snapshot.js";
 import { deductionRate } from "../knowledge/accounts.js";
 import { ETF_BENCHMARKS } from "../knowledge/etfBenchmarks.js";
 import { projectIsaRollover } from "./isaRollover.js";
+import { accountEligibility } from "./eligibility.js";
 
 // 롤오버 전망 수익률 — 시나리오와 동일한 벤치마크(PLUS 미국S&P500) 가정치 사용
 const PLAN_CAGR = ETF_BENCHMARKS[0]?.cagrRef ?? 0.07;
@@ -204,6 +205,9 @@ function normalizeRoomsInput(o = {}) {
         manual: o.ledger?.accounts ?? null,
         income: o.profile?.income,
         age: o.profile?.age,
+        earnedIncome: o.profile?.earnedIncome,
+        businessIncome: o.profile?.businessIncome,
+        finIncome: o.profile?.finIncome,
         monthlyContribution: o.contribution?.monthly,
         taxPref: o.strategy?.taxPref,
         isaRollover: o.strategy?.isaRollover,
@@ -217,6 +221,9 @@ function normalizeRoomsInput(o = {}) {
     manual: flat.manual ?? null,
     income: flat.income ?? 50_000_000,
     age: flat.age ?? null,
+    earnedIncome: flat.earnedIncome ?? null,
+    businessIncome: flat.businessIncome ?? null,
+    finIncome: flat.finIncome ?? null,
     monthlyContribution: flat.monthlyContribution ?? 0,
     taxPref: flat.taxPref ?? "growth",
     isaRollover: flat.isaRollover ?? "isa1",
@@ -248,9 +255,11 @@ function sanitizeOrder(override, baseOrder) {
  * refund: 연금저축→IRP→ISA)를 정확히 재현하도록 보정된 휴리스틱 값이다. */
 const EFFECTIVE_DEDUCT_INCOME_MIN = 15_000_000; // 결정세액 근사 — 이하면 공제 환급 실효 없음(근로소득 면세점 부근)
 
-function scorePriority({ rooms, taxPref, isaRollover, income, age, liquidity }) {
+function scorePriority({ rooms, taxPref, isaRollover, income, workIncome, age, liquidity, defense = false, pensionOnly = false, noWorkIncome = false }) {
   const rate = deductionRate(income);
-  const noTaxBenefit = (income || 0) < EFFECTIVE_DEDUCT_INCOME_MIN;
+  /* 공제 실효 판정은 근로·사업소득 기준 — 금융소득 분리과세는 결정세액을 만들지
+   * 않아 세액공제 환급이 불가하다(금융소득만 있는 은퇴자·주부가 여기 해당) */
+  const noTaxBenefit = (workIncome ?? income ?? 0) < EFFECTIVE_DEDUCT_INCOME_MIN;
   const wRefund = taxPref === "refund" ? 3 : 1;
   const wGrowth = taxPref === "refund" ? 1 : 3;
   const locked = age != null && age >= 55 ? 0 : 1; // 55세 이상이면 연금계좌 잠김 부담 없음
@@ -259,7 +268,11 @@ function scorePriority({ rooms, taxPref, isaRollover, income, age, liquidity }) 
     pensionSavings: {
       refund: noTaxBenefit ? 0 : rate * 100,
       growth: 100,
-      lock: noTaxBenefit ? -40 * locked : 0,
+      /* defense(무소득 + 금융소득 산입 임계 근접): 잠김 페널티 대신 가점 —
+       * 계좌 안의 배당은 소득으로 안 잡혀 피부양자 방어 가치가 잠김 비용을 상회.
+       * pensionOnly(ISA 가입 불가로 절세 대안이 연금저축뿐): "잠김 대비 보상 없음"
+       * 페널티는 ISA 라는 대체 절세처가 있을 때만 유효하므로 마찬가지로 가점 */
+      lock: defense || pensionOnly ? 20 : noTaxBenefit ? -40 * locked : 0,
     },
     isa: {
       refund: !noTaxBenefit && isaRollover === "isa1" ? 5 : 0, // 만기 이전 10% 추가공제의 연 환산 근사
@@ -277,6 +290,16 @@ function scorePriority({ rooms, taxPref, isaRollover, income, age, liquidity }) 
     factors.pensionSavings.lock -= 30 * locked;
     factors.irp.lock -= 30 * locked;
   }
+  if (defense) {
+    /* 피부양자 방어 — ISA·연금저축 모두 배당을 '소득'에서 빼내는 방어 계좌지만,
+     * 공제 슬라이스가 막힌 연금저축(비공제 전용)보다 비과세+유동성의 ISA 를 앞세운다.
+     * 연금저축은 ISA 한도를 넘는 금액의 2순위 방어처(비공제 추가납입). */
+    factors.isa.lock += 60;
+  } else if (noWorkIncome) {
+    /* 무소득자(주부·은퇴자) 기본 전략 — 유동성 있는 ISA 1순위, 연금저축 2순위.
+     * 55세 이상은 잠김 페널티가 0이라 연금저축이 역전할 수 있어 가점으로 고정한다 */
+    factors.isa.lock += 40;
+  }
 
   const base = PLAN_ORDERS[taxPref] ?? PLAN_ORDERS.growth; // 동점 시 프리셋 순서 유지
   const roomOf = (id) => rooms.find((r) => r.id === id)?.room ?? 0;
@@ -291,14 +314,26 @@ function scorePriority({ rooms, taxPref, isaRollover, income, age, liquidity }) 
   return { order, scores, noTaxBenefit };
 }
 
-/* 순위 근거 문구 — 동적 상황(한도 소진·공제 실효 없음)이 프리셋 문구보다 우선 */
-function priorityReasonFor(id, { rooms, reasons, noTaxBenefit }) {
+/* 순위 근거 문구 — 동적 상황(자격 없음·한도 소진·공제 실효 없음)이 프리셋 문구보다 우선 */
+function priorityReasonFor(id, { rooms, reasons, noTaxBenefit, defense, pensionOnly, noWorkIncome, isaSeomin }) {
   const r = rooms.find((x) => x.id === id);
+  if (r && r.eligible === false) return r.ineligibleReason; // 가입자격 없음 — 최우선 안내
   if (r && r.roomType !== "none" && (r.room ?? 0) <= 0) return "올해 납입 한도를 모두 채워서, 남은 계좌부터 담아요.";
   if (noTaxBenefit) {
-    if (id === "isa") return "세액공제와 무관한 비과세 계좌라, 공제 효과가 없는 상황에서 가장 유리해요.";
-    if (id === "pensionSavings" || id === "irp")
+    if (id === "isa")
+      return isaSeomin
+        ? "세액공제와 무관한 비과세 계좌인 데다 3년 뒤부터 유동성도 확보돼, 공제 효과가 없는 상황에서 1순위예요. 서민형 가입 대상이라 비과세 한도도 400만원으로 2배예요."
+        : "세액공제와 무관한 비과세 계좌인 데다 3년 뒤부터 유동성도 확보돼, 공제 효과가 없는 상황에서 1순위예요.";
+    if (id === "pensionSavings") {
+      if (defense)
+        return "소득이 없어 세액공제는 없지만, 계좌 안에서 받는 배당은 소득으로 잡히지 않아요. 금융소득 산입(연 1,000만)·피부양자 상실(연 2,000만) 임계를 피하는 비공제 납입처로 활용해요.";
+      if (pensionOnly)
+        return "ISA·IRP는 가입 요건이 안 되어, 나이·소득 제한이 없는 연금저축이 유일한 절세 계좌예요. 세액공제는 없지만 과세이연과 55세 이후 저율 연금소득세 이점을 위해 우선 담아요.";
+      if (noWorkIncome)
+        return "근로소득이 없어 세액공제 환급은 없지만, ISA 다음 2순위 절세처예요. 과세이연과 55세 이후 저율 연금소득세(3.3~5.5%) 이점이 있어요.";
       return "소득이 적어 세액공제 환급이 없어요. 55세까지 잠기는 부담만 남아 지금은 담지 않아요.";
+    }
+    if (id === "irp") return "소득이 적어 세액공제 환급이 없어요. 55세까지 잠기는 부담만 남아 지금은 담지 않아요.";
   }
   return reasons[id];
 }
@@ -311,14 +346,25 @@ function priorityReasonFor(id, { rooms, reasons, noTaxBenefit }) {
  *  · 비공제 연금 추가납입(4단계): 과세이연뿐이라 보상이 약함 — 55세까지 남은
  *    기간이 짧을수록 많이 허용한다(≤5년 전액 / ≤10년 절반 / ≤15년 1/4 / 그 외 0).
  *    유동성 단기 선호(liquidity==="short")면 0. 넘치는 금액은 ISA·일반으로 흐른다. */
-function deriveAutoLimits({ age, noTaxBenefit, liquidity }) {
+function deriveAutoLimits({ age, noTaxBenefit, liquidity, defense = false, pensionOnly = false, noWorkIncome = false }) {
   const t = age == null ? 15 : Math.max(0, 55 - age); // 나이 미상 → 40세 상당으로 보수 추정
   const lockedNoReward = noTaxBenefit && t > 0; // 공제 보상 없이 잠김만 남는 상황
+  /* defense(무소득 + 금융소득이 피부양자 임계 근접): 공제 보상이 없어도
+   * 과세이연·건보 산정 제외가 잠김을 보상 → 비공제 납입을 오히려 넉넉히 허용.
+   * pensionOnly(ISA 불가로 절세 대안이 연금저축뿐 — 미성년·무소득 등)와
+   * noWorkIncome(무소득 주부·은퇴자 — ISA 1순위, 연금저축 2순위 기본 전략):
+   * 일반계좌 대비 과세이연·저율 연금소득세가 잠김을 보상하므로 동일하게 허용한다 */
   const extraFactor =
-    liquidity === "short" || lockedNoReward ? 0 : t <= 5 ? 1 : t <= 10 ? 0.5 : t <= 15 ? 0.25 : 0;
+    liquidity === "short" ? 0
+      : defense || pensionOnly || noWorkIncome ? (t <= 5 ? 1 : t <= 10 ? 0.75 : 0.5)
+      : lockedNoReward ? 0
+      : t <= 5 ? 1 : t <= 10 ? 0.5 : t <= 15 ? 0.25 : 0;
   return {
     allowDeduct: !lockedNoReward, // false 면 연금저축·IRP 공제 슬라이스도 담지 않는다
     extraFactor, // 비공제 추가납입 허용 비율(잔여 납입한도 대비)
+    defense, // 피부양자 방어 모드 — 문구 분기용
+    pensionOnly, // 연금저축 단독 절세 모드 — 문구 분기용
+    noWorkIncome, // 무소득자(주부·은퇴자) 기본 전략 — 문구 분기용
   };
 }
 
@@ -343,8 +389,31 @@ function deriveAutoLimits({ age, noTaxBenefit, liquidity }) {
  * @returns 4계좌 room 목록 + 요약 (+ priority: 우선순위 id 배열, strategyCode: "growth-isa1" 형식)
  */
 export function buildAccountRooms(input = {}) {
-  const { mydata, manual, income, age, liquidity, monthlyContribution, taxPref, isaRollover, priorityOverride, perAccount } =
+  const { mydata, manual, income, age, liquidity, monthlyContribution, taxPref, isaRollover, priorityOverride, perAccount, earnedIncome, businessIncome, finIncome } =
     normalizeRoomsInput(input);
+  /* 소득 종류·금융소득 해석 — 호출부(사용자 입력)가 최우선.
+   * 금융소득(finIncome)이 명시되면 총소득에서 금융소득을 뺀 나머지를 근로소득으로
+   * 근사한다(수기 입력은 종류 미상이라 근사). 소득 종류가 하나도 지정되지 않은
+   * 마이데이터 연동 호출에만 목업 프로필로 보충한다(레거시 호환) — 그렇지 않으면
+   * mydata 플래그가 사용자 입력(나이·소득)을 목업 소득으로 덮어써 가입자격
+   * 게이트·피부양자 방어 판정이 입력과 무관하게 나온다. */
+  const useMockProfile = mydata && earnedIncome == null && businessIncome == null && finIncome == null;
+  const fin = finIncome ?? (useMockProfile ? MYDATA_PROFILE.financialIncomePrevYear : 0);
+  const business = businessIncome ?? (useMockProfile ? MYDATA_PROFILE.businessIncomePrevYear : 0);
+  const earned = earnedIncome ?? (useMockProfile ? MYDATA_PROFILE.earnedIncomePrevYear : Math.max(0, (income || 0) - fin));
+  /* 공제 실효 판정은 근로·사업소득 기준 — 금융소득 분리과세는 결정세액을 만들지
+   * 않아 세액공제 환급이 불가하다(총소득이 커도 금융소득뿐이면 환급 실효 없음) */
+  const workIncome = earned + business;
+  const noDeduct = workIncome < EFFECTIVE_DEDUCT_INCOME_MIN; // 결정세액 근사 — 공제 환급 실효 없음
+  const noWorkIncome = workIncome <= 0; // 무소득자(주부·은퇴자) — ISA 1순위·연금저축 2순위 기본 전략
+  /* 서민형 ISA 판정(근사) — 직전년도 총급여 5,000만 이하 근로자 또는 종합소득
+   * 3,800만 이하 사업자. 무소득자(주부·은퇴자)도 소득확인증명으로 가입 대상.
+   * 서민형은 비과세 한도가 200만 → 400만으로 2배 */
+  const isaSeomin = earned <= 50_000_000 && business <= 38_000_000;
+  const ISA_TAXFREE_LIMIT = isaSeomin ? 4_000_000 : 2_000_000;
+  /* 피부양자 방어 모드 — 무소득(공제 실효 없음)인데 금융소득이 전액 산입
+   * 임계(연 1,000만)에 걸리는 상황: 비공제 연금저축이 배당을 '소득'에서 빼낸다 */
+  const defense = noDeduct && fin >= 10_000_000;
   /* 프리셋 문구(선호·ISA 세부전략 반영) — 순서 자체는 rooms 산출 뒤
    * scorePriority 가 요소별 점수로 동적으로 계산한다(연금저축 1순위 고정 없음). */
   const reasons = { ...PLAN_REASONS.common, ...(PLAN_REASONS[taxPref] ?? PLAN_REASONS.growth) };
@@ -410,11 +479,13 @@ export function buildAccountRooms(input = {}) {
         : pensionUsed[d.id] || 0;
     const room = Math.max(0, d.limit - used);
     const pct = d.limit > 0 ? Math.min(100, (used / d.limit) * 100) : 0;
-    const estRefund = d.roomType === "deduct" ? Math.round(room * DEDUCT_RATE) : 0;
+    // 공제 실효가 없는 저·무소득자는 환급 추정 0 (결정세액이 없어 돌려받을 세금이 없음)
+    const effRate = noDeduct ? 0 : DEDUCT_RATE;
+    const estRefund = d.roomType === "deduct" ? Math.round(room * effRate) : 0;
     // 이 계좌를 한도(limit)까지 다 채웠을 때 매년 받는 총 세액공제 환급액 (여력이 아닌 총액 기준)
-    const maxRefund = d.roomType === "deduct" ? Math.round(d.limit * DEDUCT_RATE) : 0;
-    // 예상 절세효과 — 연금계좌: 세액공제 환급, ISA: 비과세 한도(200만) 상당의 절세액
-    const estSaving = d.roomType === "deduct" ? estRefund : d.id === "isa" ? Math.round(2_000_000 * 0.154) : 0;
+    const maxRefund = d.roomType === "deduct" ? Math.round(d.limit * effRate) : 0;
+    // 예상 절세효과 — 연금계좌: 세액공제 환급, ISA: 비과세 한도(일반 200만·서민형 400만) 상당의 절세액
+    const estSaving = d.roomType === "deduct" ? estRefund : d.id === "isa" ? Math.round(ISA_TAXFREE_LIMIT * 0.154) : 0;
 
     return {
       ...d,
@@ -430,16 +501,38 @@ export function buildAccountRooms(input = {}) {
       estRefund,
       maxRefund,
       estSaving,
+      // ISA 전용 — 서민형 여부와 적용 비과세 한도(UI 문구·절세액 표기용)
+      ...(d.id === "isa" && { seomin: isaSeomin, taxFreeLimit: ISA_TAXFREE_LIMIT }),
     };
   });
 
+  /* 가입자격 게이트 — 무소득자·미성년자 등: 자격 없는 계좌는 여력 0 처리
+   * (배분·순위에서 자동 최하위) + 개설 추천 대상에서도 제외한다 */
+  const elig = accountEligibility({ age, earnedIncome: earned, businessIncome: business, finIncome: fin });
+  for (const r of rooms) {
+    const e = elig[r.id] || { eligible: true };
+    r.eligible = e.eligible;
+    if (!e.eligible) {
+      r.ineligibleReason = e.reason;
+      r.room = 0;
+      r.roomText = "가입 대상 아님";
+      r.estRefund = 0;
+      r.maxRefund = 0;
+      r.estSaving = 0;
+    }
+  }
+
+  /* 연금저축 단독 절세 모드 — ISA 가입이 불가(미성년·금소세 등)하고 연금저축만
+   * 열려 있으면, 공제 실효가 없어도 연금저축 비공제 납입을 일반계좌보다 앞세운다 */
+  const pensionOnly = elig.isa?.eligible === false && elig.pensionSavings?.eligible !== false;
+
   /* 동적 우선순위 — 선호·소득(공제 실효)·나이(잠김)·유동성·한도 소진을 점수로 합산.
    * 수동 오버라이드(priorityOverride)가 있으면 그것이 최우선. */
-  const scored = scorePriority({ rooms, taxPref, isaRollover, income, age, liquidity });
+  const scored = scorePriority({ rooms, taxPref, isaRollover, income, workIncome, age, liquidity, defense, pensionOnly, noWorkIncome });
   const order = priorityOverride ? sanitizeOrder(priorityOverride, scored.order) : scored.order;
-  const reasonFor = (id) => priorityReasonFor(id, { rooms, reasons, noTaxBenefit: scored.noTaxBenefit });
+  const reasonFor = (id) => priorityReasonFor(id, { rooms, reasons, noTaxBenefit: scored.noTaxBenefit, defense, pensionOnly, noWorkIncome, isaSeomin });
   // 상황 기반 자동 금액 한도 — 순서와 함께 "각 계좌에 얼마까지"도 엔진이 판단
-  const auto = deriveAutoLimits({ age, noTaxBenefit: scored.noTaxBenefit, liquidity });
+  const auto = deriveAutoLimits({ age, noTaxBenefit: scored.noTaxBenefit, liquidity, defense, pensionOnly, noWorkIncome });
 
   // 월 불입 배분 — 우선순위대로 남은 여력(연)까지 waterfall 로 흘려 담는다
   if (monthlyContribution > 0) {
@@ -495,10 +588,15 @@ export function buildAccountRooms(input = {}) {
     const extra = Math.max(0, Math.min(rem, extraAllowed));
     if (ps && extra > 0) {
       ps.planExtraAnnual = extra;
-      ps.planExtraReason =
-        auto.extraFactor < 1
-          ? `${reasons.pensionExtra} 55세까지 잠기는 기간을 고려해 잔여 한도의 일부만 담아요.`
-          : reasons.pensionExtra;
+      ps.planExtraReason = auto.defense
+        ? "세액공제 없이도 과세이연·건보료 산정 제외 효과는 동일해요. 배당을 '소득'에서 빼내 피부양자 자격을 지키는 비공제 납입이에요."
+        : auto.pensionOnly
+          ? "ISA·IRP는 가입 요건이 안 되어 연금저축이 유일한 절세 계좌예요. 세액공제는 없지만 과세이연과 55세 이후 저율 연금소득세 이점이 있는 비공제 납입이에요."
+          : auto.noWorkIncome
+            ? "근로소득이 없어 세액공제는 없지만, ISA 한도를 채운 뒤의 2순위 절세처예요. 과세이연과 55세 이후 저율 연금소득세 이점이 있는 비공제 납입이에요."
+            : auto.extraFactor < 1
+              ? `${reasons.pensionExtra} 55세까지 잠기는 기간을 고려해 잔여 한도의 일부만 담아요.`
+              : reasons.pensionExtra;
     }
     rem -= extra;
 
@@ -524,8 +622,8 @@ export function buildAccountRooms(input = {}) {
   for (const r of rooms) r.priorityReason = reasonFor(r.id);
 
   const totalRefund = rooms.reduce((s, r) => s + (r.estRefund || 0), 0);
-  // 개설 추천 대상 — 연동됐으나 미보유(held===false)인 절세계좌 (일반계좌는 제외)
-  const openable = rooms.filter((r) => r.held === false && r.recommend).map((r) => r.name);
+  // 개설 추천 대상 — 연동됐으나 미보유(held===false)인 절세계좌 (일반계좌·가입자격 없는 계좌 제외)
+  const openable = rooms.filter((r) => r.held === false && r.recommend && r.eligible !== false).map((r) => r.name);
 
   return {
     rooms,
@@ -538,7 +636,8 @@ export function buildAccountRooms(input = {}) {
     strategyCode: encodeStrategy({ taxPref, isaRollover, liquidity }),
     priority: order,
     priorityScores: scored.scores, // 요소별 합산 점수 — 순위 산출 근거(디버그·설명용)
-    autoLimits: auto, // 상황 기반 자동 금액 판단(allowDeduct·extraFactor) — 설명 UI 용
+    autoLimits: auto, // 상황 기반 자동 금액 판단(allowDeduct·extraFactor·defense) — 설명 UI 용
+    eligibility: elig, // 계좌별 가입자격 판정 결과 — 안내 UI 용
   };
 }
 
