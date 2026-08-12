@@ -215,6 +215,10 @@
   font-size: 12.5px;
   color: var(--sub);
 }
+/* 비포함 고지의 제목줄 — 본문과 같은 밝기면 고지가 눈에 안 들어온다 */
+.thread :global(.notice b) {
+  color: var(--text);
+}
 .thread :global(.notice-strong) {
   margin: 12px 0;
   padding-left: 12px;
