@@ -34,28 +34,43 @@ export function MydataStep({ isDemo, name, onDemoLink, onManualNext, forceManual
   return <ManualForm onNext={onManualNext} initial={initial} />;
 }
 
+/* 소득 유형 칩 — "얼마"보다 "어떤 소득"을 먼저 물어 총소득/금융소득 포함관계
+ * 혼동을 없앤다. 유형에 따라 필요한 금액 필드만 노출된다 */
+const INCOME_TYPES = [
+  { id: "none", label: "없음" },
+  { id: "work", label: "근로 · 사업" },
+  { id: "fin", label: "금융 (이자·배당)" },
+  { id: "mixed", label: "섞여 있어요" },
+];
+
 function ManualForm({ onNext, initial }) {
   const [values, setValues] = useState({ isa: 0, pensionSavings: 0, irp: 0, general: 0, ...(initial?.accounts || {}) });
   const [age, setAge] = useState(initial?.age ? String(initial.age) : "");
-  // 연소득(만원) — initial.income 은 원 단위라 만원으로 환산해 보여준다
-  const [income, setIncome] = useState(initial?.income ? String(Math.round(initial.income / 10_000)) : "");
-  /* 금융소득(만원, 선택) — ISA 가입 제한(금소세)·피부양자 방어 판정에 쓰인다.
-   * 미입력은 0(금융소득 없음)으로 처리한다 */
-  const [finIncome, setFinIncome] = useState(initial?.finIncome ? String(Math.round(initial.finIncome / 10_000)) : "");
+  // 재설계 진입 시 기존 소득값에서 유형·금액 역산 (원 → 만원)
+  const initInc = initial?.income || 0;
+  const initFin = initial?.finIncome || 0;
+  const [incomeType, setIncomeType] = useState(
+    initInc <= 0 ? "none" : initFin >= initInc ? "fin" : initFin > 0 ? "mixed" : "work"
+  );
+  const [workAmt, setWorkAmt] = useState(initInc > initFin ? String(Math.round((initInc - initFin) / 10_000)) : "");
+  const [finAmt, setFinAmt] = useState(initFin > 0 ? String(Math.round(initFin / 10_000)) : "");
   const set = (id, v) => setValues((s) => ({ ...s, [id]: v }));
   const total = Object.values(values).reduce((s, v) => s + v, 0);
   const owned = ACCOUNTS.filter((a) => values[a.id] > 0);
-  const ready = age.trim() !== "" && income.trim() !== "";
+  // 나이만 필수 — 소득 유형 기본값(없음)이라 무소득 주부·은퇴자·미성년은 바로 진행
+  const ready = age.trim() !== "";
 
   const submit = () => {
     if (!ready) return;
-    // 금융소득은 총소득을 넘을 수 없다 — 초과 입력은 총소득으로 클램프
-    const incomeWon = digits(income) * 10_000;
-    const finWon = Math.min(digits(finIncome) * 10_000, incomeWon);
+    // 유형별로 총소득·금융소득을 합산 — 포함관계 계산을 사용자 대신 여기서 처리
+    const w = digits(workAmt) * 10_000; // 만원 → 원
+    const f = digits(finAmt) * 10_000;
+    const finWon = incomeType === "fin" ? f : incomeType === "mixed" ? f : 0;
+    const incomeWon = incomeType === "work" ? w : incomeType === "fin" ? f : incomeType === "mixed" ? w + f : 0;
     onNext?.({
       accounts: values,
       age: digits(age),
-      income: incomeWon, // 만원 → 원
+      income: incomeWon,
       finIncome: finWon,
     });
   };
@@ -64,7 +79,7 @@ function ManualForm({ onNext, initial }) {
     <Pad
       footer={
         <Button onClick={submit} icon={ArrowRight} disabled={!ready}>
-          {ready ? "이 정보로 계좌 분석하기" : "나이·연소득을 입력해 주세요"}
+          {ready ? "이 정보로 계좌 분석하기" : "나이를 입력해 주세요"}
         </Button>
       }
     >
@@ -72,8 +87,8 @@ function ManualForm({ onNext, initial }) {
         내 정보 직접 입력
       </Heading>
 
-      {/* 나이 · 연소득 — 계좌 최적화 가설과 투자기간(60−나이) 산정에 쓰는 필수 입력이라 맨 위에 배치 */}
-      <div className={styles.sectionLabel}>나이 · 연소득</div>
+      {/* 나이 — 계좌 최적화 가설과 투자기간(60−나이) 산정에 쓰는 필수 입력이라 맨 위에 배치 */}
+      <div className={styles.sectionLabel}>나이 · 전년도 소득</div>
       <div className={styles.fields}>
         <label className={cx(styles.field, age.trim() !== "" && styles.fieldOn)}>
           <span className={styles.fieldK}>
@@ -93,47 +108,77 @@ function ManualForm({ onNext, initial }) {
             <span className={styles.unit}>세</span>
           </div>
         </label>
-        <label className={cx(styles.field, income.trim() !== "" && styles.fieldOn)}>
-          <span className={styles.fieldK}>
-            전년도 연소득
-            <span className={styles.editBadge} aria-hidden="true">
-              <Pencil size={11} strokeWidth={2.6} />
-            </span>
-          </span>
-          <div className={styles.inputWrap}>
-            <input
-              className={styles.input}
-              inputMode="numeric"
-              /* 표시만 천단위 콤마 — 상태(income)는 숫자 문자열 그대로 유지하고,
-               * onChange 의 digits() 가 콤마를 걷어내 파싱하므로 로직은 그대로다 */
-              value={income ? Number(income).toLocaleString() : ""}
-              onChange={(e) => setIncome(String(digits(e.target.value) || ""))}
-              placeholder="예) 9,000"
-            />
-            <span className={styles.unit}>만원</span>
-          </div>
-        </label>
-        <label className={cx(styles.field, finIncome.trim() !== "" && styles.fieldOn)}>
-          <span className={styles.fieldK}>
-            이 중 금융소득 (이자·배당, 선택)
-            <span className={styles.editBadge} aria-hidden="true">
-              <Pencil size={11} strokeWidth={2.6} />
-            </span>
-          </span>
-          <div className={styles.inputWrap}>
-            <input
-              className={styles.input}
-              inputMode="numeric"
-              value={finIncome ? Number(finIncome).toLocaleString() : ""}
-              onChange={(e) => setFinIncome(String(digits(e.target.value) || ""))}
-              placeholder="없으면 비워두세요"
-            />
-            <span className={styles.unit}>만원</span>
-          </div>
-        </label>
       </div>
+
+      {/* 소득 유형 칩 — 유형을 먼저 고르면 필요한 금액 필드만 나타난다 */}
+      <div className={styles.chipLabel}>전년도에 어떤 소득이 있으셨나요?</div>
+      <div className={styles.chips} role="radiogroup" aria-label="전년도 소득 유형">
+        {INCOME_TYPES.map((t) => (
+          <button
+            key={t.id}
+            type="button"
+            role="radio"
+            aria-checked={incomeType === t.id}
+            className={cx(styles.chip, incomeType === t.id && styles.chipOn)}
+            onClick={() => setIncomeType(t.id)}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {incomeType !== "none" && (
+        <div className={styles.fields} style={{ marginTop: 10 }}>
+          {(incomeType === "work" || incomeType === "mixed") && (
+            <label className={cx(styles.field, workAmt.trim() !== "" && styles.fieldOn)}>
+              <span className={styles.fieldK}>
+                {incomeType === "mixed" ? "근로 · 사업소득" : "연소득 (근로 · 사업)"}
+                <span className={styles.editBadge} aria-hidden="true">
+                  <Pencil size={11} strokeWidth={2.6} />
+                </span>
+              </span>
+              <div className={styles.inputWrap}>
+                <input
+                  className={styles.input}
+                  inputMode="numeric"
+                  /* 표시만 천단위 콤마 — 상태는 숫자 문자열 그대로, digits() 가 콤마를 걷어낸다 */
+                  value={workAmt ? Number(workAmt).toLocaleString() : ""}
+                  onChange={(e) => setWorkAmt(String(digits(e.target.value) || ""))}
+                  placeholder="예) 5,000"
+                />
+                <span className={styles.unit}>만원</span>
+              </div>
+            </label>
+          )}
+          {(incomeType === "fin" || incomeType === "mixed") && (
+            <label className={cx(styles.field, finAmt.trim() !== "" && styles.fieldOn)}>
+              <span className={styles.fieldK}>
+                금융소득 (이자 · 배당)
+                <span className={styles.editBadge} aria-hidden="true">
+                  <Pencil size={11} strokeWidth={2.6} />
+                </span>
+              </span>
+              <div className={styles.inputWrap}>
+                <input
+                  className={styles.input}
+                  inputMode="numeric"
+                  value={finAmt ? Number(finAmt).toLocaleString() : ""}
+                  onChange={(e) => setFinAmt(String(digits(e.target.value) || ""))}
+                  placeholder="예) 300"
+                />
+                <span className={styles.unit}>만원</span>
+              </div>
+            </label>
+          )}
+        </div>
+      )}
       <p className={styles.hint2}>
-        <BadgeCheck size={12} /> 총급여 5,500만원 이하면 연금 세액공제율이 16.5%로 높아져요. 금융소득이 연 2,000만원을 넘으면 ISA 가입이 제한돼요.
+        <BadgeCheck size={12} />
+        {incomeType === "none"
+          ? "소득이 없어도 ISA 비과세(서민형 400만원)와 연금저축은 활용할 수 있어요."
+          : incomeType === "fin"
+            ? "금융소득이 연 2,000만원을 넘으면 ISA 가입이 제한돼요."
+            : "총급여 5,500만원 이하면 연금 세액공제율이 16.5%로 높아져요."}
       </p>
 
       {/* 계좌 현황 — 올해 납입액(=현재 평가액 가정) */}
