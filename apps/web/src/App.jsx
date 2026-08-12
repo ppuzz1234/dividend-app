@@ -3,6 +3,7 @@ import { ChromeBody } from "./components/layout/ChromeBody.jsx";
 import { PlainShell } from "./components/layout/PlainShell.jsx";
 import { PhoneShell } from "./components/layout/PhoneShell.jsx";
 import { STEPS, STAGE, NO_HEADER } from "./lib/flow.js";
+import { CubeCopilot } from "./components/cube/CubeCopilot.jsx";
 import {
   STOCKS,
   simulatePortfolio,
@@ -527,5 +528,11 @@ export default function App() {
     </ChromeBody>
   );
 
-  return framed ? <PhoneShell>{body}</PhoneShell> : <PlainShell inset={deviceInset}>{body}</PlainShell>;
+  // 세법 팩트 코파일럿 — 셸의 자식으로 넣는다. PhoneShell 이 transform: scale() 을 쓰므로
+  // body 로 포탈하면 ?frame=1 에서 베젤 밖으로 튀어나온다. (VITE_CUBE_API_BASE 비면 렌더 안 됨)
+  const cube = <CubeCopilot step={step} framed={framed} />;
+
+  return framed
+    ? <PhoneShell>{body}{cube}</PhoneShell>
+    : <PlainShell inset={deviceInset}>{body}{cube}</PlainShell>;
 }
