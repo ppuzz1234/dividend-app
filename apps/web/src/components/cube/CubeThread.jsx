@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { CubeLoader } from "../ui/CubeLoader.jsx";
 import { cubeStream } from "../../lib/cubeApi.js";
 import styles from "./CubeThread.module.css";
 
@@ -18,6 +19,29 @@ import styles from "./CubeThread.module.css";
 function questionOf(el) {
   const turn = el.closest(".turn");
   return turn === null ? "" : (turn.querySelector(".turn-q p")?.textContent ?? "");
+}
+
+/**
+ * 답이 나오기까지 실제로 밟는 세 단계. 지어낸 단계가 아니라 엔진이 보내는
+ * stage 이벤트 그대로다 — "관련 조문을 찾는 중…" → "조문 N개를 읽는 중…" → 델타 시작.
+ * 이걸 보여주는 이유: 이 답이 LLM 한 방이 아니라 **검색 → 대조 → 작성**을 거친다는
+ * 사실이 화면에 드러나야, 인용 [n] 이 장식이 아니라는 게 설명된다.
+ *
+ * 단계 판정이 어긋나도 손해가 없다 — 바로 아래에 엔진이 보낸 원문(stage)이 늘 그대로 찍힌다.
+ */
+const PHASES = ["조문 검색", "근거 확보", "답변 작성"];
+
+function StageRail({ phase }) {
+  return (
+    <ol className={styles.rail} aria-hidden="true">
+      {PHASES.map((label, i) => (
+        <li key={label} className={i < phase ? styles.done : i === phase ? styles.now : styles.todo}>
+          <i className={styles.dot} />
+          {label}
+        </li>
+      ))}
+    </ol>
+  );
 }
 
 export function CubeThread({ turns, busy, convIdRef, onAsk, onBusy }) {
@@ -123,6 +147,13 @@ export function CubeThread({ turns, busy, convIdRef, onAsk, onBusy }) {
           <section className="turn streaming" key={t.id}>
             <div className="turn-q"><p>{t.q}</p></div>
             <div className="turn-a">
+              {t.live === "" && !t.done && (
+                <div className={styles.searching}>
+                  {/* 이 앱의 브랜드 로더를 그대로 쓴다 — 조문을 뒤지는 동안이 가장 긴 구간이다 */}
+                  <CubeLoader size={62} bare />
+                  <StageRail phase={t.phase} />
+                </div>
+              )}
               <p className="stage">{t.stage}</p>
               <div className={t.done ? "answer-body" : "answer-body live"}>{t.live}</div>
             </div>

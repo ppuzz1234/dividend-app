@@ -44,6 +44,66 @@
   opacity: 0.96;
 }
 
+/* ─── 검색 중 화면 — 브랜드 큐브 + 실제로 밟는 단계 ───
+   조문을 뒤지는 구간이 가장 길다. 여기가 빈 화면이면 "멈췄나" 로 읽힌다. */
+.searching {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 0 14px;
+}
+
+.rail {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 11px;
+  color: var(--sub);
+}
+.rail li {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.rail li + li::before {
+  content: "";
+  width: 14px;
+  height: 1px;
+  background: var(--line);
+}
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--line);
+}
+.todo {
+  opacity: 0.5;
+}
+.done .dot {
+  background: var(--jade);
+}
+.now {
+  color: var(--text);
+  font-weight: 700;
+}
+.now .dot {
+  background: var(--jade);
+  box-shadow: 0 0 0 3px rgba(242, 194, 48, 0.18);
+  animation: cubeBlink 1s ease-in-out infinite;
+}
+@keyframes cubeBlink {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .now .dot { animation: none; }
+}
+
 /* ─── 진행 표시 · 스트리밍 커서 ─── */
 .thread :global(.stage) {
   margin: 0 0 8px;

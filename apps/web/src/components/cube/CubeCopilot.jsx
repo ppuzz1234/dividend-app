@@ -24,6 +24,18 @@ const STARTERS = [
   "IRP 중도해지하면 어떻게 돼?",
 ];
 
+/*
+ * KNOWN-LIMITATION(화면 값 주입): 화면이 아는 소득·나이를 질문 뒤에 붙여 보내면
+ * "ISA 한도는 400 또는 200" 이 "당신은 200" 까지 좁혀진다. 실제로 동작도 했다.
+ * 그런데 **그건 안전장치를 우회한 것**이었다 — fact/src/router.ts 가 개인 수치를
+ * FACT 엔진에서 걷어내는 이유가 사양 §1.2(개인 적용 금지)와 절대 규칙 3(계산 경로
+ * LLM 금지)이고, 라우터 주석에 그 사고(세액공제를 LLM 이 90만원으로 계산해 버림)가
+ * 실측으로 남아 있다. 우리 시도가 통과한 건 조사("총급여는", "40세야")가 정규식을
+ * 빗겨간 덕이지 허용된 경로여서가 아니다.
+ * → 올바른 경로는 PLAN(승인된 규칙으로 계산, rule id 추적) 쪽이다. 그건 미션 2 소관이라
+ *   여기서 임의로 뚫지 않는다. 화면 값은 보내지 않는다.
+ */
+
 export function CubeCopilot({ step, framed = false }) {
   const [open, setOpen] = useState(false);
   const [turns, setTurns] = useState([]);
@@ -42,7 +54,7 @@ export function CubeCopilot({ step, framed = false }) {
     setQ("");
 
     const id = ++seq.current;
-    setTurns((prev) => [...prev, { id, q: text, stage: "", live: "", html: null, done: false }]);
+    setTurns((prev) => [...prev, { id, q: text, stage: "", live: "", phase: 0, html: null, done: false }]);
     const patch = (fields) =>
       setTurns((prev) => prev.map((t) => (t.id === id ? { ...t, ...fields } : t)));
 
@@ -53,10 +65,16 @@ export function CubeCopilot({ step, framed = false }) {
       {
         signal: aborter.current.signal,
         onStart: (ev) => { convId.current = ev.convId; },
-        onStage: (t) => patch({ stage: t }),
+        // 단계는 뒤로 가지 않는다 — 답변 뒤에 오는 "다시 쓰는 중" 이 레일을 되돌리면 안 된다.
+        onStage: (t) =>
+          setTurns((prev) =>
+            prev.map((x) =>
+              x.id === id ? { ...x, stage: t, phase: Math.max(x.phase, t.includes("읽는") ? 1 : 0) } : x,
+            ),
+          ),
         onDelta: (t) =>
           setTurns((prev) =>
-            prev.map((x) => (x.id === id ? { ...x, stage: "", live: x.live + t } : x)),
+            prev.map((x) => (x.id === id ? { ...x, stage: "", phase: 2, live: x.live + t } : x)),
           ),
         onFinal: (html) => patch({ html }),
       },
@@ -128,8 +146,6 @@ export function CubeCopilot({ step, framed = false }) {
                   </ul>
                 </div>
               )}
-              {/* convId 는 값이 아니라 ref 로 넘긴다 — 렌더 시점에 읽으면 스트림이
-                  방금 받은 convId 를 놓친다(말투 토글이 엉뚱한 대화로 간다). */}
               <CubeThread turns={turns} busy={busy} convIdRef={convId} onAsk={ask} onBusy={setBusy} />
             </div>
 
@@ -172,10 +188,10 @@ export function CubeCopilot({ step, framed = false }) {
 
       <button
         type="button"
-        className={styles.fab}
+        className={`${styles.fab} ${busy && !open ? styles.fabBusy : ""}`}
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        aria-label="세법 팩트 열기"
+        aria-label={open ? "세법 팩트 닫기" : "세법 팩트 열기"}
       >
         {open ? <X size={20} /> : <Scale size={20} />}
       </button>

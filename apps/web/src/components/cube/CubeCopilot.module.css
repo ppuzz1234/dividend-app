@@ -53,6 +53,20 @@
 .fab:active {
   transform: scale(0.94);
 }
+/* 패널을 닫아 둔 채 답을 기다리는 중 — 버튼이 아직 일하고 있다고 알려준다.
+   안 그러면 닫고 나서 "끝났나?" 를 확인할 방법이 없다. */
+.fabBusy::after {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  border-radius: 999px;
+  border: 2px solid var(--jade);
+  animation: cubeRing 1.4s ease-out infinite;
+}
+@keyframes cubeRing {
+  0% { transform: scale(1); opacity: 0.7; }
+  100% { transform: scale(1.28); opacity: 0; }
+}
 
 /* 버튼 자리에서 튀어나오듯 열린다 — "눌러서 들어가는" 느낌의 근거 */
 .panel {
@@ -83,7 +97,8 @@
 @media (prefers-reduced-motion: reduce) {
   .scrim,
   .panel,
-  .fab {
+  .fab,
+  .fabBusy::after {
     animation: none;
     transition: none;
   }
