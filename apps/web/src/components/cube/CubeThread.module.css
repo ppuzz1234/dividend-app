@@ -1,0 +1,583 @@
+/* ------------------------------------------------------------------ *
+ *  엔진(A4-RAG factui)이 만든 HTML 을 호스트 룩으로 다시 칠한다.
+ *
+ *  원본: A4-RAG/packages/factui/public/style.css (다크 #1a1a1a + 오렌지 #f37321)
+ *  여기: 호스트 토큰(--card/--line/--text/--sub/--jade)으로만 쓴다.
+ *
+ *  엔진 클래스는 전역 이름이라 :global() 로 잡되, 해시된 .thread 아래에만
+ *  둔다 → 양방향 스타일 누수가 없다. 마크업은 한 줄도 고치지 않는다.
+ *  (고치면 렌더러가 두 벌이 되고 라벨·스탬프·고지가 갈라진다)
+ * ------------------------------------------------------------------ */
+.thread {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text);
+}
+.thread :global(*) {
+  box-sizing: border-box;
+}
+
+/* ─── 턴 ─── */
+.thread :global(.turn) {
+  margin-bottom: 22px;
+}
+/* 턴 사이 구분선. 엔진의 `.turn + .turn` 을 그대로 못 쓰는 이유: 최종 HTML 을
+   주입하는 래퍼 <div> 가 한 겹 끼어서 .turn 끼리 형제가 아니게 된다.
+   래퍼가 곧 턴이므로 .thread 의 직계 자식 기준으로 긋는다. */
+.thread > * + * {
+  border-top: 1px solid var(--line);
+  padding-top: 20px;
+}
+.thread :global(.turn-q) {
+  margin-bottom: 13px;
+  padding: 9px 13px;
+  border-left: 3px solid var(--jade);
+  border-radius: 0 12px 12px 0;
+  background: var(--bg);
+}
+.thread :global(.turn-q p) {
+  margin: 0;
+  font-size: 13.5px;
+  font-weight: 700;
+}
+.thread :global(.turn.streaming .turn-a) {
+  opacity: 0.96;
+}
+
+/* ─── 진행 표시 · 스트리밍 커서 ─── */
+.thread :global(.stage) {
+  margin: 0 0 8px;
+  font-size: 12.5px;
+  color: var(--sub);
+}
+.thread :global(.stage:not(:empty))::after {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-left: 7px;
+  border-radius: 50%;
+  background: var(--jade);
+  animation: cubePulse 1s ease-in-out infinite;
+}
+.thread :global(.answer-body.live)::after {
+  content: "▍";
+  color: var(--jade);
+  animation: cubePulse 0.9s steps(2) infinite;
+}
+@keyframes cubePulse {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .thread :global(.stage:not(:empty))::after,
+  .thread :global(.answer-body.live)::after {
+    animation: none;
+  }
+}
+
+/* ─── 답변 본문 ─── */
+.thread :global(.answer-body) {
+  font-size: 14px;
+  line-height: 1.75;
+  white-space: pre-wrap;
+  word-break: keep-all;
+}
+.thread :global(.answer-body a.ref) {
+  color: var(--jade);
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.thread :global(.answer-body a.ref:hover) {
+  text-decoration: underline;
+}
+/* Sonnet 이 긴 답을 `## 1. …` 로 나눠 쓴다 */
+.thread :global(.ans-h) {
+  display: block;
+  margin: 18px 0 6px;
+  padding-bottom: 2px;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text);
+  border-bottom: 2px solid var(--jade);
+}
+
+/* ─── 클래스 라벨: 이 답이 무엇인지가 가장 먼저 보여야 한다 (사양 §1.2) ─── */
+.thread :global(.class-label) {
+  display: inline-block;
+  margin: 0 0 11px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+.thread :global(.class-label.resolved) {
+  color: var(--green, #6fcf97);
+  background: rgba(111, 207, 151, 0.12);
+  border: 1px solid rgba(111, 207, 151, 0.4);
+}
+.thread :global(.class-label.unmodeled) {
+  color: var(--gold);
+  background: rgba(224, 145, 58, 0.12);
+  border: 1px solid rgba(224, 145, 58, 0.4);
+}
+.thread :global(.class-label.plan),
+.thread :global(.class-label.plan-calc) {
+  color: #7ac9e8;
+  background: rgba(122, 201, 232, 0.12);
+  border: 1px solid rgba(122, 201, 232, 0.35);
+}
+.thread :global(.class-label.reject) {
+  color: var(--danger, #e26a6a);
+  background: rgba(226, 106, 106, 0.12);
+  border: 1px solid rgba(226, 106, 106, 0.4);
+}
+
+/* ─── 합성 값 스탬프: 놓칠 수 없게 (절대 규칙 0). 여기만은 톤을 낮추지 않는다 ─── */
+.thread :global(.stamp) {
+  margin: 0 0 12px;
+  padding: 11px 14px;
+  border-radius: 10px;
+  background: #6b1d1d;
+  border: 2px solid #ff5a5a;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+/* ─── 고지 ─── */
+.thread :global(.notice) {
+  margin: 16px 0;
+  padding-left: 12px;
+  border-left: 3px solid var(--line);
+  font-size: 12.5px;
+  color: var(--sub);
+}
+.thread :global(.notice-strong) {
+  margin: 12px 0;
+  padding-left: 12px;
+  border-left: 3px solid var(--gold);
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--gold);
+}
+.thread :global(.caveat) {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: var(--gold);
+}
+.thread :global(.caveat.sunset) {
+  color: var(--danger, #e26a6a);
+  font-weight: 700;
+}
+.thread :global(.verify) {
+  margin-top: 14px;
+  font-size: 12px;
+  color: var(--sub);
+}
+
+/* ─── 접히는 근거·검증 칸 ─── */
+.thread :global(h3) {
+  margin: 22px 0 0;
+  padding-bottom: 7px;
+  border-bottom: 1px solid var(--line);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--sub);
+}
+.thread :global(summary) {
+  cursor: pointer;
+  margin-top: 8px;
+  font-size: 12.5px;
+  color: var(--sub);
+}
+.thread :global(summary:hover) {
+  color: var(--jade);
+}
+.thread :global(.ev) {
+  margin-top: 16px;
+  padding-top: 4px;
+  border-top: 1px solid var(--line);
+}
+.thread :global(.ev > summary) {
+  padding: 6px 0;
+  list-style: none;
+  font-size: 12.5px;
+}
+.thread :global(.ev > summary)::-webkit-details-marker {
+  display: none;
+}
+.thread :global(.ev > summary)::before {
+  content: "▸ ";
+  color: var(--jade);
+}
+.thread :global(.ev[open] > summary)::before {
+  content: "▾ ";
+}
+.thread :global(.ev.meta > summary) {
+  font-weight: 700;
+}
+.thread :global(.ev h3) {
+  margin-top: 10px;
+}
+.thread :global(.src-fold > summary) {
+  color: var(--jade);
+}
+.thread :global(.src-fold[open] > summary) {
+  color: var(--sub);
+}
+
+/* ─── 조문 카드 ─── */
+.thread :global(.src) {
+  margin: 10px 0;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--bg);
+}
+.thread :global(.src h4) {
+  margin: 0 0 4px;
+  font-size: 13px;
+}
+.thread :global(.src .refno) {
+  color: var(--jade);
+}
+.thread :global(.src-title) {
+  color: var(--sub);
+  font-weight: 400;
+}
+.thread :global(.src .meta) {
+  margin: 0;
+  font-size: 11.5px;
+  color: var(--sub);
+}
+.thread :global(.src code) {
+  font-size: 11.5px;
+  color: #b9d7ff;
+}
+.thread :global(.src pre) {
+  margin: 9px 0 0;
+  padding: 11px;
+  border-radius: 9px;
+  background: #0c1310;
+  font-size: 12.5px;
+  color: #d2d2d2;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+/* [n] 을 눌러 도착한 조문을 잠깐 표시해 준다 */
+.thread :global(.src.flash) {
+  outline: 2px solid var(--jade);
+  outline-offset: 2px;
+}
+
+/* ─── 매니페스트 ─── */
+.thread :global(.manifest) {
+  margin-top: 10px;
+  overflow-x: auto;
+}
+.thread :global(.manifest table) {
+  width: 100%;
+  margin-top: 8px;
+  border-collapse: collapse;
+  font-size: 11.5px;
+}
+.thread :global(.manifest th) {
+  padding: 4px 10px 4px 0;
+  text-align: left;
+  vertical-align: top;
+  white-space: nowrap;
+  font-weight: 400;
+  color: var(--sub);
+}
+.thread :global(.manifest td) {
+  padding: 4px 0;
+  word-break: break-all;
+}
+.thread :global(.manifest code) {
+  color: #b9d7ff;
+}
+
+/* ─── 답변 안의 표 (비교형 답) ─── */
+.thread :global(.tbl) {
+  margin: 12px 0;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.thread :global(.answer-body table) {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+  white-space: normal;
+}
+.thread :global(.answer-body th),
+.thread :global(.answer-body td) {
+  padding: 8px 11px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+.thread :global(.answer-body th) {
+  background: var(--bg);
+  font-weight: 700;
+  white-space: nowrap;
+}
+.thread :global(.answer-body tbody tr:last-child td) {
+  border-bottom: 0;
+}
+
+/* ─── 말투 토글 ─── */
+.thread :global(.mode-bar) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 12px;
+}
+.thread :global(.mode-btns) {
+  display: inline-flex;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+}
+.thread :global(.mode-btn) {
+  padding: 5px 13px;
+  border: 0;
+  background: transparent;
+  color: var(--sub);
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.thread :global(.mode-btn + .mode-btn) {
+  border-left: 1px solid var(--line);
+}
+.thread :global(.mode-btn.on) {
+  background: var(--jade);
+  color: #17150f;
+  font-weight: 800;
+}
+.thread :global(.mode-hint) {
+  font-size: 11px;
+  color: var(--sub);
+}
+.thread :global(.resolved-from) {
+  margin: 0 0 10px;
+  font-size: 11.5px;
+  color: var(--sub);
+}
+.thread :global(.resolved-from b) {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* ─── 이어서 물어볼 것 ─── */
+.thread :global(.suggests) {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.thread :global(.suggests-label),
+.thread :global(.issues-label),
+.thread :global(.plan-offer-label) {
+  margin: 0 0 8px;
+  font-size: 11.5px;
+  color: var(--sub);
+}
+.thread :global(.suggests-row) {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.thread :global(.suggest) {
+  width: 100%;
+  padding: 8px 12px;
+  text-align: left;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: transparent;
+  color: var(--sub);
+  font-family: inherit;
+  font-size: 12.5px;
+  cursor: pointer;
+}
+.thread :global(.suggest:hover) {
+  color: var(--jade);
+  border-color: var(--jade);
+}
+
+/* ─── 근거 없는 문장 펼치기 ─── */
+.thread :global(.issues ul) {
+  margin: 5px 0 10px;
+  padding-left: 18px;
+}
+.thread :global(.issues li) {
+  margin: 3px 0;
+  font-size: 12px;
+  color: var(--gold);
+}
+.thread :global(.issues-note) {
+  margin: 5px 0 0;
+  font-size: 11.5px;
+  color: var(--sub);
+}
+
+/* ─── 공식 팩트 패널 — LLM 을 거치지 않은 값.
+       답변 본문과 시각적으로 다른 층이어야 "승인된 값 / LLM 이 쓴 글"이 갈린다 ─── */
+.thread :global(.approved) {
+  margin: 0 0 16px;
+  padding: 11px 13px;
+  border: 1px solid rgba(111, 207, 151, 0.4);
+  border-radius: 12px;
+  background: rgba(111, 207, 151, 0.06);
+}
+.thread :global(.approved.none) {
+  border-color: var(--line);
+  background: var(--bg);
+}
+.thread :global(.approved .class-label) {
+  margin-top: 0;
+}
+.thread :global(.approved .dim),
+.thread :global(.approved .approved-meta) {
+  margin: 6px 0 8px;
+  font-size: 11.5px;
+  color: var(--sub);
+}
+.thread :global(.approved table) {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.thread :global(.approved th),
+.thread :global(.approved td) {
+  padding: 5px 8px 5px 0;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--line);
+}
+
+/* ─── 계산 결과 (PLAN) ─── */
+.thread :global(.plan-read) {
+  margin: 0 0 10px;
+  font-size: 12px;
+  color: var(--sub);
+}
+.thread :global(.plan-read b) {
+  color: var(--text);
+}
+.thread :global(.plan-headline) {
+  margin: 4px 0 12px;
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--jade);
+}
+.thread :global(.plan-gap) {
+  margin: 8px 0 12px;
+  padding-left: 18px;
+}
+.thread :global(.plan-gap li) {
+  margin: 3px 0;
+  font-size: 12.5px;
+  color: var(--gold);
+}
+.thread :global(.plan-skipped) {
+  margin: 14px 0 0;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--danger, #e26a6a);
+}
+.thread :global(.plan-offer) {
+  margin-top: 18px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.thread :global(.plan-offer-label b) {
+  color: var(--text);
+}
+
+/* ─── 되묻기 카드 ─── */
+.thread :global(.ask) {
+  margin: 10px 0;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--bg);
+}
+.thread :global(.ask-q) {
+  margin: 0 0 8px;
+  font-size: 13.5px;
+  font-weight: 700;
+}
+.thread :global(.ask-note) {
+  margin: 0 0 8px;
+  font-size: 11.5px;
+  color: var(--sub);
+}
+.thread :global(.ask-form) {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 9px;
+}
+.thread :global(.ask-input) {
+  flex: 0 1 130px;
+  min-width: 0;
+  padding: 7px 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--card);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+}
+.thread :global(.ask-input:focus) {
+  outline: none;
+  border-color: var(--jade);
+}
+.thread :global(.ask-unit) {
+  font-size: 12px;
+  color: var(--sub);
+}
+.thread :global(.ask-go) {
+  padding: 7px 15px;
+  border: none;
+  border-radius: 999px;
+  background: var(--jade);
+  color: #17150f;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.thread :global(.ask-opt) {
+  border-color: var(--jade);
+  color: var(--jade);
+}
+.thread :global(.ask-slider) {
+  margin-top: 10px;
+}
+.thread :global(.ask-range) {
+  width: 100%;
+  accent-color: var(--jade);
+}
+.thread :global(.ask-range-meta) {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  margin-top: 4px;
+}
+.thread :global(.ask-range-val) {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--jade);
+}
+.thread :global(.ask-range-meta .dim) {
+  font-size: 11px;
+  color: var(--sub);
+  text-align: right;
+}
