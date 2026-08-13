@@ -1,0 +1,257 @@
+/* ------------------------------------------------------------------ *
+ *  떠 있는 버튼 + 코파일럿 패널
+ *
+ *  .root 를 화면 전체에 깔고 pointer-events:none 으로 통과시킨다.
+ *  이렇게 해야 scrim(배경 어둡게)과 FAB 이 **같은 기준 상자**를 쓰고,
+ *  fixed(일반) / absolute(?frame=1 폰 목업) 를 한 줄 교체로 갈아탈 수 있다.
+ * ------------------------------------------------------------------ */
+.root {
+  z-index: 120;
+  pointer-events: none;
+  font-family: var(--font-sans);
+}
+.floating {
+  position: fixed;
+  inset: 0;
+}
+/* PhoneShell 의 .scaled 가 transform 을 쓰므로 fixed 는 베젤을 뚫는다 → absolute */
+.framed {
+  position: absolute;
+  inset: 0;
+}
+.root > * {
+  pointer-events: auto;
+}
+
+.scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(2px);
+  animation: cubeFade 0.18s ease;
+}
+
+.fab {
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border: none;
+  border-radius: 999px;
+  background: var(--jade);
+  color: #17150f;
+  cursor: pointer;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5);
+  transition: transform 0.16s ease;
+}
+.fab:hover {
+  transform: translateY(-2px);
+}
+.fab:active {
+  transform: scale(0.94);
+}
+/* 패널을 닫아 둔 채 답을 기다리는 중 — 버튼이 아직 일하고 있다고 알려준다.
+   안 그러면 닫고 나서 "끝났나?" 를 확인할 방법이 없다. */
+.fabBusy::after {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  border-radius: 999px;
+  border: 2px solid var(--jade);
+  animation: cubeRing 1.4s ease-out infinite;
+}
+@keyframes cubeRing {
+  0% { transform: scale(1); opacity: 0.7; }
+  100% { transform: scale(1.28); opacity: 0; }
+}
+
+/* 버튼 자리에서 튀어나오듯 열린다 — "눌러서 들어가는" 느낌의 근거 */
+.panel {
+  position: absolute;
+  right: 18px;
+  bottom: 84px;
+  width: min(420px, calc(100% - 36px));
+  height: min(660px, calc(100% - 112px));
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--card);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+  transform-origin: 100% 100%;
+  animation: cubePop 0.22s cubic-bezier(0.22, 0.9, 0.3, 1.2);
+}
+
+@keyframes cubeFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes cubePop {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scrim,
+  .panel,
+  .fab,
+  .fabBusy::after {
+    animation: none;
+    transition: none;
+  }
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 12px 13px 15px;
+  border-bottom: 1px solid var(--line);
+  background: var(--bg);
+}
+.mark {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  color: var(--jade);
+  background: var(--jade-dim, #2c2409);
+}
+.headText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.headText b {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.headText span {
+  font-size: 11px;
+  color: var(--sub);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.iconBtn {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--sub);
+  cursor: pointer;
+}
+.iconBtn:hover {
+  color: var(--text);
+  background: var(--line);
+}
+
+.scroll {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 16px 15px 8px;
+}
+
+.empty {
+  padding: 6px 0 4px;
+}
+.emptyLead {
+  margin: 0 0 14px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--sub);
+  word-break: keep-all;
+}
+.emptyLead b {
+  color: var(--text);
+}
+.chips {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.chips button {
+  width: 100%;
+  padding: 10px 13px;
+  text-align: left;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: transparent;
+  color: var(--sub);
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+.chips button:hover {
+  color: var(--jade);
+  border-color: var(--jade);
+}
+
+.composer {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 10px 12px 12px;
+  border-top: 1px solid var(--line);
+  background: var(--bg);
+}
+.input {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-height: 120px;
+  padding: 10px 12px;
+  resize: none;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--card);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.input::placeholder {
+  color: var(--sub);
+}
+.input:focus {
+  outline: none;
+  border-color: var(--jade);
+}
+.send,
+.stop {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.send {
+  background: var(--jade);
+  color: #17150f;
+}
+.send:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.stop {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--sub);
+}
