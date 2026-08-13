@@ -46,12 +46,14 @@
 
 /* ─── 검색 중 화면 — 브랜드 큐브 + 실제로 밟는 단계 ───
    조문을 뒤지는 구간이 가장 길다. 여기가 빈 화면이면 "멈췄나" 로 읽힌다. */
+/* 위 여백이 넉넉해야 한다 — CubeLoader 의 .glow 가 inset:-30% 로 자기 상자 밖까지
+   번져서, 패딩을 줄이면 바로 위 질문 말풍선에 겹쳐 보인다. */
 .searching {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  padding: 10px 0 14px;
+  gap: 12px;
+  padding: 28px 0 16px;
 }
 
 .rail {
