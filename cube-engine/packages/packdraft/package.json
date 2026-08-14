@@ -1,0 +1,29 @@
+{
+  "name": "@cube/packdraft",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/src/index.js",
+  "types": "./dist/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "default": "./dist/src/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -b tsconfig.json",
+    "test": "tsc -b tsconfig.json && node --test \"dist/test/**/*.test.js\"",
+    "draft": "tsc -b tsconfig.json && node --env-file-if-exists=../../.env dist/scripts/draft.js",
+    "review": "tsc -b tsconfig.json && node dist/scripts/review.js",
+    "promote": "tsc -b tsconfig.json && node dist/scripts/promote.js",
+    "verify-handwritten": "node scripts/verify-handwritten.mjs ../corpus/snapshots ../policy/packs/drafts"
+  },
+  "dependencies": {
+    "@cube/corpus": "*",
+    "@cube/factindex": "*",
+    "@cube/policy": "*",
+    "yaml": "^2.6.1",
+    "@cube/fact": "*"
+  }
+}

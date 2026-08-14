@@ -1,0 +1,151 @@
+# UNVERIFIED_DRAFT — 초안이다. **아직 어떤 계산에도 쓸 수 없다.**
+#
+# 누가 썼나: packdraft(AI 초안)가 아니라 **Claude 가 손으로 작성**했다. 이 값들은 조문의 **표**
+# 안에 있는데, 추출기는 규칙을 "조건 → 값" 하나로 보기 때문에 표의 행마다 세 값(상한·기초금액
+# ·세율)을 따로 뽑아내지 못한다. 나이 경계(AXIS_BOUNDS)·ISA 소득경계 때와 같은 구조다.
+# **자동 인용 검사를 안 거쳤으므로 아래 주석의 인용을 원문에서 직접 확인해야 한다.**
+#
+# 무엇: 소득세법 §50 기본공제(1명당 150만원)와 §14 ③ 금융소득 종합과세기준금액(2천만원)
+# 왜:   종합소득금액 → 과세표준으로 내려가는 최소 조각, 그리고 배당·이자가 종합과세로 넘어가는 경계.
+#
+# ★ 이것은 소득공제의 **일부일 뿐**이다.
+#   §51 추가공제, §51의3 연금보험료공제, §52 특별소득공제, 조특법 소득공제가 빠져 있다.
+#   따라서 이 값들로 만든 과세표준은 **실제보다 크고**, 세액은 실제보다 크게 나온다.
+#   보수적(세금을 더 무는) 방향이지만 정확하지 않다. 결과에 근사임을 표기해야 한다.
+#
+# ★ 부양가족 수는 우리 모델에 없는 사실이다.
+#   §50 은 "사람의 수" 로 곱하는데 지금 PlanInput 에는 가구 정보가 없다. 본인 1명으로만
+#   계산하면 부양가족이 있는 사람은 세금이 과대평가된다. 사실을 새로 받을지 사람이 정해야 한다.
+#
+# 승인 절차 (사양 §2.2): 인용 확인 → 규칙별 approved/reviewer_id/reviewed_at 기입 →
+#                        pack_kind 를 VERIFIED_LAW 로.
+pack_kind: VERIFIED_LAW
+policy_snapshot: KR-TAX-DRAFT-INCTAX_DEDUCTIONS
+rules:
+  # §50 ① — "사람의 수에 1명당 연 150만원을 곱하여 계산한 금액을 … 종합소득금액에서 공제"
+  - id: INCTAX.PERSONAL_DEDUCTION.PER_PERSON
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-10
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value: "1500000"
+      unit: KRW
+    sources:
+      - source_id: INCTAX_50
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_50
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-11
+
+  # §50 ① 2·3호 — 배우자·부양가족의 "소득금액 합계액이 100만원 이하"
+  - id: INCTAX.PERSONAL_DEDUCTION.DEPENDENT_INCOME_CEILING
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-10
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value: "1000000"
+      unit: KRW
+    sources:
+      - source_id: INCTAX_50
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_50
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-11
+
+  # §50 ① 2·3호 괄호 — "총급여액 500만원 이하의 근로소득만 있는" 사람 포함
+  - id: INCTAX.PERSONAL_DEDUCTION.DEPENDENT_SALARY_CEILING
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-10
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value: "5000000"
+      unit: KRW
+    sources:
+      - source_id: INCTAX_50
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_50
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-11
+
+  # §14 ③ 6호 — "그 소득의 합계액이 2천만원(이하 \"이자소득등의 종합과세기준금액\"이라 한다) 이하"
+  - id: INCTAX.FINANCIAL_INCOME.AGGREGATE_THRESHOLD
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-10
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value: "20000000"
+      unit: KRW
+    sources:
+      - source_id: INCTAX_14
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_14
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-11

@@ -1,0 +1,116 @@
+{
+  "$comment": [
+    "사용자 어휘 → 법령 어휘 번역 사전. ★ 사람 승인이 필요한 데이터 산출물이다.",
+    "",
+    "왜 필요한가 (실측): 코퍼스 전수 문자열 검색 결과 'ISA' 0건 · 'IRP' 0건 · '서민형' 0건 ·",
+    "'세액공제율' 0건. 법령은 '개인종합자산관리계좌'·'개인형퇴직연금'이라고만 쓴다.",
+    "2-gram 토크나이저를 넣어도 문자열 자체가 없으면 BM25 는 원리적으로 0점이다.",
+    "",
+    "왜 LLM 즉흥 확장이 아닌가: 같은 질의가 매번 다른 후보를 부르면 answerPayloadHash",
+    "재현성(사양 §1.3)이 깨진다. 확장은 승인된 사전 조회여야 한다.",
+    "",
+    "corpusHits 는 실측치이며 test/tokenize.test.ts 가 코퍼스와 대조해 검증한다 —",
+    "존재하지 않는 용어를 가리키는 별칭은 확장해봐야 무의미하므로 테스트가 잡는다.",
+    "approved:false 인 항목은 확장에 사용되지 않는다 (정책 팩과 같은 규율).",
+    "",
+    "★ 미승인 상태: reviewer 가 비어 있다. 이 사전은 '질의를 어느 조문으로 번역할지'를",
+    "결정하므로 틀리면 엉뚱한 조문이 근거로 나간다. 승인 주체는 BUILD-PLAN Q6 참조."
+  ],
+  "version": "draft-2026-07-31",
+  "aliases": [
+    {
+      "term": "ISA",
+      "expandsTo": [
+        "개인종합자산관리계좌"
+      ],
+      "corpusHits": 11,
+      "approved": true,
+      "reviewer": "Seohyun Park",
+      "reviewedAt": "2026-08-03",
+      "note": "조세특례제한법 §91의18 이 정의하는 계좌. 업계·언론이 ISA 로 부른다."
+    },
+    {
+      "term": "IRP",
+      "expandsTo": [
+        "개인형퇴직연금"
+      ],
+      "corpusHits": 35,
+      "approved": true,
+      "reviewer": "Seohyun Park",
+      "reviewedAt": "2026-08-03",
+      "note": "근로자퇴직급여 보장법 §24. DC(확정기여형)와 혼동 주의 — RETIRE_D_14 는 DC 조문이다."
+    },
+    {
+      "term": "연금저축",
+      "expandsTo": [
+        "연금계좌"
+      ],
+      "corpusHits": 37,
+      "approved": true,
+      "reviewer": "Seohyun Park",
+      "reviewedAt": "2026-08-03",
+      "note": "소득세법은 '연금계좌'로 통칭한다. '연금저축'도 5건 등장하나 범위가 좁다."
+    },
+    {
+      "term": "세액공제율",
+      "expandsTo": [
+        "세액공제"
+      ],
+      "corpusHits": 200,
+      "approved": true,
+      "reviewer": "Seohyun Park",
+      "reviewedAt": "2026-08-03",
+      "note": "'율'이 붙은 형태는 조문에 없다. 소득세법 §59의3 이 공제 대상·비율을 정한다."
+    },
+    {
+      "term": "퇴직연금",
+      "expandsTo": [
+        "퇴직연금"
+      ],
+      "corpusHits": 159,
+      "approved": true,
+      "reviewer": "Seohyun Park",
+      "reviewedAt": "2026-08-03",
+      "note": "그대로 존재. 항등 별칭이지만 사전에 두어 '커버된 용어'임을 명시한다."
+    },
+    {
+      "term": "중도인출",
+      "expandsTo": [
+        "중도인출"
+      ],
+      "corpusHits": 10,
+      "approved": true,
+      "reviewer": "Seohyun Park",
+      "reviewedAt": "2026-08-03",
+      "note": "그대로 존재. IRP 는 RETIRE_D_18, DC 는 RETIRE_D_14."
+    },
+    {
+      "term": "서민형",
+      "expandsTo": [],
+      "corpusHits": 0,
+      "approved": true,
+      "reviewer": "Seohyun Park",
+      "reviewedAt": "2026-08-03",
+      "note": "★ 조문에 대응어가 없다. 조특법 §91의18 ②1호의 '다음 각 목의 어느 하나에 해당하는 경우: 400만원'을 업계가 부르는 이름이고, 판정 시점 등 세부는 ADMIN_GUIDANCE 층(Phase 3)에 있다. 확장 대상 없음 = UNMODELED 로 답해야 하는 질의."
+    },
+    {
+      "term": "일임형",
+      "expandsTo": [],
+      "corpusHits": 0,
+      "approved": true,
+      "reviewer": "Seohyun Park",
+      "reviewedAt": "2026-08-03",
+      "note": "★ 조문에 없다. 조특법 §91의18 ③은 '투자일임업자와 대통령령으로 정하는 계약을 체결하여 개설한 계좌'라고 서술한다. '일임'만으로는 3건."
+    },
+    {
+      "term": "신탁형",
+      "expandsTo": [],
+      "corpusHits": 0,
+      "approved": true,
+      "reviewer": "Seohyun Park",
+      "reviewedAt": "2026-08-03",
+      "note": "★ 조문에 없다. 위와 같은 구조 — '신탁업자와 특정금전신탁계약'."
+    }
+  ],
+  "$measured": "2026-08-03 승인 완료(Seohyun Park). 승인 전후 실측: 유형별 평가셋(user-queries.json) 묶음 적중 16/19 → 18/19, hit@1 10/19 → 13/19. 닫힌 구멍 2건: 'ISA 서민형 요건'(TAXEX_91_18 이 아예 안 잡혔다) · 'IRP로 개별 주식'(PENSUP 층이 안 잡혔다). 둘 다 ISA·IRP·서민형이 **조문에 없는 말**이라 검색이 헛돌던 것. 기존 검색 평가셋(queries.json)에는 회귀 없음(25/26 유지). 재현: npm run check:bundle -w @cube/fact -- --set user"
+}

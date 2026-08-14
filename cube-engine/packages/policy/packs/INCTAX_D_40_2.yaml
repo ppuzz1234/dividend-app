@@ -1,0 +1,255 @@
+# VERIFIED_LAW — 사람이 원문과 대조해 승인한 규칙만 담는다.
+#
+# 이 파일에 남은 규칙의 조건: ① review.approved: true  ② 값이 확정됨(PLACEHOLDER 없음).
+# 값을 바꾸려면 초안 → 대조표 → 사람 승인 절차를 다시 거친다. 여기서 직접 고치지 않는다.
+#
+# ────────────────────────────────────────────────────────────────────────────
+# 2026-08-04 재승인 — 이전 파일(RETIRE_D_17_2.yaml)의 결함 2건을 바로잡았다.
+#
+# ① **근거 조문이 틀렸다.** 모든 규칙이 `RETIRE_D_17_2`(근퇴법 시행령 제17조의2)를
+#    PRIMARY 로 달고 있었는데, 그 조문에는 **숫자가 하나도 없다** — 「소득세법 시행령」
+#    제40조의2를 가리키는 위임 조문일 뿐이다. 값은 전부 여기(제40조의2제2항제1호)에 있다.
+#    초안 생성기가 위임 사슬을 읽혀 놓고, PRIMARY 는 씨앗 조문으로 못박은 탓이다
+#    (`packdraft/src/toYaml.ts` 에서 원인 수정).
+#
+# ② **단위가 전부 KRW 였다.** 나이 60 이 `60 KRW`, 기간 10년이 `10 KRW` 로 들어가 있었다.
+#    초안 생성기의 단위 목록에 YEARS·MONTHS 가 없어 `UNKNOWN → KRW` 로 조용히 떨어진 것이다.
+#    (어휘에 MONTHS 추가 + 무언의 KRW 치환 제거로 원인 수정.)
+#
+# 대조 기준: 소득세법 시행령 제40조의2제2항제1호 (시행 2026-07-01, snapshot INCTAX_D_40_2)
+# ────────────────────────────────────────────────────────────────────────────
+
+pack_kind: VERIFIED_LAW
+policy_snapshot: KR-TAX-INCTAX_D_40_2
+rules:
+  # 가목 "연간 1천800만원"
+  - id: INCTAX_D_40_2.CONTRIBUTION_LIMIT_COMPONENT.GENERAL
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: DECREE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX_D_40_2
+    temporal:
+      promulgated_at: 2026-07-01
+      valid_from: 2026-07-01
+      valid_to: null
+      recorded_at: 2026-08-04
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value: "18000000"
+      unit: KRW
+      rounding:
+        stage: PER_YEAR
+        mode: FLOOR
+        unit_krw: "1"
+    sources:
+      - source_id: INCTAX_D_40_2
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_D_40_2
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-04
+
+  # 다목 1) "연금주택 양도일 현재 거주자 또는 그 배우자가 60세 이상일 것"
+  - id: INCTAX_D_40_2.HOUSING_SALE_CRITERIA.AGE_THRESHOLD
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: DECREE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX_D_40_2
+    temporal:
+      promulgated_at: 2026-07-01
+      valid_from: 2026-07-01
+      valid_to: null
+      recorded_at: 2026-08-04
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value: "60"
+      unit: YEARS
+    sources:
+      - source_id: INCTAX_D_40_2
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_D_40_2
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-04
+
+  # 다목 2) 단서 "축소주택을 취득한 날부터 6개월 이내에 연금주택을 양도한 경우"
+  - id: INCTAX_D_40_2.HOUSING_SALE_CRITERIA.GRACE_PERIOD_FOR_2_HOUSES
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: DECREE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX_D_40_2
+    temporal:
+      promulgated_at: 2026-07-01
+      valid_from: 2026-07-01
+      valid_to: null
+      recorded_at: 2026-08-04
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value: "6"
+      unit: MONTHS
+    sources:
+      - source_id: INCTAX_D_40_2
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_D_40_2
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-04
+
+  # 다목 3) "연금주택의 법 제99조에 따른 기준시가가 12억원 이하일 것"
+  - id: INCTAX_D_40_2.HOUSING_SALE_CRITERIA.STANDARD_PRICE_LIMIT
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: DECREE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX_D_40_2
+    temporal:
+      promulgated_at: 2026-07-01
+      valid_from: 2026-07-01
+      valid_to: null
+      recorded_at: 2026-08-04
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value: "1200000000"
+      unit: KRW
+      rounding:
+        stage: PER_YEAR
+        mode: FLOOR
+        unit_krw: "1"
+    sources:
+      - source_id: INCTAX_D_40_2
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_D_40_2
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-04
+
+  # 다목 5) "연금주택 양도일부터 6개월 이내에 주택차액을 … 연금계좌로 납입할 것"
+  - id: INCTAX_D_40_2.HOUSING_SALE_CRITERIA.CONTRIBUTION_DEADLINE
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: DECREE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX_D_40_2
+    temporal:
+      promulgated_at: 2026-07-01
+      valid_from: 2026-07-01
+      valid_to: null
+      recorded_at: 2026-08-04
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value: "6"
+      unit: MONTHS
+    sources:
+      - source_id: INCTAX_D_40_2
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_D_40_2
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-04
+
+  # 라목 3) "연금부동산을 보유한 기간이 10년 이상일 것"
+  - id: INCTAX_D_40_2.REAL_ESTATE_SALE_CRITERIA.HOLDING_PERIOD
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: DECREE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX_D_40_2
+    temporal:
+      promulgated_at: 2026-07-01
+      valid_from: 2026-07-01
+      valid_to: null
+      recorded_at: 2026-08-04
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value: "10"
+      unit: YEARS
+    sources:
+      - source_id: INCTAX_D_40_2
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_D_40_2
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-04
+
+  # 라목 4) "연금부동산 양도일부터 6개월 이내에 연금부동산 양도차액을 … 납입할 것"
+  - id: INCTAX_D_40_2.REAL_ESTATE_SALE_CRITERIA.CONTRIBUTION_DEADLINE
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: DECREE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX_D_40_2
+    temporal:
+      promulgated_at: 2026-07-01
+      valid_from: 2026-07-01
+      valid_to: null
+      recorded_at: 2026-08-04
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value: "6"
+      unit: MONTHS
+    sources:
+      - source_id: INCTAX_D_40_2
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_D_40_2
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-04

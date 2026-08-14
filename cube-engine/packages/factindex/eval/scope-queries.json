@@ -1,0 +1,16 @@
+{
+    "authority": "ORACLE",
+  "reviewer": "Seohyun Park",
+  "reviewedAt": "2026-08-11",
+  "$comment": "scope 자동 조절 측정용. 정답지가 아니라 **질문 폭에 따라 답 길이가 실제로 갈리는지** 재는 회귀 감지용 세트다. narrow=단일 사실, wide=비교·종합.",
+  "queries": [
+    { "bucket": "narrow", "q": "ISA 비과세 한도가 얼마야", "expected": "TAXEX_91_18" },
+    { "bucket": "narrow", "q": "IRP 연간 납입한도 얼마야", "expected": "INCTAX_D_40_2" },
+    { "bucket": "narrow", "q": "연금저축 세액공제율 몇 퍼센트야", "expected": "INCTAX_59_3" },
+    { "bucket": "narrow", "q": "ISA 의무 가입기간 몇 년이야", "expected": "TAXEX_91_18" },
+    { "bucket": "wide", "q": "ISA가 뭐고 어떤 혜택이 있는지 전반적으로 알려줘", "expected": "TAXEX_91_18" },
+    { "bucket": "wide", "q": "ISA, 연금저축, IRP 셋을 전반적으로 비교해줘", "expected": "INCTAX_D_40_2" },
+    { "bucket": "wide", "q": "연금계좌 세액공제 제도를 처음부터 끝까지 설명해줘", "expected": "INCTAX_59_3" },
+    { "bucket": "wide", "q": "ISA 가입부터 만기까지 전 과정과 세금 처리를 설명해줘", "expected": "TAXEX_91_18" }
+  ]
+}

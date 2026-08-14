@@ -1,0 +1,5003 @@
+{
+  "kind": "divergence-probe",
+  "authority": "NOT_AN_ORACLE",
+  "$authority_note": [
+    "이 파일은 정답지가 아니다 (authority: NOT_AN_ORACLE).",
+    "TypeScript 구현의 출력을 기록한 것이므로 정답의 근거가 될 수 없다.",
+    "용도: (1) TS 구현 회귀 감지 (2) 순서 5 Python 독립 구현과의 불일치 탐지.",
+    "불일치 시 판정은 *.spec-derived.json 과 사양 원문이 한다. 이 파일을 근거로 사양을 바꾸지 마라.",
+    "재생성: npm run gen:vectors -w @cube/numeric"
+  ],
+  "specVersion": "v1.4",
+  "specSection": "§5.2 / §5.2.1",
+  "inputEncoding": {
+    "$bigint": "임의 정밀도 정수",
+    "$undefined": "JS undefined"
+  },
+  "generator": {
+    "algorithm": "LCG (Numerical Recipes)",
+    "multiplier": 1664525,
+    "increment": 1013904223,
+    "modulus": 4294967296,
+    "seed": 31415926
+  },
+  "caseCount": 500,
+  "cases": [
+    {
+      "input": {
+        "z": {
+          "n": null
+        },
+        "amount": [
+          800
+        ],
+        "accountId": {
+          "$bigint": "-7698729432"
+        }
+      },
+      "canonical": "{\"accountId\":\"-7698729432\",\"amount\":[800],\"z\":{\"n\":null}}",
+      "sha256": "74608bbfc1f9bd132d0a76e56adacc3173a0130465575833d7b0f4e70a45ef18"
+    },
+    {
+      "input": {
+        "valid_from": "q\"uote",
+        "accountId": true,
+        "note": 743,
+        "taxYear": {
+          "$bigint": "-943670"
+        }
+      },
+      "canonical": "{\"accountId\":true,\"note\":743,\"taxYear\":\"-943670\",\"valid_from\":\"q\\\"uote\"}",
+      "sha256": "4d326e1973535a68d384fd5ce96a6b404fb4b2c4427e7f089d40a96c28084e99"
+    },
+    {
+      "input": {
+        "priority": [
+          969
+        ],
+        "unitKrw": {
+          "$bigint": "541"
+        }
+      },
+      "canonical": "{\"priority\":[969],\"unitKrw\":\"541\"}",
+      "sha256": "a850c4d9d26760931e6a361940f069f03e06279b980099888fa77580ebd9e9b6"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "priority": null
+      },
+      "canonical": "{\"priority\":null}",
+      "sha256": "0a6202f188859cb41dee0f08388e9da21babf6f4b569f7b18abf0453caaa1062"
+    },
+    {
+      "input": {
+        "x1": {
+          "$bigint": "-1434"
+        },
+        "unitKrw": {
+          "$bigint": "3838945"
+        }
+      },
+      "canonical": "{\"unitKrw\":\"3838945\",\"x1\":\"-1434\"}",
+      "sha256": "3af1a2829e880ec84caa6cb375db92e8a288b1111da7fc91c628098a068d5a7f"
+    },
+    {
+      "input": {
+        "PENSION_SAVINGS": 24,
+        "z": true,
+        "amount": -523
+      },
+      "canonical": "{\"PENSION_SAVINGS\":24,\"amount\":-523,\"z\":true}",
+      "sha256": "e54d4660ca26a17833b83e9bde846336afed6160b80827312f5959959e7bff12"
+    },
+    {
+      "input": {
+        "b": null,
+        "note": [
+          -661
+        ],
+        "PENSION_SAVINGS": {
+          "$bigint": "14549234763"
+        },
+        "n": "back\\slash"
+      },
+      "canonical": "{\"PENSION_SAVINGS\":\"14549234763\",\"b\":null,\"n\":\"back\\\\slash\",\"note\":[-661]}",
+      "sha256": "d81a655e217503242d83257762e684a375ea49f803a8a6e64aa1ed3728ea7e6e"
+    },
+    {
+      "input": {
+        "b": [
+          463
+        ]
+      },
+      "canonical": "{\"b\":[463]}",
+      "sha256": "ab26a28d145f53d629d34182b6f0116b32aa45a6985cff917c0ce122dc0b04e4"
+    },
+    {
+      "input": {
+        "_leading": null,
+        "note": [
+          -561
+        ],
+        "z": {
+          "$bigint": "3612103"
+        }
+      },
+      "canonical": "{\"_leading\":null,\"note\":[-561],\"z\":\"3612103\"}",
+      "sha256": "0e71c302ed7746c5900a672c862a82b527cdf328c98c1f41a1e7999adb766f14"
+    },
+    {
+      "input": {
+        "n": null,
+        "amount": [
+          -880
+        ]
+      },
+      "canonical": "{\"amount\":[-880],\"n\":null}",
+      "sha256": "f83feddf6ce24d5ed3bf4275392cbe4596f0b696dadd23e42cee98eeba8a009d"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "valid_from": [
+          993
+        ]
+      },
+      "canonical": "{\"valid_from\":[993]}",
+      "sha256": "4ea977cd6a92978f7e8c28299d658fa2c2587df622efd85f747b1fc813556b55"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "x1": true
+      },
+      "canonical": "{\"x1\":true}",
+      "sha256": "50018055b56475f08daf1d25523fc2b1d46898e6c39253bd961ab27e3bc58728"
+    },
+    {
+      "input": {
+        "unitKrw": {}
+      },
+      "canonical": "{\"unitKrw\":{}}",
+      "sha256": "feaf403be6560b0da69b2c7f755eba835b7b4545153bb942e5501efa45a570a5"
+    },
+    {
+      "input": {
+        "a": true,
+        "b": 667
+      },
+      "canonical": "{\"a\":true,\"b\":667}",
+      "sha256": "2140a65e55532c96630aa007b33340abe6776aa1ee31f6d2979da9592007df87"
+    },
+    {
+      "input": {
+        "priority": [
+          -91
+        ],
+        "taxYear": {
+          "$bigint": "9630343474123"
+        },
+        "_leading": null
+      },
+      "canonical": "{\"_leading\":null,\"priority\":[-91],\"taxYear\":\"9630343474123\"}",
+      "sha256": "79074d2c82c3bc37cc884d248ebffa4f41296587405110e9dfecc1cf67389208"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "priority": -12,
+        "x1": {
+          "$bigint": "-56141896"
+        },
+        "PENSION_SAVINGS": -37
+      },
+      "canonical": "{\"PENSION_SAVINGS\":-37,\"priority\":-12,\"x1\":\"-56141896\"}",
+      "sha256": "c4ae06ae6908d127599ebd80c63cebb4cb23040aa346f799cc121e873c536ee8"
+    },
+    {
+      "input": {
+        "_leading": null
+      },
+      "canonical": "{\"_leading\":null}",
+      "sha256": "3fc156b135ca16adc94a4bb3d408364d2dee923481aa13d06e21947af4485b7e"
+    },
+    {
+      "input": {
+        "z": 39,
+        "PENSION_SAVINGS": {
+          "$bigint": "-569674"
+        },
+        "taxYear": true
+      },
+      "canonical": "{\"PENSION_SAVINGS\":\"-569674\",\"taxYear\":true,\"z\":39}",
+      "sha256": "fb5a6b9ce9215fc0bbadacc2c1c30bc5ac91e1eafc0518fa6db69ec95f0ea851"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "taxYear": true,
+        "valid_from": -475,
+        "accountId": {
+          "$bigint": "749218765438905"
+        },
+        "n": [
+          -76
+        ]
+      },
+      "canonical": "{\"accountId\":\"749218765438905\",\"n\":[-76],\"taxYear\":true,\"valid_from\":-475}",
+      "sha256": "6b329b7c791d4643ae8466be1fa025a5876c3445d8a38a579c371f38dd31687b"
+    },
+    {
+      "input": {
+        "n": null,
+        "amount": [
+          -426
+        ]
+      },
+      "canonical": "{\"amount\":[-426],\"n\":null}",
+      "sha256": "c208b7ff886b716bd5ceffdbed9a38011ed0fd594136e80e8443b35cc62ec1f5"
+    },
+    {
+      "input": {
+        "b": null,
+        "_leading": [
+          -734
+        ]
+      },
+      "canonical": "{\"_leading\":[-734],\"b\":null}",
+      "sha256": "c6ba096a8fc2221ac38cdc880eaa2a232326f67e01332079e4f58d57aaadd318"
+    },
+    {
+      "input": {
+        "amount": null,
+        "note": [
+          -559
+        ]
+      },
+      "canonical": "{\"amount\":null,\"note\":[-559]}",
+      "sha256": "13c79a46f2d685eeb5490f8bf889ed0c035fb63f2a8e1de412d4e538dbc0673c"
+    },
+    {
+      "input": {
+        "priority": null
+      },
+      "canonical": "{\"priority\":null}",
+      "sha256": "0a6202f188859cb41dee0f08388e9da21babf6f4b569f7b18abf0453caaa1062"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "amount": 131,
+        "accountId": {
+          "$bigint": "-58989676387638"
+        },
+        "PENSION_SAVINGS": true
+      },
+      "canonical": "{\"PENSION_SAVINGS\":true,\"accountId\":\"-58989676387638\",\"amount\":131}",
+      "sha256": "f0deacf0f3118f8e1d7fe34ddaca9837347acd22506f9b84c33c96712a25c9fe"
+    },
+    {
+      "input": {
+        "_leading": null,
+        "amount": [
+          195
+        ],
+        "a": {
+          "$bigint": "5"
+        },
+        "b": 33
+      },
+      "canonical": "{\"_leading\":null,\"a\":\"5\",\"amount\":[195],\"b\":33}",
+      "sha256": "d1ba54318306dcac3471b5af17d243d9b46f0adf3f5095de3b2b13a62de3cb0b"
+    },
+    {
+      "input": {
+        "priority": null,
+        "amount": [
+          -230
+        ],
+        "unitKrw": {
+          "$bigint": "-981454145632"
+        }
+      },
+      "canonical": "{\"amount\":[-230],\"priority\":null,\"unitKrw\":\"-981454145632\"}",
+      "sha256": "00c3f5091475ab813d402b80895bbe6ec7f82206cb5816e69dc8f6e3f503e97c"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "n": [
+          285
+        ],
+        "taxYear": {
+          "$bigint": "-583832127678"
+        }
+      },
+      "canonical": "{\"n\":[285],\"taxYear\":\"-583832127678\"}",
+      "sha256": "e85dc0e687cc1ed218153eb4fae9c9c3cf94f9f904d14733618104ce7d83cf90"
+    },
+    {
+      "input": {
+        "amount": null,
+        "priority": [
+          -179
+        ],
+        "accountId": {
+          "amount": [
+            -3
+          ],
+          "note": [
+            611
+          ],
+          "x1": {
+            "$bigint": "3678323"
+          }
+        }
+      },
+      "canonical": "{\"accountId\":{\"amount\":[-3],\"note\":[611],\"x1\":\"3678323\"},\"amount\":null,\"priority\":[-179]}",
+      "sha256": "933534d61bd6a8cbdf24cb7c2b89eea708431aa61b3e931d4166519035dc62e3"
+    },
+    {
+      "input": {
+        "_leading": null,
+        "valid_from": [
+          303
+        ],
+        "taxYear": {
+          "$bigint": "9078769"
+        },
+        "priority": [
+          969
+        ]
+      },
+      "canonical": "{\"_leading\":null,\"priority\":[969],\"taxYear\":\"9078769\",\"valid_from\":[303]}",
+      "sha256": "64b25e8c5764398c14e9b56c0d324fe2b63f2b5bdc383d17faf4dfa9392c994a"
+    },
+    {
+      "input": {
+        "priority": null,
+        "b": [
+          -71
+        ]
+      },
+      "canonical": "{\"b\":[-71],\"priority\":null}",
+      "sha256": "39388af2f67def90cda36c29e07afbb859f6ddb2601a6540580c9cc9c01b9d3b"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "PENSION_SAVINGS": true,
+        "priority": 196
+      },
+      "canonical": "{\"PENSION_SAVINGS\":true,\"priority\":196}",
+      "sha256": "378e1a13583b893b9d62de132d8ee12bbb376443fcb5242cadaa9c30ebba5041"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "note": [
+          392
+        ],
+        "a": {
+          "$bigint": "363698729090769"
+        },
+        "priority": [
+          -919
+        ]
+      },
+      "canonical": "{\"a\":\"363698729090769\",\"note\":[392],\"priority\":[-919]}",
+      "sha256": "03af8957d88f2ad1ac50a80bc26317edb3832332279b79cbaeba8a397f6995ce"
+    },
+    {
+      "input": {
+        "b": null,
+        "valid_from": [
+          536
+        ]
+      },
+      "canonical": "{\"b\":null,\"valid_from\":[536]}",
+      "sha256": "7748cb6a7409017946ce41923a698f33277f457f7c585674f0de920847251dd5"
+    },
+    {
+      "input": {
+        "valid_from": null
+      },
+      "canonical": "{\"valid_from\":null}",
+      "sha256": "899cd0917a7cba953971fc9cdc04057b189e8c316c48193d5fe5d81150fbce1e"
+    },
+    {
+      "input": {
+        "PENSION_SAVINGS": {
+          "$undefined": true
+        },
+        "amount": "tab\there"
+      },
+      "canonical": "{\"amount\":\"tab\\there\"}",
+      "sha256": "cda5c5286e144e833ee60a655781ec2f173a1f9a1a8483dc64ab875b4512fbff"
+    },
+    {
+      "input": {
+        "b": [
+          -432
+        ],
+        "unitKrw": {
+          "$bigint": "5272963094969"
+        }
+      },
+      "canonical": "{\"b\":[-432],\"unitKrw\":\"5272963094969\"}",
+      "sha256": "7cca4f41448b348cd06fbc52c30a478f5a4713517faadff2e8f9ece82e9e0c46"
+    },
+    {
+      "input": {
+        "b": null
+      },
+      "canonical": "{\"b\":null}",
+      "sha256": "46d44c558a54e9b241f123fe793d9a07b0c6b08eba7d62d409f37f5787d6dd5f"
+    },
+    {
+      "input": {
+        "x1": 32,
+        "PENSION_SAVINGS": {
+          "$bigint": "109"
+        }
+      },
+      "canonical": "{\"PENSION_SAVINGS\":\"109\",\"x1\":32}",
+      "sha256": "c22eb0aca793321ccec2f8fc9c7f4bfc5ce66cdf463a779fc8b193f36a7d5aac"
+    },
+    {
+      "input": {
+        "taxYear": {
+          "$bigint": "-385238"
+        },
+        "PENSION_SAVINGS": true,
+        "b": -945
+      },
+      "canonical": "{\"PENSION_SAVINGS\":true,\"b\":-945,\"taxYear\":\"-385238\"}",
+      "sha256": "1850b455e15c8040966506de868cb7d593a7a7fcb24874081a1ebd28b1a82a8a"
+    },
+    {
+      "input": {
+        "priority": null
+      },
+      "canonical": "{\"priority\":null}",
+      "sha256": "0a6202f188859cb41dee0f08388e9da21babf6f4b569f7b18abf0453caaa1062"
+    },
+    {
+      "input": {
+        "z": 37,
+        "PENSION_SAVINGS": {
+          "$bigint": "96905876347"
+        },
+        "amount": "q\"uote",
+        "unitKrw": true
+      },
+      "canonical": "{\"PENSION_SAVINGS\":\"96905876347\",\"amount\":\"q\\\"uote\",\"unitKrw\":true,\"z\":37}",
+      "sha256": "9fda14bf0b1ff63c96860a392b5a628b800bf56739af3a259bc918dda3e33697"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "note": "back\\slash"
+      },
+      "canonical": "{\"note\":\"back\\\\slash\"}",
+      "sha256": "2f83879ff90e343ad2991782ee6dc25bb9c6b83099c42a50fec4e5c8db9e1a41"
+    },
+    {
+      "input": {
+        "valid_from": [
+          -692
+        ]
+      },
+      "canonical": "{\"valid_from\":[-692]}",
+      "sha256": "48ddf1942725d6a9c9675e684d5ab873946d154b1037572609282770ed5cd4d2"
+    },
+    {
+      "input": {
+        "priority": null,
+        "valid_from": [
+          416
+        ],
+        "PENSION_SAVINGS": {
+          "$bigint": "7250505"
+        },
+        "amount": [
+          -452
+        ]
+      },
+      "canonical": "{\"PENSION_SAVINGS\":\"7250505\",\"amount\":[-452],\"priority\":null,\"valid_from\":[416]}",
+      "sha256": "d5f8e85643c917f74ce30bc32198f2a35027fb58e1a48d7eb178f524d7204f46"
+    },
+    {
+      "input": {
+        "amount": null,
+        "priority": [
+          -151
+        ],
+        "accountId": {
+          "$bigint": "-565478"
+        }
+      },
+      "canonical": "{\"accountId\":\"-565478\",\"amount\":null,\"priority\":[-151]}",
+      "sha256": "3e506dc9174a7f476636c3f68cb8ce1a54d2de1658a65931117b3210dbc54d40"
+    },
+    {
+      "input": {
+        "priority": [
+          -99
+        ]
+      },
+      "canonical": "{\"priority\":[-99]}",
+      "sha256": "2cb6cea10f4af0c0842f34d589e92ba54e635f77cd7cac2ab3101667b9d7e99b"
+    },
+    {
+      "input": {
+        "_leading": null
+      },
+      "canonical": "{\"_leading\":null}",
+      "sha256": "3fc156b135ca16adc94a4bb3d408364d2dee923481aa13d06e21947af4485b7e"
+    },
+    {
+      "input": {
+        "a": -40,
+        "z": {
+          "$bigint": "-3878"
+        },
+        "x1": {
+          "$bigint": "1"
+        }
+      },
+      "canonical": "{\"a\":-40,\"x1\":\"1\",\"z\":\"-3878\"}",
+      "sha256": "46203e39f1ab341c6841651f537626ac4bbbd25cc197bb0d30920b569ab92e85"
+    },
+    {
+      "input": {
+        "x1": {
+          "_leading": null
+        }
+      },
+      "canonical": "{\"x1\":{\"_leading\":null}}",
+      "sha256": "ec8e28e7f5982025a54a4dd445ae2d2adbc8697e3b81f2e1d1de0e578b1104ae"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "valid_from": 519,
+        "accountId": {
+          "$bigint": "-34"
+        },
+        "z": {
+          "valid_from": null,
+          "b": [
+            -636
+          ],
+          "x1": {
+            "$bigint": "18505036389"
+          }
+        }
+      },
+      "canonical": "{\"accountId\":\"-34\",\"valid_from\":519,\"z\":{\"b\":[-636],\"valid_from\":null,\"x1\":\"18505036389\"}}",
+      "sha256": "c1a658563a11202cc102a685de380668bca3ff80a9b5d9270b31609d3efd3607"
+    },
+    {
+      "input": {
+        "taxYear": {
+          "$bigint": "147"
+        },
+        "amount": "2026-07-30"
+      },
+      "canonical": "{\"amount\":\"2026-07-30\",\"taxYear\":\"147\"}",
+      "sha256": "68e9b197b63b54fd91e08b0f642615bf073029efa31afacff77f898a554dba9d"
+    },
+    {
+      "input": {
+        "note": [
+          13
+        ],
+        "unitKrw": {
+          "$bigint": "7"
+        },
+        "n": -627
+      },
+      "canonical": "{\"n\":-627,\"note\":[13],\"unitKrw\":\"7\"}",
+      "sha256": "860a5b5210611a2fd0ab2a8d4481de2b7f96894d95697d441bc19b77a7344e65"
+    },
+    {
+      "input": {
+        "b": null,
+        "amount": [
+          -531
+        ],
+        "PENSION_SAVINGS": {
+          "$bigint": "-703816"
+        }
+      },
+      "canonical": "{\"PENSION_SAVINGS\":\"-703816\",\"amount\":[-531],\"b\":null}",
+      "sha256": "e660f588bfad9cbe2cb3291a03aae960b86924b63ee833fc25ca91af246b516e"
+    },
+    {
+      "input": {
+        "amount": [
+          -339
+        ]
+      },
+      "canonical": "{\"amount\":[-339]}",
+      "sha256": "523beeae29d46bae647a842fb1bc317612d3fc416a6508a52a87f3094b04ee67"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "a": true,
+        "amount": [
+          294
+        ],
+        "unitKrw": {
+          "$bigint": "549890923038581"
+        }
+      },
+      "canonical": "{\"a\":true,\"amount\":[294],\"unitKrw\":\"549890923038581\"}",
+      "sha256": "8d1e1546048be99e98baf39854503a364c9ad9d55209e5c316e78209ab72ea2a"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "priority": [
+          -346
+        ]
+      },
+      "canonical": "{\"priority\":[-346]}",
+      "sha256": "a4dd613cb8149d444ef6d9f2afa74e00e04f06e0bc2e3a10d5abb895ba22e93c"
+    },
+    {
+      "input": {
+        "valid_from": [
+          -117
+        ],
+        "a": {
+          "$bigint": "-3414303816"
+        },
+        "z": {
+          "n": null,
+          "priority": [
+            -90
+          ]
+        }
+      },
+      "canonical": "{\"a\":\"-3414303816\",\"valid_from\":[-117],\"z\":{\"n\":null,\"priority\":[-90]}}",
+      "sha256": "8f9119e069757d28b3285835c808eb11e756a053690e810128ae866f1a0e5abd"
+    },
+    {
+      "input": {
+        "b": null,
+        "note": [
+          -777
+        ]
+      },
+      "canonical": "{\"b\":null,\"note\":[-777]}",
+      "sha256": "7822c6b6a194393a6a9ca8bb806a35e51f3829871f1ae75ed4b4a08008b46015"
+    },
+    {
+      "input": {
+        "note": null
+      },
+      "canonical": "{\"note\":null}",
+      "sha256": "0cd4101d3beb3cdd08a62cb8508f2a2a0942b290a02d6ba252d5fb481d3ce054"
+    },
+    {
+      "input": {
+        "x1": {
+          "$bigint": "7"
+        },
+        "note": 321,
+        "unitKrw": {
+          "$bigint": "1"
+        }
+      },
+      "canonical": "{\"note\":321,\"unitKrw\":\"1\",\"x1\":\"7\"}",
+      "sha256": "8378c2e9a27da42c58f00e7d17958787f7ad1cac245ee7e860e384af0dd5ea25"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "b": "2026-07-30"
+      },
+      "canonical": "{\"b\":\"2026-07-30\"}",
+      "sha256": "f58d60049c8aa5faa0d6947e6635aa823637953d41806985c8d520abc86198ab"
+    },
+    {
+      "input": {
+        "b": [
+          52
+        ]
+      },
+      "canonical": "{\"b\":[52]}",
+      "sha256": "ea56709db6e9cd6bbf4b0d9c1b826db926d5479ee6384cdbded06a20d1766bce"
+    },
+    {
+      "input": {
+        "valid_from": null,
+        "priority": [
+          -393
+        ],
+        "taxYear": {
+          "$bigint": "567816923258763"
+        },
+        "amount": [
+          -157
+        ]
+      },
+      "canonical": "{\"amount\":[-157],\"priority\":[-393],\"taxYear\":\"567816923258763\",\"valid_from\":null}",
+      "sha256": "84418d43148608fe37d108001f4ec153cce3c189fb29e4fa6a1772d8ef03d268"
+    },
+    {
+      "input": {
+        "priority": null,
+        "valid_from": [
+          -390
+        ],
+        "taxYear": {
+          "$bigint": "-90381412"
+        },
+        "accountId": {
+          "$undefined": true
+        }
+      },
+      "canonical": "{\"priority\":null,\"taxYear\":\"-90381412\",\"valid_from\":[-390]}",
+      "sha256": "646b271443ecee990ee63583a069bc006cd70441399e568975fcd6ba195742f5"
+    },
+    {
+      "input": {
+        "a": {
+          "$bigint": "-921816"
+        }
+      },
+      "canonical": "{\"a\":\"-921816\"}",
+      "sha256": "b09c313d9f940addc1402d16ad8ad2b9335a08d34b79a45d3a2759f546ee72ba"
+    },
+    {
+      "input": {
+        "amount": [
+          699
+        ]
+      },
+      "canonical": "{\"amount\":[699]}",
+      "sha256": "031497e3e3536e51808ff09cba04e4d98cf0054dbbc2b8d925bef98053b7cf8c"
+    },
+    {
+      "input": {
+        "_leading": null,
+        "valid_from": [
+          221
+        ],
+        "z": {
+          "$bigint": "7698385070545"
+        }
+      },
+      "canonical": "{\"_leading\":null,\"valid_from\":[221],\"z\":\"7698385070545\"}",
+      "sha256": "4f7623248128c1567f41db979effa4158cca4139db40c2318c6e3eb70331d067"
+    },
+    {
+      "input": {
+        "z": {
+          "$bigint": "9018749"
+        },
+        "note": -398,
+        "valid_from": [
+          -961
+        ]
+      },
+      "canonical": "{\"note\":-398,\"valid_from\":[-961],\"z\":\"9018749\"}",
+      "sha256": "07fcc3aff2e2bbe5cafdb42cb576ff165cf0037c67e3a2b402136e16d52a6bd7"
+    },
+    {
+      "input": {
+        "amount": null,
+        "_leading": [
+          44
+        ],
+        "unitKrw": {
+          "$bigint": "-56341896567496"
+        }
+      },
+      "canonical": "{\"_leading\":[44],\"amount\":null,\"unitKrw\":\"-56341896567496\"}",
+      "sha256": "2434482d42327682005470b935a7a2b2d262ff06c7b53c03590e1669125e6066"
+    },
+    {
+      "input": {
+        "note": [
+          723
+        ]
+      },
+      "canonical": "{\"note\":[723]}",
+      "sha256": "f927ff5de2f00e8090ccaeea05f4fdc6532de0d674a7e851f45b845457a18782"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "b": -509
+      },
+      "canonical": "{\"b\":-509}",
+      "sha256": "1fa336d49cdf872d62f20f5115f115703519b876dc0d12da8a00930b96583ddd"
+    },
+    {
+      "input": {
+        "n": null,
+        "b": [
+          -404
+        ]
+      },
+      "canonical": "{\"b\":[-404],\"n\":null}",
+      "sha256": "015e53363a9356ab74b585f0d8f17719c7347b661156190094da6a822b20544c"
+    },
+    {
+      "input": {
+        "amount": null,
+        "b": [
+          -249
+        ]
+      },
+      "canonical": "{\"amount\":null,\"b\":[-249]}",
+      "sha256": "ebbdbf1aaafd584d53ac97d1244dd2718755f16182666f3d9296db0fb687cc71"
+    },
+    {
+      "input": {
+        "priority": -230,
+        "amount": [
+          327
+        ],
+        "a": {
+          "$bigint": "709098325"
+        }
+      },
+      "canonical": "{\"a\":\"709098325\",\"amount\":[327],\"priority\":-230}",
+      "sha256": "51ce3af1730e75d3d85b267ed18ab7f6cc806c961c7f0d4bd766c046b254045a"
+    },
+    {
+      "input": {
+        "n": null
+      },
+      "canonical": "{\"n\":null}",
+      "sha256": "5b4da02351c1c20974b216a5e3a4edb59ac51cbda6be3e9d82952b4f5beea463"
+    },
+    {
+      "input": {
+        "x1": -16,
+        "z": {
+          "$bigint": "5814321"
+        },
+        "amount": [
+          661
+        ]
+      },
+      "canonical": "{\"amount\":[661],\"x1\":-16,\"z\":\"5814321\"}",
+      "sha256": "45a0141e5322caece85f2266a3bed8aa635d1f6aa0b61281a2a1089e9c82abca"
+    },
+    {
+      "input": {
+        "b": null
+      },
+      "canonical": "{\"b\":null}",
+      "sha256": "46d44c558a54e9b241f123fe793d9a07b0c6b08eba7d62d409f37f5787d6dd5f"
+    },
+    {
+      "input": {
+        "x1": {
+          "$undefined": true
+        },
+        "valid_from": "q\"uote",
+        "a": true
+      },
+      "canonical": "{\"a\":true,\"valid_from\":\"q\\\"uote\"}",
+      "sha256": "0de57f23bfbc044d135796a7eed6be52c65ebb0156a91662132511bee3114872"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "_leading": "s",
+        "taxYear": true,
+        "note": -483,
+        "unitKrw": {
+          "$bigint": "3272563434527"
+        }
+      },
+      "canonical": "{\"_leading\":\"s\",\"note\":-483,\"taxYear\":true,\"unitKrw\":\"3272563434527\"}",
+      "sha256": "3fa27522fc8f55e8d65005cb85ebd7c705dbfdb3551c6551a9c6b7b014ab611d"
+    },
+    {
+      "input": {
+        "unitKrw": true
+      },
+      "canonical": "{\"unitKrw\":true}",
+      "sha256": "0d55114a79356d8637ba16a3adbfec0eabdeef2abf17c7e4d95b06b1a4fdf824"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "n": "q\"uote"
+      },
+      "canonical": "{\"n\":\"q\\\"uote\"}",
+      "sha256": "aecb03a5f63ba36117e568a8d5b0d3c879b0d0566b0c0d1fada254f11408b5a2"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "taxYear": -30,
+        "x1": {
+          "$bigint": "725072345278747"
+        }
+      },
+      "canonical": "{\"taxYear\":-30,\"x1\":\"725072345278747\"}",
+      "sha256": "8ef5d870f07422b814ccd8dbeb0571faf86cc76b4c5eed280a470b8c2484b881"
+    },
+    {
+      "input": {
+        "unitKrw": true,
+        "b": "back\\slash"
+      },
+      "canonical": "{\"b\":\"back\\\\slash\",\"unitKrw\":true}",
+      "sha256": "8fa0b34a3c298ff319feb3e6d4e8a9251f5febad7652f4c844a074875ae7efb5"
+    },
+    {
+      "input": {
+        "accountId": {
+          "b": -751,
+          "priority": [
+            80
+          ],
+          "accountId": {
+            "$bigint": "5"
+          }
+        }
+      },
+      "canonical": "{\"accountId\":{\"accountId\":\"5\",\"b\":-751,\"priority\":[80]}}",
+      "sha256": "da512632298db12df749cf37b3f4b4c568d6e7df680e5e8d4cc094c32f6183c5"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "taxYear": true
+      },
+      "canonical": "{\"taxYear\":true}",
+      "sha256": "a2a42ccc056894c69b3e9998fb8790ee1d39990455f2a496d0447a940e41dd89"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "b": "연금저축",
+        "unitKrw": true
+      },
+      "canonical": "{\"b\":\"연금저축\",\"unitKrw\":true}",
+      "sha256": "d35de1fbf2479accf1a9e541c2caf7322321ce43b4afd6235af72d76554a75eb"
+    },
+    {
+      "input": {
+        "a": {}
+      },
+      "canonical": "{\"a\":{}}",
+      "sha256": "5d8171b9fc362e385a79ccd9d7992c96bcb4afca51d6278068bd1df49863b3a7"
+    },
+    {
+      "input": {
+        "z": true,
+        "n": -255,
+        "taxYear": {
+          "$bigint": "36365"
+        }
+      },
+      "canonical": "{\"n\":-255,\"taxYear\":\"36365\",\"z\":true}",
+      "sha256": "bb9d9db23853b6428a3801f8bc3f7034b518fbac9e3d80cc2542f39cc2d279f3"
+    },
+    {
+      "input": {
+        "accountId": true
+      },
+      "canonical": "{\"accountId\":true}",
+      "sha256": "1f070305c2ad2eb561966d3d4281fa590065efbaea96914aaf9969ddfea9a270"
+    },
+    {
+      "input": {
+        "accountId": {
+          "b": null,
+          "amount": [
+            -615
+          ],
+          "PENSION_SAVINGS": {
+            "$bigint": "-52961630"
+          }
+        }
+      },
+      "canonical": "{\"accountId\":{\"PENSION_SAVINGS\":\"-52961630\",\"amount\":[-615],\"b\":null}}",
+      "sha256": "3dd5dae834e012efb46e4c628e8ab3086943cc84a4a25848ba48944b933769aa"
+    },
+    {
+      "input": {
+        "valid_from": -348,
+        "x1": {
+          "$bigint": "-9014"
+        },
+        "z": {
+          "$bigint": "-927094389274"
+        }
+      },
+      "canonical": "{\"valid_from\":-348,\"x1\":\"-9014\",\"z\":\"-927094389274\"}",
+      "sha256": "6de1ee241d986058febe29b0c66a4d6a88f85d2e5b282b91713bf0a732db4b8a"
+    },
+    {
+      "input": {
+        "_leading": null,
+        "valid_from": [
+          -724
+        ],
+        "x1": {
+          "$bigint": "381492789"
+        }
+      },
+      "canonical": "{\"_leading\":null,\"valid_from\":[-724],\"x1\":\"381492789\"}",
+      "sha256": "488b2639d54b543b5d354a2f5166c3abc625920b89bdb030b1f738a9b3c47e03"
+    },
+    {
+      "input": {
+        "unitKrw": {
+          "b": null,
+          "priority": [
+            391
+          ],
+          "x1": {
+            "$bigint": "-945012345014"
+          }
+        }
+      },
+      "canonical": "{\"unitKrw\":{\"b\":null,\"priority\":[391],\"x1\":\"-945012345014\"}}",
+      "sha256": "6336fdeccc2c3d183385ca31fb0b6d65373bc56094e2f4a65d41b28fd92bfe8d"
+    },
+    {
+      "input": {
+        "amount": null,
+        "priority": [
+          849
+        ],
+        "taxYear": {
+          "$bigint": "-3850"
+        },
+        "a": {
+          "$bigint": "9698109"
+        }
+      },
+      "canonical": "{\"a\":\"9698109\",\"amount\":null,\"priority\":[849],\"taxYear\":\"-3850\"}",
+      "sha256": "d67f53865c2ddfbd8d6b9f998e8d0f1228f7516410db7c33f6cc52f60498c0a6"
+    },
+    {
+      "input": {
+        "accountId": 13,
+        "PENSION_SAVINGS": {
+          "$bigint": "3270105"
+        },
+        "note": [
+          192
+        ],
+        "taxYear": {
+          "$bigint": "9216741"
+        }
+      },
+      "canonical": "{\"PENSION_SAVINGS\":\"3270105\",\"accountId\":13,\"note\":[192],\"taxYear\":\"9216741\"}",
+      "sha256": "03eb1e08c037699d486a11f2578205696b5ec3c18f1911f42c0ab8fa60eeacae"
+    },
+    {
+      "input": {
+        "a": -29,
+        "unitKrw": {
+          "$bigint": "963"
+        },
+        "amount": "",
+        "accountId": true
+      },
+      "canonical": "{\"a\":-29,\"accountId\":true,\"amount\":\"\",\"unitKrw\":\"963\"}",
+      "sha256": "a452221019ce7ad44d249469d14010a9c1572f13e13a5516b1bfb91c3c8e223b"
+    },
+    {
+      "input": {
+        "PENSION_SAVINGS": {
+          "$bigint": "-3690"
+        },
+        "priority": [
+          257
+        ]
+      },
+      "canonical": "{\"PENSION_SAVINGS\":\"-3690\",\"priority\":[257]}",
+      "sha256": "d7955fc2f5e512d732c181d927af70b8a0d222c8786ed24321731ffa4f45e45d"
+    },
+    {
+      "input": {
+        "amount": null,
+        "n": [
+          512
+        ],
+        "PENSION_SAVINGS": {
+          "$bigint": "96545"
+        }
+      },
+      "canonical": "{\"PENSION_SAVINGS\":\"96545\",\"amount\":null,\"n\":[512]}",
+      "sha256": "7e089b10f82b517c841a8e9be4d3249e5cb6f8da64158eda30a097b38a0cbefa"
+    },
+    {
+      "input": {
+        "x1": true
+      },
+      "canonical": "{\"x1\":true}",
+      "sha256": "50018055b56475f08daf1d25523fc2b1d46898e6c39253bd961ab27e3bc58728"
+    },
+    {
+      "input": {
+        "z": {
+          "note": null,
+          "_leading": [
+            -596
+          ],
+          "z": {
+            "$bigint": "-301232769878"
+          }
+        },
+        "accountId": {
+          "$bigint": "-9270103618"
+        },
+        "taxYear": {
+          "note": null,
+          "n": [
+            645
+          ]
+        }
+      },
+      "canonical": "{\"accountId\":\"-9270103618\",\"taxYear\":{\"n\":[645],\"note\":null},\"z\":{\"_leading\":[-596],\"note\":null,\"z\":\"-301232769878\"}}",
+      "sha256": "99d2bc5c889b4484c52c7258b06cec712ccce0b4972514bfdd366751ab13f802"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "n": [
+          334
+        ],
+        "z": {
+          "$bigint": "94789"
+        },
+        "priority": [
+          -203
+        ]
+      },
+      "canonical": "{\"n\":[334],\"priority\":[-203],\"z\":\"94789\"}",
+      "sha256": "830c2a87e2fd13489d9b5b2f36df85c49008f84ca0a877737b292e5699c9af86"
+    },
+    {
+      "input": {
+        "_leading": 906,
+        "note": [
+          551
+        ],
+        "unitKrw": {
+          "$bigint": "5"
+        }
+      },
+      "canonical": "{\"_leading\":906,\"note\":[551],\"unitKrw\":\"5\"}",
+      "sha256": "6becdf393508505cd5d4a7fc3c1352ebc0fd8c0f0eb467f64138a3e650fb7bda"
+    },
+    {
+      "input": {
+        "n": null,
+        "valid_from": [
+          -333
+        ]
+      },
+      "canonical": "{\"n\":null,\"valid_from\":[-333]}",
+      "sha256": "c7a5751e89d28acdbe3482dc7705a11f3d43d86c4b6e97e508c6fb5521b21eb6"
+    },
+    {
+      "input": {
+        "n": null,
+        "valid_from": [
+          688
+        ],
+        "x1": {
+          "$bigint": "1634969292165"
+        },
+        "amount": null
+      },
+      "canonical": "{\"amount\":null,\"n\":null,\"valid_from\":[688],\"x1\":\"1634969292165\"}",
+      "sha256": "4d2f06854c3d54624d72aefc61ddd369b6c475e483c17ccc1e4c2deb2feee623"
+    },
+    {
+      "input": {
+        "unitKrw": 29,
+        "a": {
+          "$bigint": "58945"
+        },
+        "valid_from": null,
+        "note": [
+          899
+        ]
+      },
+      "canonical": "{\"a\":\"58945\",\"note\":[899],\"unitKrw\":29,\"valid_from\":null}",
+      "sha256": "65638f3237e32ffb63c60498969795c6f31fd0c7a3100ed5153b7da7ecd01177"
+    },
+    {
+      "input": {
+        "n": null,
+        "priority": [
+          346
+        ],
+        "z": {
+          "$bigint": "7"
+        }
+      },
+      "canonical": "{\"n\":null,\"priority\":[346],\"z\":\"7\"}",
+      "sha256": "686980633eb5ce8ec0eb371cd758cba20d40e723b54484de4d33056c90e09bb9"
+    },
+    {
+      "input": {
+        "PENSION_SAVINGS": {
+          "n": null
+        },
+        "note": [
+          852
+        ]
+      },
+      "canonical": "{\"PENSION_SAVINGS\":{\"n\":null},\"note\":[852]}",
+      "sha256": "796066a8c42922ca648ae81b93e4755cbf271665c428135436c5dfe8b24bbd9a"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "x1": true,
+        "valid_from": -714,
+        "a": {
+          "$bigint": "-98745434"
+        }
+      },
+      "canonical": "{\"a\":\"-98745434\",\"valid_from\":-714,\"x1\":true}",
+      "sha256": "68c1f8e59fec0a393c9976b8140f366c9d0d037f438d56df52544d0b15049f57"
+    },
+    {
+      "input": {
+        "n": 63,
+        "x1": {
+          "$bigint": "3470127276927"
+        }
+      },
+      "canonical": "{\"n\":63,\"x1\":\"3470127276927\"}",
+      "sha256": "6d8a157116f5054534e3e57ae9ffe8e08711816cac1253bb1fb2c2c9bf4617cb"
+    },
+    {
+      "input": {
+        "z": true,
+        "amount": 907
+      },
+      "canonical": "{\"amount\":907,\"z\":true}",
+      "sha256": "ed6a9bb78826b4784399db9a807b7fdf2caadfec1c0f4dae4e864cbc876b7d7d"
+    },
+    {
+      "input": {
+        "amount": null
+      },
+      "canonical": "{\"amount\":null}",
+      "sha256": "2ccd94e2ba19c54ed10b40a18c17a6122ae49060dad6bb43051c9a65894d578b"
+    },
+    {
+      "input": {
+        "x1": {
+          "$undefined": true
+        },
+        "n": "s"
+      },
+      "canonical": "{\"n\":\"s\"}",
+      "sha256": "4f512a5d9857b9d10e49e5ca7081f2426004859603f51021431a89a8d3998db9"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "PENSION_SAVINGS": {
+          "$undefined": true
+        },
+        "priority": 906,
+        "x1": true
+      },
+      "canonical": "{\"priority\":906,\"x1\":true}",
+      "sha256": "12eeb77a92456b3d147d25ff5e7ab63e0c87fc3cf40d9041d8b2d5cdc081a7c6"
+    },
+    {
+      "input": {
+        "b": null
+      },
+      "canonical": "{\"b\":null}",
+      "sha256": "46d44c558a54e9b241f123fe793d9a07b0c6b08eba7d62d409f37f5787d6dd5f"
+    },
+    {
+      "input": {
+        "taxYear": 19
+      },
+      "canonical": "{\"taxYear\":19}",
+      "sha256": "0edd08f0e053b0a44869d57ad030d8e6091ed05739695ad16417882c1077335f"
+    },
+    {
+      "input": {
+        "note": null
+      },
+      "canonical": "{\"note\":null}",
+      "sha256": "0cd4101d3beb3cdd08a62cb8508f2a2a0942b290a02d6ba252d5fb481d3ce054"
+    },
+    {
+      "input": {
+        "z": -26
+      },
+      "canonical": "{\"z\":-26}",
+      "sha256": "ac36ce611ceb438aba2d4825b1669b531d1d799d4803beab800d3125867f6ec6"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "PENSION_SAVINGS": true,
+        "note": 72,
+        "x1": {
+          "$bigint": "-145610"
+        }
+      },
+      "canonical": "{\"PENSION_SAVINGS\":true,\"note\":72,\"x1\":\"-145610\"}",
+      "sha256": "fb16375616e347b8a9eea00f4d096bd57e2143c8c494a819251f5a5a60b449bf"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "z": {
+          "$bigint": "-543056"
+        },
+        "PENSION_SAVINGS": true
+      },
+      "canonical": "{\"PENSION_SAVINGS\":true,\"z\":\"-543056\"}",
+      "sha256": "8ab45a647821da64f915ac71eddc91148b99bae747e03db3087231590333c289"
+    },
+    {
+      "input": {
+        "accountId": {
+          "priority": null
+        }
+      },
+      "canonical": "{\"accountId\":{\"priority\":null}}",
+      "sha256": "48d55064db04cd6f6f459ab897d846d25d942fa3a6b69a6b0a6bcfc4fc07a0c5"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "note": -348,
+        "z": {
+          "$bigint": "-90525438"
+        },
+        "x1": {
+          "$undefined": true
+        }
+      },
+      "canonical": "{\"note\":-348,\"z\":\"-90525438\"}",
+      "sha256": "1c15685ced6ae1526f6324f53687827e4297086b7b938d03541f0a925decdcb6"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "amount": null
+      },
+      "canonical": "{\"amount\":null}",
+      "sha256": "2ccd94e2ba19c54ed10b40a18c17a6122ae49060dad6bb43051c9a65894d578b"
+    },
+    {
+      "input": {
+        "PENSION_SAVINGS": -15
+      },
+      "canonical": "{\"PENSION_SAVINGS\":-15}",
+      "sha256": "1fd074a0217ffe73e0e30cab3cb8e909e930aee9d86ad94e46fc8d18480f75f7"
+    },
+    {
+      "input": {
+        "n": null,
+        "_leading": [
+          725
+        ],
+        "accountId": {
+          "$bigint": "1434365"
+        }
+      },
+      "canonical": "{\"_leading\":[725],\"accountId\":\"1434365\",\"n\":null}",
+      "sha256": "c3804887021cecec2f362724ccf41d9a2e848af533d64fe0e776630ccfadd727"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "_leading": 60,
+        "PENSION_SAVINGS": {
+          "$bigint": "3832361"
+        }
+      },
+      "canonical": "{\"PENSION_SAVINGS\":\"3832361\",\"_leading\":60}",
+      "sha256": "0c8f219cfeb18ecf62e9226038a949ac0da24a314833ba733ce3dbf02f2a471a"
+    },
+    {
+      "input": {
+        "accountId": {
+          "$undefined": true
+        },
+        "_leading": "2026-07-30",
+        "x1": true
+      },
+      "canonical": "{\"_leading\":\"2026-07-30\",\"x1\":true}",
+      "sha256": "b2087e7d1e6a6e57c27229933614fd03faec373d02a586cdc364ead9cf1135c4"
+    },
+    {
+      "input": {
+        "taxYear": {
+          "amount": null
+        },
+        "b": [
+          -972
+        ]
+      },
+      "canonical": "{\"b\":[-972],\"taxYear\":{\"amount\":null}}",
+      "sha256": "4b82fca019545ce62246ff72c933ae0ce69db4027a7e2065e18a4f7ad7308514"
+    },
+    {
+      "input": {
+        "priority": null,
+        "amount": [
+          467
+        ],
+        "z": {
+          "$bigint": "-78"
+        }
+      },
+      "canonical": "{\"amount\":[467],\"priority\":null,\"z\":\"-78\"}",
+      "sha256": "262a8312dde74168af44059762b62399deb7c3b4245df4f15b0da4662f2a5c2e"
+    },
+    {
+      "input": {
+        "b": "",
+        "x1": true
+      },
+      "canonical": "{\"b\":\"\",\"x1\":true}",
+      "sha256": "21becb588b3d687bc68913d6422283d630eba6db837bee1db92a60792e196e6e"
+    },
+    {
+      "input": {
+        "taxYear": {
+          "n": null
+        }
+      },
+      "canonical": "{\"taxYear\":{\"n\":null}}",
+      "sha256": "03427ecb6afbd0874cebf2de260fdb4f6c553dc7ce3ea7962046678eed378254"
+    },
+    {
+      "input": {
+        "taxYear": 47,
+        "accountId": {
+          "$bigint": "-58347250"
+        },
+        "unitKrw": {
+          "$undefined": true
+        }
+      },
+      "canonical": "{\"accountId\":\"-58347250\",\"taxYear\":47}",
+      "sha256": "32810c1171beebf5ce4d37b47fadc87f006334f207d9ecc7164a1b4f72a01406"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "note": null,
+        "_leading": [
+          740
+        ],
+        "accountId": {
+          "$bigint": "387812161850983"
+        }
+      },
+      "canonical": "{\"_leading\":[740],\"accountId\":\"387812161850983\",\"note\":null}",
+      "sha256": "0039f65ae8d9faf9a51c2a05c1852154666e6ec148f472ceadaeccea013b5bac"
+    },
+    {
+      "input": {
+        "PENSION_SAVINGS": -34
+      },
+      "canonical": "{\"PENSION_SAVINGS\":-34}",
+      "sha256": "4f1634154819ff9df6c449b4759f98aa48875b2d21d7ab44e8a3a64e44c43dcf"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "x1": true
+      },
+      "canonical": "{\"x1\":true}",
+      "sha256": "50018055b56475f08daf1d25523fc2b1d46898e6c39253bd961ab27e3bc58728"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "b": 812,
+        "accountId": true
+      },
+      "canonical": "{\"accountId\":true,\"b\":812}",
+      "sha256": "d65599d3b8f7cee2e5f171717f232a029c77a13d13f973c14e097442b56f92f3"
+    },
+    {
+      "input": {
+        "note": null,
+        "_leading": [
+          169
+        ],
+        "z": {
+          "$bigint": "5652901072127"
+        },
+        "b": null
+      },
+      "canonical": "{\"_leading\":[169],\"b\":null,\"note\":null,\"z\":\"5652901072127\"}",
+      "sha256": "81857353f0f9f26132c0274dfe09be42ab46c496d6b15bb32355287a88a523d0"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "z": {
+          "note": null,
+          "_leading": [
+            825
+          ],
+          "PENSION_SAVINGS": {
+            "$bigint": "74165"
+          }
+        }
+      },
+      "canonical": "{\"z\":{\"PENSION_SAVINGS\":\"74165\",\"_leading\":[825],\"note\":null}}",
+      "sha256": "d6715c69cb68b75758452d91b5b36f59df67d4ed4b5cc007c2f0b859d45cb465"
+    },
+    {
+      "input": {
+        "z": true,
+        "b": -481,
+        "unitKrw": {
+          "$bigint": "54363"
+        }
+      },
+      "canonical": "{\"b\":-481,\"unitKrw\":\"54363\",\"z\":true}",
+      "sha256": "1d0c9ef0d6a339afd5e7c3494225754fd685b4934466327deb5caf12e19b7b65"
+    },
+    {
+      "input": {
+        "unitKrw": true,
+        "n": -940,
+        "a": {
+          "$bigint": "109052965"
+        }
+      },
+      "canonical": "{\"a\":\"109052965\",\"n\":-940,\"unitKrw\":true}",
+      "sha256": "661a0b08bc0422607cfbb420489306673b9754be130050f8c77542750d9dbb4e"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "_leading": "tab\there",
+        "PENSION_SAVINGS": true,
+        "priority": -38,
+        "a": {
+          "$bigint": "5"
+        }
+      },
+      "canonical": "{\"PENSION_SAVINGS\":true,\"_leading\":\"tab\\there\",\"a\":\"5\",\"priority\":-38}",
+      "sha256": "98b786034e1d7453c27600ab80657f8262316d9f37c6f7622bbf5030cf2e7a75"
+    },
+    {
+      "input": {
+        "taxYear": {
+          "amount": [
+            -11
+          ]
+        },
+        "accountId": {
+          "$bigint": "961216307614783"
+        }
+      },
+      "canonical": "{\"accountId\":\"961216307614783\",\"taxYear\":{\"amount\":[-11]}}",
+      "sha256": "c65aadee934dfdf42fc906b2fee6e78dcbdc954cf083db0cc506927ff78a03bf"
+    },
+    {
+      "input": {
+        "accountId": -2,
+        "taxYear": {
+          "$bigint": "589472905"
+        },
+        "priority": 761
+      },
+      "canonical": "{\"accountId\":-2,\"priority\":761,\"taxYear\":\"589472905\"}",
+      "sha256": "f8f99ab1900f858ec06ee7cea49465c9795d9a1e3105f0f8a3107e9b2ab8a912"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "PENSION_SAVINGS": true
+      },
+      "canonical": "{\"PENSION_SAVINGS\":true}",
+      "sha256": "5f6cb2a8df9a96b9ea429a14eaacee0288fff5f86e4a0f33648edb281079c676"
+    },
+    {
+      "input": {
+        "a": {
+          "note": null,
+          "valid_from": [
+            -749
+          ],
+          "z": {
+            "$bigint": "-78"
+          }
+        },
+        "taxYear": {
+          "amount": null,
+          "note": [
+            906
+          ],
+          "unitKrw": {
+            "$bigint": "-949234"
+          }
+        },
+        "accountId": true,
+        "priority": 106
+      },
+      "canonical": "{\"a\":{\"note\":null,\"valid_from\":[-749],\"z\":\"-78\"},\"accountId\":true,\"priority\":106,\"taxYear\":{\"amount\":null,\"note\":[906],\"unitKrw\":\"-949234\"}}",
+      "sha256": "6382de2de298f4f95993bcb6180c89f54131afe2a77a6673645cf5abf97e70fd"
+    },
+    {
+      "input": {
+        "b": null
+      },
+      "canonical": "{\"b\":null}",
+      "sha256": "46d44c558a54e9b241f123fe793d9a07b0c6b08eba7d62d409f37f5787d6dd5f"
+    },
+    {
+      "input": {
+        "a": {
+          "$undefined": true
+        },
+        "priority": "",
+        "taxYear": true
+      },
+      "canonical": "{\"priority\":\"\",\"taxYear\":true}",
+      "sha256": "9edf757fe47fed79e65172b5ddfc80ab811e0c9539a14f712a29d93e642896e5"
+    },
+    {
+      "input": {
+        "PENSION_SAVINGS": {
+          "$bigint": "7612545478389"
+        },
+        "_leading": null,
+        "valid_from": [
+          -809
+        ]
+      },
+      "canonical": "{\"PENSION_SAVINGS\":\"7612545478389\",\"_leading\":null,\"valid_from\":[-809]}",
+      "sha256": "efbcba2f1fb65a3f1c45f71d08f67b29fd535a0753974b566b3776da68484bfc"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "accountId": true,
+        "valid_from": -821,
+        "a": {
+          "$bigint": "-385618541230"
+        }
+      },
+      "canonical": "{\"a\":\"-385618541230\",\"accountId\":true,\"valid_from\":-821}",
+      "sha256": "17b1f7aaea900e27e1157ff4e6d7bb544a5880cd266360027889e5f0b69cec90"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "a": true,
+        "n": 939
+      },
+      "canonical": "{\"a\":true,\"n\":939}",
+      "sha256": "454c950489969fefb268b8c82590c510d1a59c53e92ea06c1e5b3efb587d1b63"
+    },
+    {
+      "input": {
+        "n": null,
+        "note": [
+          82
+        ],
+        "unitKrw": {
+          "$bigint": "-34525014987674"
+        },
+        "accountId": true
+      },
+      "canonical": "{\"accountId\":true,\"n\":null,\"note\":[82],\"unitKrw\":\"-34525014987674\"}",
+      "sha256": "b2ac6f593e464ce4a5435d332ede31bf52e7e8e170b692bca2751e4b938f0794"
+    },
+    {
+      "input": {
+        "accountId": {
+          "b": null,
+          "n": [
+            78
+          ],
+          "accountId": {
+            "$bigint": "-721678"
+          },
+          "unitKrw": true
+        },
+        "valid_from": 552,
+        "PENSION_SAVINGS": {
+          "$bigint": "-507618703856"
+        },
+        "x1": {
+          "$bigint": "54763674323"
+        }
+      },
+      "canonical": "{\"PENSION_SAVINGS\":\"-507618703856\",\"accountId\":{\"accountId\":\"-721678\",\"b\":null,\"n\":[78],\"unitKrw\":true},\"valid_from\":552,\"x1\":\"54763674323\"}",
+      "sha256": "1905d79e3177361e6fb84abccf04750200246db46b703131c69550fbe2beada8"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "note": null,
+        "n": [
+          589
+        ],
+        "taxYear": {
+          "$bigint": "-1652369278"
+        },
+        "z": {}
+      },
+      "canonical": "{\"n\":[589],\"note\":null,\"taxYear\":\"-1652369278\",\"z\":{}}",
+      "sha256": "0081fa72733208d37e4e800e996d08d10b03e8bb0d49e7ac3e14e38732fffa6c"
+    },
+    {
+      "input": {
+        "x1": true
+      },
+      "canonical": "{\"x1\":true}",
+      "sha256": "50018055b56475f08daf1d25523fc2b1d46898e6c39253bd961ab27e3bc58728"
+    },
+    {
+      "input": {
+        "z": {},
+        "b": null
+      },
+      "canonical": "{\"b\":null,\"z\":{}}",
+      "sha256": "a273200de2ca4309d12cccab53a0f78a7652a5658959005a4a295e404a282bf6"
+    },
+    {
+      "input": {
+        "taxYear": {
+          "$undefined": true
+        }
+      },
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "unitKrw": {
+          "$bigint": "7896149"
+        },
+        "b": [
+          422
+        ],
+        "taxYear": {
+          "$bigint": "52745072587"
+        }
+      },
+      "canonical": "{\"b\":[422],\"taxYear\":\"52745072587\",\"unitKrw\":\"7896149\"}",
+      "sha256": "bd42892809a58e31fead13285a8ecabe6c81ba005c6dc1bc0f8887e1380f63e5"
+    },
+    {
+      "input": {
+        "unitKrw": true,
+        "n": "tab\there"
+      },
+      "canonical": "{\"n\":\"tab\\there\",\"unitKrw\":true}",
+      "sha256": "7f252e4ab70808ff1ca8dd2fb64b3ad72bfbe61981dca3b3c1ebf287d40309d8"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "unitKrw": {
+          "$bigint": "521"
+        },
+        "b": "연금저축",
+        "z": true,
+        "_leading": 907
+      },
+      "canonical": "{\"_leading\":907,\"b\":\"연금저축\",\"unitKrw\":\"521\",\"z\":true}",
+      "sha256": "5ef83fc9788d7c0ea670eface7a479732b7fdbe3f70f4a1941bb71cf6064911e"
+    },
+    {
+      "input": {
+        "priority": null
+      },
+      "canonical": "{\"priority\":null}",
+      "sha256": "0a6202f188859cb41dee0f08388e9da21babf6f4b569f7b18abf0453caaa1062"
+    },
+    {
+      "input": {
+        "z": 1
+      },
+      "canonical": "{\"z\":1}",
+      "sha256": "9d80fd5b8b1e66e0eb1a8f15644749bbdcb6304691b9d3de20aa4010cdac2bc1"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "x1": -36,
+        "unitKrw": {
+          "$bigint": "-34"
+        }
+      },
+      "canonical": "{\"unitKrw\":\"-34\",\"x1\":-36}",
+      "sha256": "ac54f854fea3edf0afdf7a2c4a5a69d5ef591fa1395fc8f1b1aaeb7c30687ca6"
+    },
+    {
+      "input": {
+        "valid_from": "q\"uote",
+        "unitKrw": true
+      },
+      "canonical": "{\"unitKrw\":true,\"valid_from\":\"q\\\"uote\"}",
+      "sha256": "1ef90f878aa9bf05e16ff001fb73c461c057d32e280df8efb9ba83c6513ad81d"
+    },
+    {
+      "input": {
+        "PENSION_SAVINGS": {
+          "amount": null
+        }
+      },
+      "canonical": "{\"PENSION_SAVINGS\":{\"amount\":null}}",
+      "sha256": "a4541d810eef80303d6df9d526f16c9bf448496b0507c96bb9983f6145434918"
+    },
+    {
+      "input": {
+        "taxYear": -42,
+        "PENSION_SAVINGS": -32
+      },
+      "canonical": "{\"PENSION_SAVINGS\":-32,\"taxYear\":-42}",
+      "sha256": "d2642427cd66e3aa1637ed964b16726f7494f69b49179d6fa8895574be594392"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "PENSION_SAVINGS": true,
+        "note": 35,
+        "x1": {
+          "$bigint": "-90943252"
+        }
+      },
+      "canonical": "{\"PENSION_SAVINGS\":true,\"note\":35,\"x1\":\"-90943252\"}",
+      "sha256": "cf63edd878d6edbaab9a29c64d1efa054e2845aa78dd0896342a8b60c7bf9628"
+    },
+    {
+      "input": {
+        "n": 678
+      },
+      "canonical": "{\"n\":678}",
+      "sha256": "528ae441b0344b5d5aa97529bd69be86f7d6adf313a983952be86e4c3c2955b5"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "taxYear": true
+      },
+      "canonical": "{\"taxYear\":true}",
+      "sha256": "a2a42ccc056894c69b3e9998fb8790ee1d39990455f2a496d0447a940e41dd89"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "valid_from": "tab\there"
+      },
+      "canonical": "{\"valid_from\":\"tab\\there\"}",
+      "sha256": "3c923ebca353f85947c6aa740bd5aece2a1dec87f917f3ceeaa9bf958e25de0a"
+    },
+    {
+      "input": {
+        "n": [
+          -317
+        ],
+        "a": {
+          "$bigint": "-10347696103256"
+        },
+        "z": true,
+        "amount": -125
+      },
+      "canonical": "{\"a\":\"-10347696103256\",\"amount\":-125,\"n\":[-317],\"z\":true}",
+      "sha256": "fc61599a50fd5aebe3a8df92ab4dfca14733b75393dba86b22ee090af0494155"
+    },
+    {
+      "input": {
+        "valid_from": null,
+        "amount": [
+          -962
+        ],
+        "x1": {
+          "$bigint": "7892103"
+        }
+      },
+      "canonical": "{\"amount\":[-962],\"valid_from\":null,\"x1\":\"7892103\"}",
+      "sha256": "2ceee88ec3c11855c7da8300a5f60f2f7906b29a0ce5da590c00f7f4eaf3dab4"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "_leading": [
+          650
+        ],
+        "z": {
+          "$bigint": "3652309"
+        },
+        "x1": {
+          "$bigint": "7054549"
+        }
+      },
+      "canonical": "{\"_leading\":[650],\"x1\":\"7054549\",\"z\":\"3652309\"}",
+      "sha256": "03de277a985302c658bc4d827aaabe5e4f7285c8ec78a19d8821a9b01480435d"
+    },
+    {
+      "input": {
+        "a": -6,
+        "z": {
+          "$bigint": "-1674"
+        },
+        "x1": {
+          "$bigint": "-36167258"
+        },
+        "taxYear": {
+          "$undefined": true
+        }
+      },
+      "canonical": "{\"a\":-6,\"x1\":\"-36167258\",\"z\":\"-1674\"}",
+      "sha256": "5d4f9405c4a78a5b264cede4f7530411df8907426c85af2e35f82d51c84d0917"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "n": null
+      },
+      "canonical": "{\"n\":null}",
+      "sha256": "5b4da02351c1c20974b216a5e3a4edb59ac51cbda6be3e9d82952b4f5beea463"
+    },
+    {
+      "input": {
+        "z": 15
+      },
+      "canonical": "{\"z\":15}",
+      "sha256": "b83b993c407fc65661f2353ff6320b9455f5df3ca791a9f882a2e8b654946d0e"
+    },
+    {
+      "input": {
+        "priority": null,
+        "_leading": [
+          858
+        ]
+      },
+      "canonical": "{\"_leading\":[858],\"priority\":null}",
+      "sha256": "16e6e47d3e205626eff558ad2cb1b4cbee1ce69ec31511d3e453e59342abe18c"
+    },
+    {
+      "input": {
+        "amount": null
+      },
+      "canonical": "{\"amount\":null}",
+      "sha256": "2ccd94e2ba19c54ed10b40a18c17a6122ae49060dad6bb43051c9a65894d578b"
+    },
+    {
+      "input": {
+        "PENSION_SAVINGS": true,
+        "note": "연금저축"
+      },
+      "canonical": "{\"PENSION_SAVINGS\":true,\"note\":\"연금저축\"}",
+      "sha256": "54326bf037d16e6ac48dea3cae9d45a329ac7d23b7ae68a57c94f1a0e9abbe34"
+    },
+    {
+      "input": {
+        "x1": {
+          "priority": null,
+          "n": [
+            447
+          ],
+          "x1": {
+            "$bigint": "9418741872361"
+          }
+        },
+        "n": null
+      },
+      "canonical": "{\"n\":null,\"x1\":{\"n\":[447],\"priority\":null,\"x1\":\"9418741872361\"}}",
+      "sha256": "306319a40098738a394862d8d2a44f6a7ce2d221dd424ad15e23ad17e4c6b866"
+    },
+    {
+      "input": {
+        "x1": 36,
+        "z": {
+          "$bigint": "10563652109"
+        },
+        "n": "back\\slash"
+      },
+      "canonical": "{\"n\":\"back\\\\slash\",\"x1\":36,\"z\":\"10563652109\"}",
+      "sha256": "7390ffd459c7a3a190551da588523df274ec8fb9626ec4e7a853340fd5043113"
+    },
+    {
+      "input": {
+        "_leading": [
+          -397
+        ],
+        "z": {
+          "$bigint": "-5258503650"
+        },
+        "PENSION_SAVINGS": {
+          "valid_from": null
+        },
+        "valid_from": [
+          -910
+        ]
+      },
+      "canonical": "{\"PENSION_SAVINGS\":{\"valid_from\":null},\"_leading\":[-397],\"valid_from\":[-910],\"z\":\"-5258503650\"}",
+      "sha256": "3a855ecdac64635b16a0cc14c7f48668aed922b57187db4d074fa4e79e7356c0"
+    },
+    {
+      "input": {
+        "valid_from": [
+          218
+        ],
+        "accountId": {
+          "$bigint": "-141298"
+        }
+      },
+      "canonical": "{\"accountId\":\"-141298\",\"valid_from\":[218]}",
+      "sha256": "503d003e8c5887a5726e6c10dd8434e0792ccc22fe2c13d4416822ce1a988c8a"
+    },
+    {
+      "input": {
+        "priority": [
+          716
+        ]
+      },
+      "canonical": "{\"priority\":[716]}",
+      "sha256": "2968ad42d824f79fa03099c5794aafa3b2def324a5a3481f5ffbc657c41b88da"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "b": [
+          236
+        ],
+        "taxYear": {
+          "$bigint": "-58149038161478"
+        },
+        "z": true
+      },
+      "canonical": "{\"b\":[236],\"taxYear\":\"-58149038161478\",\"z\":true}",
+      "sha256": "34efe97961bc10b6d7b1b77079f9aaa5ad414fd883103ae28edc577f72dc2708"
+    },
+    {
+      "input": {
+        "accountId": {}
+      },
+      "canonical": "{\"accountId\":{}}",
+      "sha256": "fd34da81976c6a5ffa50f60fe8f792bdd255a4927b88cad3c163f41d2011f26a"
+    },
+    {
+      "input": {
+        "accountId": true
+      },
+      "canonical": "{\"accountId\":true}",
+      "sha256": "1f070305c2ad2eb561966d3d4281fa590065efbaea96914aaf9969ddfea9a270"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "a": {
+          "$bigint": "761638905474987"
+        },
+        "n": [
+          -294
+        ],
+        "PENSION_SAVINGS": {
+          "$bigint": "-3416729656"
+        }
+      },
+      "canonical": "{\"PENSION_SAVINGS\":\"-3416729656\",\"a\":\"761638905474987\",\"n\":[-294]}",
+      "sha256": "554788953df1533227fe8514d5cb0f5c198d41ce85f1d700439de887d168ca63"
+    },
+    {
+      "input": {
+        "_leading": "s",
+        "z": true,
+        "valid_from": 892
+      },
+      "canonical": "{\"_leading\":\"s\",\"valid_from\":892,\"z\":true}",
+      "sha256": "d8b00b4a84792d9c2f5618e5cae3070e11b8dcb15a65661c68ca75bc51b88612"
+    },
+    {
+      "input": {
+        "n": null,
+        "amount": [
+          -2
+        ],
+        "PENSION_SAVINGS": {
+          "$bigint": "94549494985"
+        },
+        "priority": ""
+      },
+      "canonical": "{\"PENSION_SAVINGS\":\"94549494985\",\"amount\":[-2],\"n\":null,\"priority\":\"\"}",
+      "sha256": "9d952117a6f9b00b1be1feaf9d6be8bf6cc25b4a6a54cd4d2d5b6719678776ce"
+    },
+    {
+      "input": {
+        "b": [
+          896
+        ],
+        "z": {
+          "$bigint": "-509276341494"
+        },
+        "taxYear": {
+          "$bigint": "1058183"
+        },
+        "n": [
+          -754
+        ]
+      },
+      "canonical": "{\"b\":[896],\"n\":[-754],\"taxYear\":\"1058183\",\"z\":\"-509276341494\"}",
+      "sha256": "fbe06d8e96bc022f53b87ca5d1eec0c2cf57f4775b724f693fc3e16a20144fed"
+    },
+    {
+      "input": {
+        "priority": null,
+        "n": [
+          721
+        ],
+        "accountId": {
+          "$bigint": "-301092385270"
+        }
+      },
+      "canonical": "{\"accountId\":\"-301092385270\",\"n\":[721],\"priority\":null}",
+      "sha256": "c8ea3e77a12da0e118d4b138e03dfe1f4fecec16a54fbbe4b66b7cc2ec08bf9d"
+    },
+    {
+      "input": {
+        "n": null,
+        "note": [
+          349
+        ],
+        "accountId": {
+          "$bigint": "3"
+        }
+      },
+      "canonical": "{\"accountId\":\"3\",\"n\":null,\"note\":[349]}",
+      "sha256": "f844a977b7e1492dc06ffdb3cf381a412881e355bf850c3b8f1414e200ff97a3"
+    },
+    {
+      "input": {
+        "x1": {
+          "note": null,
+          "_leading": [
+            -144
+          ],
+          "PENSION_SAVINGS": {
+            "$bigint": "-14"
+          },
+          "x1": {
+            "_leading": null,
+            "b": [
+              ""
+            ]
+          }
+        }
+      },
+      "canonical": "{\"x1\":{\"PENSION_SAVINGS\":\"-14\",\"_leading\":[-144],\"note\":null,\"x1\":{\"_leading\":null,\"b\":[\"\"]}}}",
+      "sha256": "b7691923f72e51ad1e3053583bf97646d28e05c10bbf9d3868acd6072f744f14"
+    },
+    {
+      "input": {
+        "priority": null
+      },
+      "canonical": "{\"priority\":null}",
+      "sha256": "0a6202f188859cb41dee0f08388e9da21babf6f4b569f7b18abf0453caaa1062"
+    },
+    {
+      "input": {
+        "accountId": -32,
+        "a": {
+          "$bigint": "-36787698"
+        },
+        "x1": -6
+      },
+      "canonical": "{\"a\":\"-36787698\",\"accountId\":-32,\"x1\":-6}",
+      "sha256": "dc97338f86b460f61e77934bea28ea4b4e3d5bb35e8dfef7277db5e6e7d7a945"
+    },
+    {
+      "input": {
+        "note": null
+      },
+      "canonical": "{\"note\":null}",
+      "sha256": "0cd4101d3beb3cdd08a62cb8508f2a2a0942b290a02d6ba252d5fb481d3ce054"
+    },
+    {
+      "input": {
+        "z": 49
+      },
+      "canonical": "{\"z\":49}",
+      "sha256": "c6882f58b2f16b6d6d890df404e9f9b2aa1e5aa8fbc25af1c6107852f87b23d6"
+    },
+    {
+      "input": {
+        "amount": null,
+        "_leading": [
+          -310
+        ],
+        "a": {
+          "$bigint": "-9618"
+        },
+        "z": {
+          "$bigint": "-1416763410"
+        }
+      },
+      "canonical": "{\"_leading\":[-310],\"a\":\"-9618\",\"amount\":null,\"z\":\"-1416763410\"}",
+      "sha256": "4a2427984ecb33c35944d3a2576438a8bb163a3fd2465e9f01484c5bb1cc19ad"
+    },
+    {
+      "input": {
+        "_leading": "2026-07-30",
+        "taxYear": true
+      },
+      "canonical": "{\"_leading\":\"2026-07-30\",\"taxYear\":true}",
+      "sha256": "d55925dd6fbe9b229f0a38d117406e8a6a0753daca95ec0d38514fa0357a4a54"
+    },
+    {
+      "input": {
+        "unitKrw": {
+          "n": [
+            -912
+          ],
+          "PENSION_SAVINGS": {
+            "$bigint": "-347870905098"
+          },
+          "accountId": {
+            "$bigint": "-163832943054"
+          }
+        },
+        "PENSION_SAVINGS": {
+          "$bigint": "1"
+        }
+      },
+      "canonical": "{\"PENSION_SAVINGS\":\"1\",\"unitKrw\":{\"PENSION_SAVINGS\":\"-347870905098\",\"accountId\":\"-163832943054\",\"n\":[-912]}}",
+      "sha256": "7237c7eefdc59790cdab2c2638d8d53f071e37823db448a5749f8690ca2c3c04"
+    },
+    {
+      "input": {
+        "x1": {
+          "$bigint": "747"
+        },
+        "unitKrw": {
+          "$bigint": "9"
+        },
+        "amount": 169
+      },
+      "canonical": "{\"amount\":169,\"unitKrw\":\"9\",\"x1\":\"747\"}",
+      "sha256": "a2c1c63b95aca17cad193c17002a2f28ea0184007c5c71eb744ea4fd24f050ca"
+    },
+    {
+      "input": {
+        "z": {
+          "$bigint": "-92163032"
+        },
+        "taxYear": -48,
+        "unitKrw": {
+          "$bigint": "-14547656181854"
+        }
+      },
+      "canonical": "{\"taxYear\":-48,\"unitKrw\":\"-14547656181854\",\"z\":\"-92163032\"}",
+      "sha256": "9e8db2784c22a0a5e829d0262a1b7467a74075fa42225a5a47a3bc2d08af63fe"
+    },
+    {
+      "input": {
+        "valid_from": [
+          -343
+        ],
+        "x1": {
+          "$bigint": "-563612"
+        },
+        "z": true
+      },
+      "canonical": "{\"valid_from\":[-343],\"x1\":\"-563612\",\"z\":true}",
+      "sha256": "43c3828fd9426acfea5160e89e83d36d7e84d8ceec68eba456ab9c4c50db9180"
+    },
+    {
+      "input": {
+        "z": {
+          "note": null,
+          "b": [
+            626
+          ],
+          "taxYear": {
+            "$bigint": "727296921098941"
+          }
+        },
+        "_leading": [
+          -291
+        ],
+        "PENSION_SAVINGS": {
+          "$bigint": "5494187618369"
+        }
+      },
+      "canonical": "{\"PENSION_SAVINGS\":\"5494187618369\",\"_leading\":[-291],\"z\":{\"b\":[626],\"note\":null,\"taxYear\":\"727296921098941\"}}",
+      "sha256": "618a9d6a508dc9358ff1437b1df3ff5c8052041fca0b7e49c020f601c31f5e0c"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "amount": [
+          -212
+        ],
+        "z": {
+          "$bigint": "345696767410565"
+        }
+      },
+      "canonical": "{\"amount\":[-212],\"z\":\"345696767410565\"}",
+      "sha256": "a24008c009628dd28278a391a73b637a1d43606c9e81755bc824eeec5649f3bb"
+    },
+    {
+      "input": {
+        "taxYear": -35,
+        "x1": {
+          "$bigint": "36965"
+        },
+        "b": [
+          -619
+        ]
+      },
+      "canonical": "{\"b\":[-619],\"taxYear\":-35,\"x1\":\"36965\"}",
+      "sha256": "5e3eb7a5aea6f4fe0645a1c034d3befaf23c2ecc9b5dd77b5b6de07458e8ced5"
+    },
+    {
+      "input": {
+        "priority": null
+      },
+      "canonical": "{\"priority\":null}",
+      "sha256": "0a6202f188859cb41dee0f08388e9da21babf6f4b569f7b18abf0453caaa1062"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "b": [
+          785
+        ],
+        "taxYear": {
+          "$bigint": "9094721"
+        },
+        "a": {
+          "$bigint": "-52161058"
+        }
+      },
+      "canonical": "{\"a\":\"-52161058\",\"b\":[785],\"taxYear\":\"9094721\"}",
+      "sha256": "50262a095a2e1b66f3d64422126ea9653909ed3981eb142d78e5557c1b03432f"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "valid_from": "tab\there"
+      },
+      "canonical": "{\"valid_from\":\"tab\\there\"}",
+      "sha256": "3c923ebca353f85947c6aa740bd5aece2a1dec87f917f3ceeaa9bf958e25de0a"
+    },
+    {
+      "input": {
+        "_leading": [
+          415
+        ]
+      },
+      "canonical": "{\"_leading\":[415]}",
+      "sha256": "cd8ebca17c9f8ecae44d44957c956d8e9a0fc3bbf3bdba533e19ab1729af2c4a"
+    },
+    {
+      "input": {
+        "b": null
+      },
+      "canonical": "{\"b\":null}",
+      "sha256": "46d44c558a54e9b241f123fe793d9a07b0c6b08eba7d62d409f37f5787d6dd5f"
+    },
+    {
+      "input": {
+        "unitKrw": {
+          "$undefined": true
+        }
+      },
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "a": {
+          "$bigint": "38305492545"
+        }
+      },
+      "canonical": "{\"a\":\"38305492545\"}",
+      "sha256": "c77ee6be5b8171d5a0736c898da87d13fadb4fb090d8756ed36eae5a876dc75e"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "b": null,
+        "n": [
+          410
+        ]
+      },
+      "canonical": "{\"b\":null,\"n\":[410]}",
+      "sha256": "6cfff156f9ecddc28d74ec350a0ebfa9b2242b5bb205b07546cb4edb7f35ff4f"
+    },
+    {
+      "input": {
+        "_leading": null,
+        "valid_from": [
+          -746
+        ]
+      },
+      "canonical": "{\"_leading\":null,\"valid_from\":[-746]}",
+      "sha256": "f6c9da780cc31a7ca268b7046d3f9d4a1c21ba3081612ebe139ca7c13dbf4258"
+    },
+    {
+      "input": {
+        "b": null
+      },
+      "canonical": "{\"b\":null}",
+      "sha256": "46d44c558a54e9b241f123fe793d9a07b0c6b08eba7d62d409f37f5787d6dd5f"
+    },
+    {
+      "input": {
+        "accountId": 43,
+        "z": {
+          "$bigint": "78345"
+        },
+        "priority": null,
+        "amount": [
+          827
+        ]
+      },
+      "canonical": "{\"accountId\":43,\"amount\":[827],\"priority\":null,\"z\":\"78345\"}",
+      "sha256": "8493af447195e5e01412bc877f3c0a185fb8a684c0cc6ca711dd97a52c0813b3"
+    },
+    {
+      "input": {
+        "b": null,
+        "priority": [
+          -525
+        ]
+      },
+      "canonical": "{\"b\":null,\"priority\":[-525]}",
+      "sha256": "47aab16d7800b18700153c02bc27ea64a35122ebce2aa282876d247a00868f71"
+    },
+    {
+      "input": {
+        "amount": null,
+        "note": [
+          113
+        ],
+        "PENSION_SAVINGS": {
+          "$bigint": "-383874189896"
+        }
+      },
+      "canonical": "{\"PENSION_SAVINGS\":\"-383874189896\",\"amount\":null,\"note\":[113]}",
+      "sha256": "bf70a3c210890d59aac989cc29cbf7adfa2a044d78c4c94d5ead1006f9b532b2"
+    },
+    {
+      "input": {
+        "n": null,
+        "priority": [
+          795
+        ],
+        "a": {
+          "$bigint": "3856743"
+        },
+        "amount": [
+          -465
+        ]
+      },
+      "canonical": "{\"a\":\"3856743\",\"amount\":[-465],\"n\":null,\"priority\":[795]}",
+      "sha256": "0dd46bc14823cd4172a561bef0f10def7ecd7bb2254ea14f1374ef2ee8262ddc"
+    },
+    {
+      "input": {
+        "b": null
+      },
+      "canonical": "{\"b\":null}",
+      "sha256": "46d44c558a54e9b241f123fe793d9a07b0c6b08eba7d62d409f37f5787d6dd5f"
+    },
+    {
+      "input": {
+        "taxYear": {
+          "$undefined": true
+        }
+      },
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "PENSION_SAVINGS": {
+          "$bigint": "521090321"
+        },
+        "note": 558,
+        "a": {
+          "$bigint": "10327438121"
+        }
+      },
+      "canonical": "{\"PENSION_SAVINGS\":\"521090321\",\"a\":\"10327438121\",\"note\":558}",
+      "sha256": "9f887a12d728dd752ea6bfd0ff0e87d5c6b935515689c823e031824c92628ee6"
+    },
+    {
+      "input": {
+        "x1": {
+          "$bigint": "-9494505854"
+        },
+        "accountId": {},
+        "n": null,
+        "valid_from": [
+          284
+        ]
+      },
+      "canonical": "{\"accountId\":{},\"n\":null,\"valid_from\":[284],\"x1\":\"-9494505854\"}",
+      "sha256": "f7ffe463d976fc8a6c2f2a7d21682b2d04cdfc89697d412b9cf07dff76a49cae"
+    },
+    {
+      "input": {
+        "b": null,
+        "amount": [
+          -608
+        ]
+      },
+      "canonical": "{\"amount\":[-608],\"b\":null}",
+      "sha256": "ab8289d0574eafac047cae6478d0a5a812923d51995ec2b183a06c217f8a3e64"
+    },
+    {
+      "input": {
+        "priority": null,
+        "b": [
+          -985
+        ],
+        "unitKrw": {
+          "$bigint": "7"
+        }
+      },
+      "canonical": "{\"b\":[-985],\"priority\":null,\"unitKrw\":\"7\"}",
+      "sha256": "1a3ecf83d53253d22f4090f3dfdf76d95597cd2c8428386d9dad5b94a8012149"
+    },
+    {
+      "input": {
+        "taxYear": {
+          "n": null,
+          "_leading": [
+            486
+          ],
+          "PENSION_SAVINGS": {
+            "$bigint": "-5658"
+          },
+          "unitKrw": {
+            "$bigint": "-361414"
+          }
+        },
+        "z": true
+      },
+      "canonical": "{\"taxYear\":{\"PENSION_SAVINGS\":\"-5658\",\"_leading\":[486],\"n\":null,\"unitKrw\":\"-361414\"},\"z\":true}",
+      "sha256": "7c28b68bd0c1624b21fc4543e292e15f91b59941b8cb98958cfdab0be57802fb"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "a": {
+          "$bigint": "983692123474523"
+        },
+        "n": [
+          657
+        ],
+        "taxYear": {
+          "$bigint": "-3254"
+        },
+        "x1": {
+          "$bigint": "-14307472"
+        }
+      },
+      "canonical": "{\"a\":\"983692123474523\",\"n\":[657],\"taxYear\":\"-3254\",\"x1\":\"-14307472\"}",
+      "sha256": "e5cb546cd0ebabcc428a27f1bc25ef8185e3c2f92669c544bcb61ba8c1d3a5c7"
+    },
+    {
+      "input": {
+        "b": -481,
+        "taxYear": {
+          "$bigint": "923"
+        }
+      },
+      "canonical": "{\"b\":-481,\"taxYear\":\"923\"}",
+      "sha256": "892e3154d3c33466b240541912421aba8c1327b4f12e9173d10920f4fa498318"
+    },
+    {
+      "input": {
+        "unitKrw": {
+          "$bigint": "-10"
+        },
+        "PENSION_SAVINGS": {
+          "$bigint": "5470921"
+        }
+      },
+      "canonical": "{\"PENSION_SAVINGS\":\"5470921\",\"unitKrw\":\"-10\"}",
+      "sha256": "64e166c260497a560cf2885f83c3fa417eeb946b674747c874702177980a36ff"
+    },
+    {
+      "input": {
+        "z": {
+          "$undefined": true
+        },
+        "b": "q\"uote",
+        "PENSION_SAVINGS": true,
+        "note": 886
+      },
+      "canonical": "{\"PENSION_SAVINGS\":true,\"b\":\"q\\\"uote\",\"note\":886}",
+      "sha256": "a1fa932f534c6725cd4850214cdbd96e5e20ed246e8c8cae0c18f4617ebb443a"
+    },
+    {
+      "input": {
+        "n": null
+      },
+      "canonical": "{\"n\":null}",
+      "sha256": "5b4da02351c1c20974b216a5e3a4edb59ac51cbda6be3e9d82952b4f5beea463"
+    },
+    {
+      "input": {
+        "z": {
+          "$undefined": true
+        },
+        "note": "q\"uote",
+        "accountId": true,
+        "amount": -593
+      },
+      "canonical": "{\"accountId\":true,\"amount\":-593,\"note\":\"q\\\"uote\"}",
+      "sha256": "759440e6a45db3722d4929db2f80cbab91e5fd2a1865c13e44a812739e73cfca"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "PENSION_SAVINGS": true
+      },
+      "canonical": "{\"PENSION_SAVINGS\":true}",
+      "sha256": "5f6cb2a8df9a96b9ea429a14eaacee0288fff5f86e4a0f33648edb281079c676"
+    },
+    {
+      "input": {
+        "accountId": {
+          "b": [
+            -622
+          ],
+          "taxYear": {
+            "$bigint": "-1872"
+          },
+          "accountId": {
+            "$bigint": "-785876925094"
+          }
+        }
+      },
+      "canonical": "{\"accountId\":{\"accountId\":\"-785876925094\",\"b\":[-622],\"taxYear\":\"-1872\"}}",
+      "sha256": "20b3f824a1526710afce7e4087112e4045c2dda25dfea72f85c05b01fc7b0563"
+    },
+    {
+      "input": {
+        "valid_from": [
+          -401
+        ],
+        "z": {
+          "$bigint": "165"
+        },
+        "n": "tab\there"
+      },
+      "canonical": "{\"n\":\"tab\\there\",\"valid_from\":[-401],\"z\":\"165\"}",
+      "sha256": "6c46ab25401d9945526d2fbe6e48204a7261f7c8234b06636910fab8af10de24"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "taxYear": 32,
+        "accountId": {
+          "$bigint": "765618921030501"
+        },
+        "amount": [
+          -18
+        ]
+      },
+      "canonical": "{\"accountId\":\"765618921030501\",\"amount\":[-18],\"taxYear\":32}",
+      "sha256": "da834e43f86b88a24848d4415813b7d0cfbbc6f010e06451da978069e5d03507"
+    },
+    {
+      "input": {
+        "_leading": null
+      },
+      "canonical": "{\"_leading\":null}",
+      "sha256": "3fc156b135ca16adc94a4bb3d408364d2dee923481aa13d06e21947af4485b7e"
+    },
+    {
+      "input": {
+        "unitKrw": {
+          "$undefined": true
+        },
+        "priority": "2026-07-30",
+        "x1": true
+      },
+      "canonical": "{\"priority\":\"2026-07-30\",\"x1\":true}",
+      "sha256": "045670cdb436c7e73392e673bf741e4dc77571bf50a2e2e9e97be3c556d9fdee"
+    },
+    {
+      "input": {
+        "PENSION_SAVINGS": {},
+        "valid_from": null,
+        "b": [
+          -190
+        ],
+        "a": {
+          "$bigint": "-747014769078"
+        }
+      },
+      "canonical": "{\"PENSION_SAVINGS\":{},\"a\":\"-747014769078\",\"b\":[-190],\"valid_from\":null}",
+      "sha256": "c890c969f5586010f9aea315db3e71de2752421c052e2885126bddac8af8aff8"
+    },
+    {
+      "input": {
+        "_leading": null,
+        "amount": [
+          -942
+        ]
+      },
+      "canonical": "{\"_leading\":null,\"amount\":[-942]}",
+      "sha256": "07697d8574b7ac78b89080232380b308a201f350d932d4bdfc781d8119b2be6c"
+    },
+    {
+      "input": {
+        "valid_from": null,
+        "priority": [
+          233
+        ]
+      },
+      "canonical": "{\"priority\":[233],\"valid_from\":null}",
+      "sha256": "b730ec2dca4bbca11ebe23ce1ca6e753dab9b6244f0241826f051d5e3ef33073"
+    },
+    {
+      "input": {
+        "valid_from": null,
+        "amount": [
+          649
+        ],
+        "accountId": {
+          "$bigint": "9072749"
+        },
+        "n": [
+          -742
+        ]
+      },
+      "canonical": "{\"accountId\":\"9072749\",\"amount\":[649],\"n\":[-742],\"valid_from\":null}",
+      "sha256": "d8782502a4c896101d127a3622ea8193bb2573eef58d909573aa251415ef181d"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "_leading": [
+          822
+        ],
+        "x1": true,
+        "note": -530
+      },
+      "canonical": "{\"_leading\":[822],\"note\":-530,\"x1\":true}",
+      "sha256": "cb1aa58330952e22e8561b7c0629b715b673333cc4fe324b984d858b3909aaa8"
+    },
+    {
+      "input": {
+        "priority": null,
+        "note": [
+          -67
+        ],
+        "unitKrw": {
+          "$bigint": "-58927652963850"
+        }
+      },
+      "canonical": "{\"note\":[-67],\"priority\":null,\"unitKrw\":\"-58927652963850\"}",
+      "sha256": "6e02b5e8adf4d2516644ab76479299c3631e46961c8c83d036f6569d1a8d903a"
+    },
+    {
+      "input": {
+        "b": [
+          790
+        ],
+        "x1": {
+          "$bigint": "9"
+        },
+        "PENSION_SAVINGS": {
+          "amount": 408,
+          "priority": [
+            -705
+          ],
+          "z": {
+            "$bigint": "369490129"
+          }
+        }
+      },
+      "canonical": "{\"PENSION_SAVINGS\":{\"amount\":408,\"priority\":[-705],\"z\":\"369490129\"},\"b\":[790],\"x1\":\"9\"}",
+      "sha256": "51eff334034fdf3dcd67af5c4947b29eacefed675c75b79e9849968fff1a9de0"
+    },
+    {
+      "input": {
+        "PENSION_SAVINGS": {
+          "priority": null,
+          "note": [
+            -831
+          ]
+        }
+      },
+      "canonical": "{\"PENSION_SAVINGS\":{\"note\":[-831],\"priority\":null}}",
+      "sha256": "657204f22acd66c98a4902e5eae16a9cd759936822297c6b5be70d142478f255"
+    },
+    {
+      "input": {
+        "n": null,
+        "note": [
+          254
+        ],
+        "PENSION_SAVINGS": true
+      },
+      "canonical": "{\"PENSION_SAVINGS\":true,\"n\":null,\"note\":[254]}",
+      "sha256": "6cce1122fdf9c5eaff1c4adc7c2d95dd57a15fc4b126289d9148d1ae2e7768d3"
+    },
+    {
+      "input": {
+        "unitKrw": {
+          "n": null
+        },
+        "amount": [
+          428
+        ],
+        "PENSION_SAVINGS": {
+          "$bigint": "-72"
+        }
+      },
+      "canonical": "{\"PENSION_SAVINGS\":\"-72\",\"amount\":[428],\"unitKrw\":{\"n\":null}}",
+      "sha256": "f23af4ff0402077a0f3c6a623ba6e37835ab195adc6cc73fa7b37b54fe995273"
+    },
+    {
+      "input": {
+        "amount": "연금저축",
+        "z": true,
+        "priority": 208
+      },
+      "canonical": "{\"amount\":\"연금저축\",\"priority\":208,\"z\":true}",
+      "sha256": "0b0264847fecb7c93183871568221cecb389096f8f4f4fcdecf9f6f4dd3ed69c"
+    },
+    {
+      "input": {
+        "b": null
+      },
+      "canonical": "{\"b\":null}",
+      "sha256": "46d44c558a54e9b241f123fe793d9a07b0c6b08eba7d62d409f37f5787d6dd5f"
+    },
+    {
+      "input": {
+        "unitKrw": -34
+      },
+      "canonical": "{\"unitKrw\":-34}",
+      "sha256": "27ed27d89aaabbeca2dc6ed7cfa2bddb4ef4114239463ea301b19882bc5f832a"
+    },
+    {
+      "input": {
+        "amount": null,
+        "valid_from": [
+          -691
+        ]
+      },
+      "canonical": "{\"amount\":null,\"valid_from\":[-691]}",
+      "sha256": "cd33b93602cdf3c76cb7bf5a4b7d2c463109324495bac2f6270630d3f3b14861"
+    },
+    {
+      "input": {
+        "valid_from": null,
+        "b": [
+          -842
+        ]
+      },
+      "canonical": "{\"b\":[-842],\"valid_from\":null}",
+      "sha256": "ea828016b028a87601e0060181d670ec1d67214ca52b5d48fcca419bde750e07"
+    },
+    {
+      "input": {
+        "priority": null,
+        "note": [
+          -220
+        ]
+      },
+      "canonical": "{\"note\":[-220],\"priority\":null}",
+      "sha256": "270266925e0628027d134672f5d5d0e94ff3d6a5a7dc2e7a39380313b3e53274"
+    },
+    {
+      "input": {
+        "priority": null,
+        "_leading": [
+          -826
+        ]
+      },
+      "canonical": "{\"_leading\":[-826],\"priority\":null}",
+      "sha256": "780dabfecc3265e104d8d8f739c40460322251d89e967b58d8c4d0c849b94da7"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "accountId": true,
+        "b": -168,
+        "x1": {
+          "$bigint": "-92"
+        }
+      },
+      "canonical": "{\"accountId\":true,\"b\":-168,\"x1\":\"-92\"}",
+      "sha256": "86a940a2c555d30be18822d427d8a24e1efea3c376892041487449273360f375"
+    },
+    {
+      "input": {
+        "_leading": "q\"uote",
+        "z": true,
+        "note": 32
+      },
+      "canonical": "{\"_leading\":\"q\\\"uote\",\"note\":32,\"z\":true}",
+      "sha256": "5c08d13b523cbcaadcf6e7f76c77c9210bb67ba1265174b4bfee7fc6552e1ff9"
+    },
+    {
+      "input": {
+        "_leading": null,
+        "valid_from": [
+          -77
+        ],
+        "x1": {
+          "$bigint": "587036581212381"
+        }
+      },
+      "canonical": "{\"_leading\":null,\"valid_from\":[-77],\"x1\":\"587036581212381\"}",
+      "sha256": "b8495496c341e42b1d5d5d06b3e1a63f389be906507e6833c9e36e8a6c0cd3c8"
+    },
+    {
+      "input": {
+        "accountId": {
+          "$undefined": true
+        }
+      },
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "priority": null,
+        "note": [
+          -276
+        ],
+        "x1": {
+          "$bigint": "9"
+        }
+      },
+      "canonical": "{\"note\":[-276],\"priority\":null,\"x1\":\"9\"}",
+      "sha256": "4ec56529c11a5c213f59de29766dcd16c9eb14bfc7277650b4d16a8cdbf8ec86"
+    },
+    {
+      "input": {
+        "z": {},
+        "_leading": null,
+        "n": [
+          -44
+        ],
+        "x1": {
+          "$bigint": "341236789496163"
+        }
+      },
+      "canonical": "{\"_leading\":null,\"n\":[-44],\"x1\":\"341236789496163\",\"z\":{}}",
+      "sha256": "f3bd581310bbd287092ff1a05ad51f095cc9139f295e2d436c2f3a9ed2a4c21c"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "amount": -211,
+        "accountId": {
+          "$bigint": "3"
+        },
+        "priority": -649,
+        "x1": {
+          "$bigint": "-1032"
+        }
+      },
+      "canonical": "{\"accountId\":\"3\",\"amount\":-211,\"priority\":-649,\"x1\":\"-1032\"}",
+      "sha256": "ead3c6606b760658a7e44357ac8354d227622b8e816977b2ee98a3c83104b340"
+    },
+    {
+      "input": {
+        "priority": null,
+        "valid_from": [
+          -401
+        ],
+        "accountId": {
+          "$bigint": "-72743610"
+        }
+      },
+      "canonical": "{\"accountId\":\"-72743610\",\"priority\":null,\"valid_from\":[-401]}",
+      "sha256": "b2c21cd2e6e366f2bf63bf4023c466dd8b4f6639ed581945abd8cfe588c6255b"
+    },
+    {
+      "input": {
+        "valid_from": 685,
+        "taxYear": {
+          "$bigint": "-96903890"
+        },
+        "unitKrw": -32
+      },
+      "canonical": "{\"taxYear\":\"-96903890\",\"unitKrw\":-32,\"valid_from\":685}",
+      "sha256": "0a9aa7d7ec3586526615f454c85aeace58fc2c69471be769738617a6a98e1e76"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "x1": true
+      },
+      "canonical": "{\"x1\":true}",
+      "sha256": "50018055b56475f08daf1d25523fc2b1d46898e6c39253bd961ab27e3bc58728"
+    },
+    {
+      "input": {
+        "x1": {
+          "n": null,
+          "note": [
+            -976
+          ],
+          "a": {
+            "$bigint": "761"
+          }
+        },
+        "_leading": "2026-07-30"
+      },
+      "canonical": "{\"_leading\":\"2026-07-30\",\"x1\":{\"a\":\"761\",\"n\":null,\"note\":[-976]}}",
+      "sha256": "cc9c6c68650d3675c65edf96f591ba9e0185165057872ba21c91a8b04dc460fd"
+    },
+    {
+      "input": {
+        "n": [
+          309
+        ],
+        "x1": {
+          "$bigint": "98703010305"
+        },
+        "note": "s",
+        "z": true
+      },
+      "canonical": "{\"n\":[309],\"note\":\"s\",\"x1\":\"98703010305\",\"z\":true}",
+      "sha256": "0871ce108c03257f6aa6e64c2eb186396cf7bfe2390ee9f6d8f47e88f6af26ce"
+    },
+    {
+      "input": {
+        "x1": {
+          "amount": null,
+          "priority": [
+            -965
+          ],
+          "z": {
+            "$bigint": "-58"
+          },
+          "accountId": {
+            "note": null,
+            "n": [
+              -35
+            ],
+            "taxYear": {
+              "$bigint": "-58145410943856"
+            }
+          }
+        },
+        "unitKrw": true,
+        "valid_from": 552
+      },
+      "canonical": "{\"unitKrw\":true,\"valid_from\":552,\"x1\":{\"accountId\":{\"n\":[-35],\"note\":null,\"taxYear\":\"-58145410943856\"},\"amount\":null,\"priority\":[-965],\"z\":\"-58\"}}",
+      "sha256": "7da19a27dc144bd1b053ad5ddf11c2ba04765cea4226569c8f9780e3dae6b8b9"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "accountId": true,
+        "valid_from": -330
+      },
+      "canonical": "{\"accountId\":true,\"valid_from\":-330}",
+      "sha256": "a0f96109640334d90a877d35bb0759a4aed7c9a34c2288fb61eac4abe16e7f94"
+    },
+    {
+      "input": {
+        "valid_from": [
+          804
+        ],
+        "z": {
+          "$bigint": "949850167"
+        },
+        "n": 664
+      },
+      "canonical": "{\"n\":664,\"valid_from\":[804],\"z\":\"949850167\"}",
+      "sha256": "d3e035f5345e993a8176f36a0f3c81b7cf725d4bdcd7cb884868af2c0b83dc39"
+    },
+    {
+      "input": {
+        "valid_from": null,
+        "n": [
+          -295
+        ],
+        "accountId": {
+          "$bigint": "787"
+        }
+      },
+      "canonical": "{\"accountId\":\"787\",\"n\":[-295],\"valid_from\":null}",
+      "sha256": "83cfc7c8ce3da2e11446d69d849c2793a0afbd99b79ffe372e147cfe4c23d1ec"
+    },
+    {
+      "input": {
+        "taxYear": {
+          "$bigint": "963"
+        },
+        "amount": "q\"uote",
+        "accountId": true
+      },
+      "canonical": "{\"accountId\":true,\"amount\":\"q\\\"uote\",\"taxYear\":\"963\"}",
+      "sha256": "a71553bac232df1d46d332ceac414c7a868c7feb3e9c3b2a50d05841382a6601"
+    },
+    {
+      "input": {
+        "unitKrw": {
+          "amount": [
+            763
+          ]
+        },
+        "PENSION_SAVINGS": {
+          "$bigint": "387278707492525"
+        },
+        "note": [
+          -948
+        ],
+        "a": {
+          "$bigint": "701654129"
+        }
+      },
+      "canonical": "{\"PENSION_SAVINGS\":\"387278707492525\",\"a\":\"701654129\",\"note\":[-948],\"unitKrw\":{\"amount\":[763]}}",
+      "sha256": "a6d7ef887f5674c72c19da4ab5e4753220f8d141e0bf2566a8accc7377bccf00"
+    },
+    {
+      "input": {
+        "z": {
+          "valid_from": null,
+          "amount": [
+            739
+          ],
+          "a": {
+            "$bigint": "-36549234"
+          },
+          "PENSION_SAVINGS": 5
+        },
+        "taxYear": {
+          "$bigint": "5"
+        },
+        "valid_from": 561,
+        "unitKrw": {
+          "$bigint": "-30163050329098"
+        }
+      },
+      "canonical": "{\"taxYear\":\"5\",\"unitKrw\":\"-30163050329098\",\"valid_from\":561,\"z\":{\"PENSION_SAVINGS\":5,\"a\":\"-36549234\",\"amount\":[739],\"valid_from\":null}}",
+      "sha256": "2b43eefc5e1c11598369e1dfd1d080177f6a7651220e364fc1c9fd1ff750aad9"
+    },
+    {
+      "input": {
+        "_leading": [
+          19
+        ]
+      },
+      "canonical": "{\"_leading\":[19]}",
+      "sha256": "33cf3e9214e2c7dc16bca0a150fbc43226047f5fd2153100ca883106cc7fd76e"
+    },
+    {
+      "input": {
+        "_leading": [
+          -503
+        ]
+      },
+      "canonical": "{\"_leading\":[-503]}",
+      "sha256": "187e1f8273ccfdb8e34fb2976e07123d7f30c0ec43a5f9326b083d3b46a19f40"
+    },
+    {
+      "input": {
+        "n": [
+          -241
+        ],
+        "z": {
+          "$bigint": "-5890785414"
+        }
+      },
+      "canonical": "{\"n\":[-241],\"z\":\"-5890785414\"}",
+      "sha256": "61e4bdaf14ca2fd547c0400d506408e98ad6e9a0921b41b364bd4f908cdcc8bb"
+    },
+    {
+      "input": {
+        "note": "",
+        "accountId": true
+      },
+      "canonical": "{\"accountId\":true,\"note\":\"\"}",
+      "sha256": "1eadd7a4f1af6cfa34ea8f1508b7148e8e2d00b827a3f448629aea674a63da94"
+    },
+    {
+      "input": {
+        "accountId": {
+          "priority": null,
+          "n": [
+            -217
+          ]
+        },
+        "x1": {
+          "$bigint": "70121"
+        },
+        "note": null
+      },
+      "canonical": "{\"accountId\":{\"n\":[-217],\"priority\":null},\"note\":null,\"x1\":\"70121\"}",
+      "sha256": "203fc822d1789d1425978ae4a8c1a8015d2c54c1757b909f1167eee308ea9e1e"
+    },
+    {
+      "input": {
+        "x1": -3
+      },
+      "canonical": "{\"x1\":-3}",
+      "sha256": "9c0be7566292ac560d549ce1fe1a639b8a8fffd31b3387a933038b87ebb1fd64"
+    },
+    {
+      "input": {
+        "priority": null
+      },
+      "canonical": "{\"priority\":null}",
+      "sha256": "0a6202f188859cb41dee0f08388e9da21babf6f4b569f7b18abf0453caaa1062"
+    },
+    {
+      "input": {
+        "taxYear": {
+          "$undefined": true
+        }
+      },
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "taxYear": {
+          "$bigint": "-18"
+        },
+        "x1": {},
+        "_leading": null,
+        "note": [
+          294
+        ]
+      },
+      "canonical": "{\"_leading\":null,\"note\":[294],\"taxYear\":\"-18\",\"x1\":{}}",
+      "sha256": "2dfe9a8c887574f6ff76ee78f42c9ccdd5a3f3f5820003da73e454d01991770c"
+    },
+    {
+      "input": {
+        "amount": null,
+        "priority": [
+          -899
+        ],
+        "accountId": {
+          "$bigint": "-929098369636"
+        },
+        "a": {
+          "$bigint": "941858163"
+        }
+      },
+      "canonical": "{\"a\":\"941858163\",\"accountId\":\"-929098369636\",\"amount\":null,\"priority\":[-899]}",
+      "sha256": "6bccd8aa07cbf131e87fb5e2788979cb57dd58ffe02dc8c2eaf42a0f5b0e7617"
+    },
+    {
+      "input": {
+        "taxYear": {
+          "priority": null
+        },
+        "priority": [
+          925
+        ]
+      },
+      "canonical": "{\"priority\":[925],\"taxYear\":{\"priority\":null}}",
+      "sha256": "c49a13cda247e3dd4f49676e45b1a3b7c358d5929a89cb2104861fefec2cd4b5"
+    },
+    {
+      "input": {
+        "amount": null,
+        "_leading": [
+          -492
+        ],
+        "unitKrw": {
+          "$bigint": "3"
+        },
+        "valid_from": 681
+      },
+      "canonical": "{\"_leading\":[-492],\"amount\":null,\"unitKrw\":\"3\",\"valid_from\":681}",
+      "sha256": "92e50298d1c2eb941f9e71ac12eff1a31a4f6b3ffcdda5e6d351bd2f2d8b3b4d"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "taxYear": true,
+        "priority": -342,
+        "x1": {
+          "$bigint": "529"
+        },
+        "amount": "연금저축"
+      },
+      "canonical": "{\"amount\":\"연금저축\",\"priority\":-342,\"taxYear\":true,\"x1\":\"529\"}",
+      "sha256": "16aa7c29538f59ecce0564de03917c683c609f7308914950da24fc55b039391b"
+    },
+    {
+      "input": {
+        "amount": [
+          320
+        ]
+      },
+      "canonical": "{\"amount\":[320]}",
+      "sha256": "19a475a7160ab4430e7218f69fd93be3854fa5d8678cb15e5e4de6303647cd4f"
+    },
+    {
+      "input": {
+        "n": null,
+        "amount": [
+          114
+        ]
+      },
+      "canonical": "{\"amount\":[114],\"n\":null}",
+      "sha256": "d61efbfc7a04ccef6b97d929ad930471f63faac110ce9fc8914855a831859458"
+    },
+    {
+      "input": {
+        "amount": null,
+        "_leading": [
+          490
+        ],
+        "unitKrw": {
+          "$bigint": "387890107254343"
+        }
+      },
+      "canonical": "{\"_leading\":[490],\"amount\":null,\"unitKrw\":\"387890107254343\"}",
+      "sha256": "554c3204fba5d62677e1c4dc1c357883388a68dcfa23db2fe11ce89c5f2da728"
+    },
+    {
+      "input": {
+        "unitKrw": 2,
+        "z": {
+          "$bigint": "725814523"
+        }
+      },
+      "canonical": "{\"unitKrw\":2,\"z\":\"725814523\"}",
+      "sha256": "581c52ddd500550eed40ab65fe6d83023c362099cda4ba9a84d697498ec7fc5c"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "b": "연금저축",
+        "taxYear": true,
+        "amount": 943
+      },
+      "canonical": "{\"amount\":943,\"b\":\"연금저축\",\"taxYear\":true}",
+      "sha256": "70a7556ba368589588d39f887d97fa443e9563d1d489bd956784ac4e01952bda"
+    },
+    {
+      "input": {
+        "valid_from": null,
+        "amount": [
+          -94
+        ],
+        "PENSION_SAVINGS": {
+          "$bigint": "-30"
+        },
+        "a": {
+          "n": null,
+          "priority": [
+            -397
+          ]
+        }
+      },
+      "canonical": "{\"PENSION_SAVINGS\":\"-30\",\"a\":{\"n\":null,\"priority\":[-397]},\"amount\":[-94],\"valid_from\":null}",
+      "sha256": "6e53c3f81386465fcd6e32b14c80b86c255ece32be3078a12f7cfa831219f1cb"
+    },
+    {
+      "input": {
+        "priority": [
+          234
+        ],
+        "a": {
+          "_leading": null,
+          "amount": [
+            -453
+          ]
+        }
+      },
+      "canonical": "{\"a\":{\"_leading\":null,\"amount\":[-453]},\"priority\":[234]}",
+      "sha256": "66334f70df48992fa3fb264fea6f00ffa164e54ec624598289a49982e038fad7"
+    },
+    {
+      "input": {
+        "priority": null
+      },
+      "canonical": "{\"priority\":null}",
+      "sha256": "0a6202f188859cb41dee0f08388e9da21babf6f4b569f7b18abf0453caaa1062"
+    },
+    {
+      "input": {
+        "accountId": 40,
+        "unitKrw": {
+          "$bigint": "5"
+        }
+      },
+      "canonical": "{\"accountId\":40,\"unitKrw\":\"5\"}",
+      "sha256": "74cd9c6a7b2de87cd9c8afa469000ef4ba8fac2c5cbed02ae0d5e6cf88551f13"
+    },
+    {
+      "input": {
+        "x1": {
+          "priority": null,
+          "n": [
+            -888
+          ]
+        },
+        "taxYear": {
+          "$bigint": "-72389276"
+        }
+      },
+      "canonical": "{\"taxYear\":\"-72389276\",\"x1\":{\"n\":[-888],\"priority\":null}}",
+      "sha256": "89ef8f6f347938649e65226923cc5896c56518d017fd7e70877cdecc1295ab61"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "z": {
+          "b": null,
+          "amount": [
+            -888
+          ]
+        }
+      },
+      "canonical": "{\"z\":{\"amount\":[-888],\"b\":null}}",
+      "sha256": "c8dfcf215e627d632ff0f96bf24f6d1fa82b02185bef48ba3022fae8cb8de102"
+    },
+    {
+      "input": {
+        "b": null
+      },
+      "canonical": "{\"b\":null}",
+      "sha256": "46d44c558a54e9b241f123fe793d9a07b0c6b08eba7d62d409f37f5787d6dd5f"
+    },
+    {
+      "input": {
+        "unitKrw": -8,
+        "taxYear": {
+          "$bigint": "-38361254963216"
+        },
+        "x1": true
+      },
+      "canonical": "{\"taxYear\":\"-38361254963216\",\"unitKrw\":-8,\"x1\":true}",
+      "sha256": "a3f37f43ac3d2f174a16bef396c4f427aeb4fb7adefb599226df8eb044739d75"
+    },
+    {
+      "input": {
+        "accountId": {
+          "amount": null
+        }
+      },
+      "canonical": "{\"accountId\":{\"amount\":null}}",
+      "sha256": "bc7690ba6a268df1fe52d3db5c96ea51148c2840256e0db0e99221aeddfd7dd4"
+    },
+    {
+      "input": {
+        "z": -3,
+        "a": {
+          "$bigint": "185894787"
+        }
+      },
+      "canonical": "{\"a\":\"185894787\",\"z\":-3}",
+      "sha256": "5abcbc480a557696726a91ff5e7dbcffa7b943870a2449ecbc942f0c273607c7"
+    },
+    {
+      "input": {
+        "PENSION_SAVINGS": {
+          "priority": null,
+          "note": [
+            149
+          ],
+          "a": {
+            "$bigint": "-723656"
+          },
+          "x1": true
+        },
+        "_leading": 834
+      },
+      "canonical": "{\"PENSION_SAVINGS\":{\"a\":\"-723656\",\"note\":[149],\"priority\":null,\"x1\":true},\"_leading\":834}",
+      "sha256": "9c86dd39113ab4a993178b8038ee4dd3c821cc34c8ed99672523217a62b7cc3f"
+    },
+    {
+      "input": {
+        "amount": [
+          -94
+        ],
+        "PENSION_SAVINGS": {
+          "$bigint": "-323472743834"
+        },
+        "x1": {
+          "$bigint": "783"
+        }
+      },
+      "canonical": "{\"PENSION_SAVINGS\":\"-323472743834\",\"amount\":[-94],\"x1\":\"783\"}",
+      "sha256": "473cb49d6ffda4f72b731064d982172e0e83264847b52b9c7218f29bbab4beab"
+    },
+    {
+      "input": {
+        "x1": {
+          "$bigint": "-145652587496"
+        },
+        "a": {
+          "$bigint": "-50"
+        }
+      },
+      "canonical": "{\"a\":\"-50\",\"x1\":\"-145652587496\"}",
+      "sha256": "c288cab0e2afffe919bb715173a5218f9d36160429ae027c3573642de502d8c0"
+    },
+    {
+      "input": {
+        "priority": "q\"uote"
+      },
+      "canonical": "{\"priority\":\"q\\\"uote\"}",
+      "sha256": "d560c1d831a4fa76915e315d899e4865365dc68c278f1bb863fd644e22a30cc5"
+    },
+    {
+      "input": {
+        "n": [
+          282
+        ],
+        "x1": {
+          "$bigint": "-5496"
+        },
+        "PENSION_SAVINGS": {
+          "$bigint": "52341"
+        }
+      },
+      "canonical": "{\"PENSION_SAVINGS\":\"52341\",\"n\":[282],\"x1\":\"-5496\"}",
+      "sha256": "08a39d4979a452f677c8002306d00caa8beb03bc67f2ea86206aba2e9617c3ee"
+    },
+    {
+      "input": {
+        "a": true,
+        "n": -139
+      },
+      "canonical": "{\"a\":true,\"n\":-139}",
+      "sha256": "06d7859660d0eb075675ba12a33a8cba5aab0bb8be4e77c47e73564a7b3169b1"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "note": [
+          213
+        ],
+        "PENSION_SAVINGS": {
+          "$undefined": true
+        },
+        "_leading": "back\\slash"
+      },
+      "canonical": "{\"_leading\":\"back\\\\slash\",\"note\":[213]}",
+      "sha256": "f8f5f7a896892e7b6a86c6eeb604851245fc279f76e9629b1237327c4e7a5c6b"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "taxYear": true,
+        "b": "2026-07-30",
+        "_leading": 631
+      },
+      "canonical": "{\"_leading\":631,\"b\":\"2026-07-30\",\"taxYear\":true}",
+      "sha256": "eb9e2e321e70eb699082d4b9bfbdfb4d4aa31c9475fc6d5c6102b78b7c12edea"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "accountId": true,
+        "valid_from": 327,
+        "PENSION_SAVINGS": {
+          "$bigint": "-783434509456"
+        }
+      },
+      "canonical": "{\"PENSION_SAVINGS\":\"-783434509456\",\"accountId\":true,\"valid_from\":327}",
+      "sha256": "ece03a3d7cf4b7e36961f4ede3cfbe6430e20056d9077a9d67e33b59b66f0d8a"
+    },
+    {
+      "input": {
+        "b": [
+          646
+        ]
+      },
+      "canonical": "{\"b\":[646]}",
+      "sha256": "9c22a848239fcaaf28d174c3d25c6c7a3cc61931c73209ee263a2e281e21ac3d"
+    },
+    {
+      "input": {
+        "amount": null,
+        "n": [
+          -517
+        ],
+        "accountId": {
+          "$bigint": "-587070"
+        }
+      },
+      "canonical": "{\"accountId\":\"-587070\",\"amount\":null,\"n\":[-517]}",
+      "sha256": "e435b462416ef220749db32833486f6dde606da5bb450e43b2ab4a64c013481b"
+    },
+    {
+      "input": {
+        "b": [
+          754
+        ],
+        "accountId": {
+          "$bigint": "3032721"
+        }
+      },
+      "canonical": "{\"accountId\":\"3032721\",\"b\":[754]}",
+      "sha256": "3ba1a70ffd5b090ca609e10c21011ec56f25fd77917f02f90a149bde7690fdd5"
+    },
+    {
+      "input": {
+        "unitKrw": {
+          "$undefined": true
+        },
+        "n": "back\\slash",
+        "accountId": true
+      },
+      "canonical": "{\"accountId\":true,\"n\":\"back\\\\slash\"}",
+      "sha256": "06b880537f1b8aaadfb41c611d4681bcee9295803907a542562e22345bc1141a"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "priority": "q\"uote"
+      },
+      "canonical": "{\"priority\":\"q\\\"uote\"}",
+      "sha256": "d560c1d831a4fa76915e315d899e4865365dc68c278f1bb863fd644e22a30cc5"
+    },
+    {
+      "input": {
+        "valid_from": "q\"uote",
+        "accountId": {
+          "$bigint": "761"
+        }
+      },
+      "canonical": "{\"accountId\":\"761\",\"valid_from\":\"q\\\"uote\"}",
+      "sha256": "bb758e641ce76d3588c057473877523293f5a5fb02d0edf623477d165f4396b1"
+    },
+    {
+      "input": {
+        "valid_from": [
+          207
+        ]
+      },
+      "canonical": "{\"valid_from\":[207]}",
+      "sha256": "517163978fded8b58e0285c0adc3d39c72f048439f3dcc98b5fbb6c573c10245"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "valid_from": [
+          -457
+        ],
+        "x1": {
+          "$bigint": "-1474389290"
+        },
+        "accountId": {
+          "priority": null,
+          "_leading": [
+            -153
+          ],
+          "PENSION_SAVINGS": {
+            "$bigint": "-349434"
+          }
+        }
+      },
+      "canonical": "{\"accountId\":{\"PENSION_SAVINGS\":\"-349434\",\"_leading\":[-153],\"priority\":null},\"valid_from\":[-457],\"x1\":\"-1474389290\"}",
+      "sha256": "456ab96b59005795d2d4675a0335c2f3281b738db62c214cce72e989de9d1f98"
+    },
+    {
+      "input": {
+        "n": [
+          -720
+        ]
+      },
+      "canonical": "{\"n\":[-720]}",
+      "sha256": "efd54e41073990630db3bdf4f6638458f79554e5aa8564bafa98843cba0d3685"
+    },
+    {
+      "input": {
+        "note": null,
+        "n": [
+          744
+        ]
+      },
+      "canonical": "{\"n\":[744],\"note\":null}",
+      "sha256": "f8896d8c709318035d05ea29266406b1c4661486a99eeb355e637b848c0aca4e"
+    },
+    {
+      "input": {
+        "priority": null,
+        "_leading": [
+          -399
+        ],
+        "unitKrw": {
+          "$bigint": "1658923"
+        }
+      },
+      "canonical": "{\"_leading\":[-399],\"priority\":null,\"unitKrw\":\"1658923\"}",
+      "sha256": "43f182d655461d8d0a14dce7dd0ce7c556172db4db5ee9e7bff573cbdcbb84a8"
+    },
+    {
+      "input": {
+        "x1": {
+          "$undefined": true
+        },
+        "priority": "back\\slash"
+      },
+      "canonical": "{\"priority\":\"back\\\\slash\"}",
+      "sha256": "2e95ea221c38d06264a118b2d5966f442a853f2c2d783bdc8a8fbae837254cc8"
+    },
+    {
+      "input": {
+        "amount": [
+          -284
+        ],
+        "a": {
+          "$bigint": "-1814903690"
+        },
+        "PENSION_SAVINGS": {
+          "_leading": null
+        }
+      },
+      "canonical": "{\"PENSION_SAVINGS\":{\"_leading\":null},\"a\":\"-1814903690\",\"amount\":[-284]}",
+      "sha256": "f34acc970b87628b63881076c8e4b214157cac284c77499c4986591bbaa53ec8"
+    },
+    {
+      "input": {
+        "PENSION_SAVINGS": -28
+      },
+      "canonical": "{\"PENSION_SAVINGS\":-28}",
+      "sha256": "bf3910a5c2c5a6bf382ffec62a4dd46e4916279178fa1f27a8bbdd486dacea0b"
+    },
+    {
+      "input": {
+        "valid_from": null
+      },
+      "canonical": "{\"valid_from\":null}",
+      "sha256": "899cd0917a7cba953971fc9cdc04057b189e8c316c48193d5fe5d81150fbce1e"
+    },
+    {
+      "input": {
+        "taxYear": 24,
+        "z": {
+          "$bigint": "-10"
+        }
+      },
+      "canonical": "{\"taxYear\":24,\"z\":\"-10\"}",
+      "sha256": "82514048019bc8e6ad515b3615df49cff9d02084d89112a80e4424b5ec4a6acc"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "valid_from": null,
+        "_leading": [
+          -94
+        ],
+        "accountId": {
+          "$bigint": "-343078503012"
+        }
+      },
+      "canonical": "{\"_leading\":[-94],\"accountId\":\"-343078503012\",\"valid_from\":null}",
+      "sha256": "debb6ab512e80859e7ea0410c31ca37cc571d1e6d2c1a7d71c977eb78debc19c"
+    },
+    {
+      "input": {
+        "n": [
+          -313
+        ]
+      },
+      "canonical": "{\"n\":[-313]}",
+      "sha256": "f0b1911fa09b7c76b751895d414c82dea3b28acf6caad3f7c27e9ef86856d0ce"
+    },
+    {
+      "input": {
+        "priority": null,
+        "note": [
+          -871
+        ],
+        "accountId": {
+          "$bigint": "7098909"
+        }
+      },
+      "canonical": "{\"accountId\":\"7098909\",\"note\":[-871],\"priority\":null}",
+      "sha256": "1a551f74e67561804b747bd1e8d977394e66d25edf91b19608f15201cb8dbd5d"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "amount": 568,
+        "x1": {
+          "$bigint": "985016163872541"
+        },
+        "note": [
+          -147
+        ]
+      },
+      "canonical": "{\"amount\":568,\"note\":[-147],\"x1\":\"985016163872541\"}",
+      "sha256": "20534f9d602e731ccea245c7269f9ace283149578cd599e2f56d0de90a67a4ee"
+    },
+    {
+      "input": {
+        "valid_from": null
+      },
+      "canonical": "{\"valid_from\":null}",
+      "sha256": "899cd0917a7cba953971fc9cdc04057b189e8c316c48193d5fe5d81150fbce1e"
+    },
+    {
+      "input": {
+        "x1": 19
+      },
+      "canonical": "{\"x1\":19}",
+      "sha256": "489a8078eaa9eb85aa4c01cf915c1242462bdb9712a3d8f936c6ff7df529b411"
+    },
+    {
+      "input": {
+        "amount": null
+      },
+      "canonical": "{\"amount\":null}",
+      "sha256": "2ccd94e2ba19c54ed10b40a18c17a6122ae49060dad6bb43051c9a65894d578b"
+    },
+    {
+      "input": {
+        "z": {
+          "$bigint": "309"
+        }
+      },
+      "canonical": "{\"z\":\"309\"}",
+      "sha256": "e2f691e6a42e39b238941a39dbb786bd04e85bfedca335928036e96991f308d6"
+    },
+    {
+      "input": {
+        "unitKrw": {
+          "$bigint": "5276723816103"
+        },
+        "valid_from": null
+      },
+      "canonical": "{\"unitKrw\":\"5276723816103\",\"valid_from\":null}",
+      "sha256": "6e042d24437a578bf0f27dd941f82b9f1e88646c1aa14e529d3cb37b7443f66c"
+    },
+    {
+      "input": {
+        "unitKrw": {
+          "$undefined": true
+        },
+        "_leading": "back\\slash",
+        "a": true
+      },
+      "canonical": "{\"_leading\":\"back\\\\slash\",\"a\":true}",
+      "sha256": "ae8aff3d007b01d875a22a045988a52ea95798595a03144e909bbd52e719f9a5"
+    },
+    {
+      "input": {
+        "x1": {
+          "note": null,
+          "_leading": [
+            -963
+          ]
+        },
+        "a": {
+          "$bigint": "18901458925"
+        }
+      },
+      "canonical": "{\"a\":\"18901458925\",\"x1\":{\"_leading\":[-963],\"note\":null}}",
+      "sha256": "0af52eaed4ddd1f5453328236ed42ccdcfed43fa44b8a1450324037e278fd64b"
+    },
+    {
+      "input": {
+        "accountId": {
+          "$bigint": "527296183"
+        }
+      },
+      "canonical": "{\"accountId\":\"527296183\"}",
+      "sha256": "0a0b2e6291772da53ed83ad0d7da218343e4c7599bb2deeab17f8d8a0e9edaf6"
+    },
+    {
+      "input": {
+        "unitKrw": {
+          "priority": [
+            -112
+          ]
+        }
+      },
+      "canonical": "{\"unitKrw\":{\"priority\":[-112]}}",
+      "sha256": "3a93741dcfabe3685338327602062361e9a236cc446b3e26ed53b9f0f546d075"
+    },
+    {
+      "input": {
+        "n": null,
+        "valid_from": [
+          700
+        ],
+        "x1": {
+          "$bigint": "54181632145"
+        },
+        "note": "2026-07-30"
+      },
+      "canonical": "{\"n\":null,\"note\":\"2026-07-30\",\"valid_from\":[700],\"x1\":\"54181632145\"}",
+      "sha256": "17234f0472286c16e06c2f5ec3fd54de1a667b8ac7ab2d7e41ba0ad95cb72f97"
+    },
+    {
+      "input": {
+        "n": [
+          39
+        ],
+        "accountId": {
+          "$bigint": "-3612"
+        }
+      },
+      "canonical": "{\"accountId\":\"-3612\",\"n\":[39]}",
+      "sha256": "38787fd2d7beff1ed72a5650359b600fc271b50040acb25d46a875662ab31214"
+    },
+    {
+      "input": {
+        "valid_from": null,
+        "priority": [
+          350
+        ],
+        "taxYear": {
+          "$bigint": "-129470107850"
+        },
+        "x1": {
+          "$bigint": "-90567676"
+        }
+      },
+      "canonical": "{\"priority\":[350],\"taxYear\":\"-129470107850\",\"valid_from\":null,\"x1\":\"-90567676\"}",
+      "sha256": "398e746a728300a18cfecbf127bc8980e9bc545bb6224c03d84ff710adc5374c"
+    },
+    {
+      "input": {
+        "_leading": 829,
+        "unitKrw": {
+          "$bigint": "329434147"
+        },
+        "n": -726,
+        "taxYear": {
+          "$bigint": "1"
+        }
+      },
+      "canonical": "{\"_leading\":829,\"n\":-726,\"taxYear\":\"1\",\"unitKrw\":\"329434147\"}",
+      "sha256": "2337aef4e2c7009a035b3054cab69803f8cfb0d75e243992c43464a6c86d89b5"
+    },
+    {
+      "input": {
+        "unitKrw": {
+          "amount": null,
+          "priority": [
+            888
+          ]
+        },
+        "a": {
+          "$bigint": "36341856367"
+        },
+        "valid_from": "back\\slash",
+        "taxYear": true
+      },
+      "canonical": "{\"a\":\"36341856367\",\"taxYear\":true,\"unitKrw\":{\"amount\":null,\"priority\":[888]},\"valid_from\":\"back\\\\slash\"}",
+      "sha256": "0b2bcc2f689e49ce3a0d2a492ea68aa262b6dea51e72de02f0a8bc989436e0f0"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "_leading": "tab\there",
+        "z": true
+      },
+      "canonical": "{\"_leading\":\"tab\\there\",\"z\":true}",
+      "sha256": "fc67eb6d823f550d29c98198f0e43513f60f1b96ef96b1ace6f4bd2b11c40ef7"
+    },
+    {
+      "input": {
+        "taxYear": {
+          "b": null,
+          "amount": [
+            -575
+          ]
+        },
+        "PENSION_SAVINGS": {
+          "$bigint": "125038165272183"
+        }
+      },
+      "canonical": "{\"PENSION_SAVINGS\":\"125038165272183\",\"taxYear\":{\"amount\":[-575],\"b\":null}}",
+      "sha256": "a8f622e6b2bd6b52127c254317030ac7432b651d42772039537ad19afebb8918"
+    },
+    {
+      "input": {
+        "unitKrw": 34,
+        "z": {
+          "$bigint": "9"
+        }
+      },
+      "canonical": "{\"unitKrw\":34,\"z\":\"9\"}",
+      "sha256": "7f94ce8b8e55f4d0cf51827ee3be9cc9b88c391237a9aa625df0a559856094ed"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "a": {
+          "$bigint": "569278969074527"
+        }
+      },
+      "canonical": "{\"a\":\"569278969074527\"}",
+      "sha256": "0095abb66f98379b02463ac7d3babca1b1876907bdecbcd117b06db652a0b645"
+    },
+    {
+      "input": {
+        "taxYear": {
+          "$undefined": true
+        },
+        "priority": "q\"uote"
+      },
+      "canonical": "{\"priority\":\"q\\\"uote\"}",
+      "sha256": "d560c1d831a4fa76915e315d899e4865365dc68c278f1bb863fd644e22a30cc5"
+    },
+    {
+      "input": {
+        "n": [
+          894
+        ],
+        "taxYear": {
+          "$bigint": "-54107670"
+        },
+        "accountId": 20,
+        "unitKrw": {
+          "$bigint": "12903"
+        }
+      },
+      "canonical": "{\"accountId\":20,\"n\":[894],\"taxYear\":\"-54107670\",\"unitKrw\":\"12903\"}",
+      "sha256": "73b5b9b9b077ff696b63783ad924292fc47b49abe32340a29ce3f930803277a2"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "x1": -3,
+        "unitKrw": {
+          "$bigint": "-54107614167616"
+        },
+        "z": true,
+        "b": 186
+      },
+      "canonical": "{\"b\":186,\"unitKrw\":\"-54107614167616\",\"x1\":-3,\"z\":true}",
+      "sha256": "e2022177c700b0556e5050d3389f1d1fc3cbe41dc0c529594ad26324a1b68dd4"
+    },
+    {
+      "input": {
+        "b": null,
+        "n": [
+          -559
+        ],
+        "x1": {
+          "$bigint": "-521452"
+        }
+      },
+      "canonical": "{\"b\":null,\"n\":[-559],\"x1\":\"-521452\"}",
+      "sha256": "df7d32c15e2ae2f11ebf3976067093f9227543d5c99ceca5bfba17e93536399d"
+    },
+    {
+      "input": {
+        "_leading": [
+          -876
+        ],
+        "x1": {
+          "$bigint": "-52947456749218"
+        }
+      },
+      "canonical": "{\"_leading\":[-876],\"x1\":\"-52947456749218\"}",
+      "sha256": "d81a1a7346289c08425e269d951e423c0ee62a36a27caa0afbeb0c398556d44c"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "accountId": true,
+        "_leading": "back\\slash"
+      },
+      "canonical": "{\"_leading\":\"back\\\\slash\",\"accountId\":true}",
+      "sha256": "e8ad192076779968b2296fe6d5c71e7f6ad2ca212ce2b69afb284a3025c9985d"
+    },
+    {
+      "input": {
+        "z": {
+          "$bigint": "1458903"
+        },
+        "n": [
+          217
+        ],
+        "priority": [
+          -750
+        ]
+      },
+      "canonical": "{\"n\":[217],\"priority\":[-750],\"z\":\"1458903\"}",
+      "sha256": "262a85027cbf3141337399f872a70558234c4694e7e67630b4d881fc5e70834f"
+    },
+    {
+      "input": {
+        "valid_from": null,
+        "n": [
+          -224
+        ],
+        "accountId": {
+          "$bigint": "38543438943"
+        }
+      },
+      "canonical": "{\"accountId\":\"38543438943\",\"n\":[-224],\"valid_from\":null}",
+      "sha256": "325384f673a6763dc95341614a173e1180727bf6757c879b48dbe9776266e78b"
+    },
+    {
+      "input": {
+        "z": {
+          "$bigint": "749674981816105"
+        }
+      },
+      "canonical": "{\"z\":\"749674981816105\"}",
+      "sha256": "57ff9fd7e511a16225482773b18e7898f83569f83fd4c42aaa3a94613f8337d2"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "b": 776,
+        "a": {
+          "$bigint": "703"
+        },
+        "n": "back\\slash",
+        "PENSION_SAVINGS": true
+      },
+      "canonical": "{\"PENSION_SAVINGS\":true,\"a\":\"703\",\"b\":776,\"n\":\"back\\\\slash\"}",
+      "sha256": "e9d8d5d3d0e51430436d978130faa2a4c4ff982434ed6e2ddb9e3e351bcb46b5"
+    },
+    {
+      "input": {
+        "taxYear": {
+          "$bigint": "-34523270349434"
+        },
+        "PENSION_SAVINGS": true
+      },
+      "canonical": "{\"PENSION_SAVINGS\":true,\"taxYear\":\"-34523270349434\"}",
+      "sha256": "918711a5424e07fbea778d9e689b30ee8621240a9bc527f251572d837757b54a"
+    },
+    {
+      "input": {
+        "taxYear": {
+          "note": null
+        },
+        "priority": [
+          9
+        ],
+        "accountId": {
+          "$bigint": "-30903098721212"
+        }
+      },
+      "canonical": "{\"accountId\":\"-30903098721212\",\"priority\":[9],\"taxYear\":{\"note\":null}}",
+      "sha256": "0d4bac4cf38bae6ac2b86636b60b2776836f92ab4ec545b2cb486f371b61ea94"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "n": -5,
+        "x1": {
+          "$bigint": "92527"
+        }
+      },
+      "canonical": "{\"n\":-5,\"x1\":\"92527\"}",
+      "sha256": "b9acc756e6cad87194c24f183444d3cc170d77ad75ca9441bed180c361b32fc6"
+    },
+    {
+      "input": {
+        "x1": true,
+        "priority": -376,
+        "a": {
+          "$bigint": "581"
+        },
+        "amount": ""
+      },
+      "canonical": "{\"a\":\"581\",\"amount\":\"\",\"priority\":-376,\"x1\":true}",
+      "sha256": "263e3d9978af7a8f57c11c2d593e18e3edc5804c355ff50564ee10a90c308e91"
+    },
+    {
+      "input": {
+        "note": [
+          162
+        ],
+        "PENSION_SAVINGS": {
+          "$bigint": "-9692"
+        }
+      },
+      "canonical": "{\"PENSION_SAVINGS\":\"-9692\",\"note\":[162]}",
+      "sha256": "c3db065c68492545851683165b0e4dd01737fa884dab0a16be8af664a55c8843"
+    },
+    {
+      "input": {
+        "b": null,
+        "_leading": [
+          536
+        ],
+        "z": {
+          "$bigint": "-141476365272"
+        },
+        "PENSION_SAVINGS": {
+          "$bigint": "-789234"
+        }
+      },
+      "canonical": "{\"PENSION_SAVINGS\":\"-789234\",\"_leading\":[536],\"b\":null,\"z\":\"-141476365272\"}",
+      "sha256": "3de894f9a6e78cbbdad69409ef808c4cc1753095c13ecf2bb1942eb360df4363"
+    },
+    {
+      "input": {
+        "valid_from": [
+          734
+        ],
+        "PENSION_SAVINGS": {
+          "$bigint": "-92109890"
+        },
+        "a": {
+          "$undefined": true
+        },
+        "note": "back\\slash"
+      },
+      "canonical": "{\"PENSION_SAVINGS\":\"-92109890\",\"note\":\"back\\\\slash\",\"valid_from\":[734]}",
+      "sha256": "f238490f98c677b335ec40d3d4b36e9e4df6e4bdaa9d7584f959238b37aa170d"
+    },
+    {
+      "input": {
+        "priority": [
+          -230
+        ]
+      },
+      "canonical": "{\"priority\":[-230]}",
+      "sha256": "5b98e4b9e7b867f38f79e5e7ecb72735e0bda2386af0000e6eaf557e8c6b8e5a"
+    },
+    {
+      "input": {
+        "valid_from": null,
+        "amount": [
+          64
+        ],
+        "z": {
+          "$bigint": "365256969092381"
+        },
+        "_leading": [
+          152
+        ]
+      },
+      "canonical": "{\"_leading\":[152],\"amount\":[64],\"valid_from\":null,\"z\":\"365256969092381\"}",
+      "sha256": "d5acca2bdf580a94c9fa19b7e7a8ed592f7fcebe2e1d68c35d4bf4486fc5541c"
+    },
+    {
+      "input": {
+        "priority": null,
+        "amount": [
+          -585
+        ]
+      },
+      "canonical": "{\"amount\":[-585],\"priority\":null}",
+      "sha256": "93fc9751387fe0e419b688b6c07fa2471b577e44c346732d65a548759d83e053"
+    },
+    {
+      "input": {
+        "b": null,
+        "n": [
+          124
+        ],
+        "a": {
+          "$bigint": "-563032527250"
+        }
+      },
+      "canonical": "{\"a\":\"-563032527250\",\"b\":null,\"n\":[124]}",
+      "sha256": "051cb508c10db1b75a384e9a182ac12feef33c0657a44d73daa9b8744933faba"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "priority": [
+          667
+        ],
+        "unitKrw": {
+          "$bigint": "123"
+        }
+      },
+      "canonical": "{\"priority\":[667],\"unitKrw\":\"123\"}",
+      "sha256": "77ea07258991c7e0b9e6caa66b983b58b7f4457f429c4e330747e08763902e1a"
+    },
+    {
+      "input": {
+        "taxYear": {
+          "$bigint": "7"
+        },
+        "valid_from": -918,
+        "PENSION_SAVINGS": {
+          "$bigint": "-32721458"
+        },
+        "accountId": -19
+      },
+      "canonical": "{\"PENSION_SAVINGS\":\"-32721458\",\"accountId\":-19,\"taxYear\":\"7\",\"valid_from\":-918}",
+      "sha256": "3ebe81d0ee2108d9b64565d09df519eaa049bed6db9e4f49940ddf07001f62e4"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "amount": [
+          -978
+        ],
+        "unitKrw": {
+          "$bigint": "-7276969254"
+        },
+        "accountId": {
+          "note": null,
+          "n": [
+            25
+          ],
+          "accountId": {
+            "$bigint": "-18567654927276"
+          }
+        },
+        "PENSION_SAVINGS": true
+      },
+      "canonical": "{\"PENSION_SAVINGS\":true,\"accountId\":{\"accountId\":\"-18567654927276\",\"n\":[25],\"note\":null},\"amount\":[-978],\"unitKrw\":\"-7276969254\"}",
+      "sha256": "9626db2f628fdb3f6f26c0436bb4a5589d3c2351cc9bb49589417c312de5c9b6"
+    },
+    {
+      "input": {
+        "a": {
+          "_leading": [
+            186
+          ]
+        },
+        "taxYear": {
+          "$bigint": "3212701016703"
+        },
+        "b": null,
+        "note": [
+          935
+        ]
+      },
+      "canonical": "{\"a\":{\"_leading\":[186]},\"b\":null,\"note\":[935],\"taxYear\":\"3212701016703\"}",
+      "sha256": "eb42ac3e234b2e8f71c95b355b279f94d011c4e6f03df0520b1dfb9df54f5d77"
+    },
+    {
+      "input": {
+        "b": null
+      },
+      "canonical": "{\"b\":null}",
+      "sha256": "46d44c558a54e9b241f123fe793d9a07b0c6b08eba7d62d409f37f5787d6dd5f"
+    },
+    {
+      "input": {
+        "accountId": 29,
+        "x1": {
+          "$bigint": "-12"
+        },
+        "taxYear": {
+          "b": "연금저축",
+          "priority": [
+            -718
+          ],
+          "PENSION_SAVINGS": {
+            "$bigint": "503"
+          }
+        }
+      },
+      "canonical": "{\"accountId\":29,\"taxYear\":{\"PENSION_SAVINGS\":\"503\",\"b\":\"연금저축\",\"priority\":[-718]},\"x1\":\"-12\"}",
+      "sha256": "18bd921e349d272c2016b7ef7dbb510e96e647123c0f14795537e3be2dc409ce"
+    },
+    {
+      "input": {
+        "b": [
+          80
+        ],
+        "PENSION_SAVINGS": {
+          "$bigint": "981"
+        },
+        "n": "back\\slash"
+      },
+      "canonical": "{\"PENSION_SAVINGS\":\"981\",\"b\":[80],\"n\":\"back\\\\slash\"}",
+      "sha256": "601e43d01325120792eabde08a7edae1c687eba586ffe8b8964ea5360ceefb56"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "b": -676
+      },
+      "canonical": "{\"b\":-676}",
+      "sha256": "c909611c29c67cc13a85de4f13e39ca3cd50df4316cc35407ae62a19bd0e1135"
+    },
+    {
+      "input": {
+        "valid_from": null,
+        "note": [
+          -217
+        ],
+        "PENSION_SAVINGS": {
+          "$bigint": "3"
+        },
+        "priority": -618
+      },
+      "canonical": "{\"PENSION_SAVINGS\":\"3\",\"note\":[-217],\"priority\":-618,\"valid_from\":null}",
+      "sha256": "0c1407921ac491c76badc67875a313eb503d1cfdaac60697a18022358f117e13"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "PENSION_SAVINGS": true,
+        "n": -63
+      },
+      "canonical": "{\"PENSION_SAVINGS\":true,\"n\":-63}",
+      "sha256": "d2400b3d2e374d2d7cfa06fd665faf0c8191915b7e8e1ce252611650aafd93c3"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "a": true,
+        "note": -55
+      },
+      "canonical": "{\"a\":true,\"note\":-55}",
+      "sha256": "8279a477ad0691a691e17ec8dbb6e8d9ca659c6ce46b6dbcc14fd0dc2e93096e"
+    },
+    {
+      "input": {
+        "n": null,
+        "b": [
+          304
+        ],
+        "x1": {
+          "$bigint": "903838309832341"
+        },
+        "amount": [
+          689
+        ]
+      },
+      "canonical": "{\"amount\":[689],\"b\":[304],\"n\":null,\"x1\":\"903838309832341\"}",
+      "sha256": "b489817e13b6a6bf9263111f67f4e073c8ab3997ba05e84e90249d3ca862fd68"
+    },
+    {
+      "input": {
+        "valid_from": null,
+        "amount": [
+          551
+        ],
+        "a": {
+          "$bigint": "-36"
+        }
+      },
+      "canonical": "{\"a\":\"-36\",\"amount\":[551],\"valid_from\":null}",
+      "sha256": "7db0c164fd205bba6808a419738997f88e523de7f88a333ec7c1eaf5e0af8208"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {},
+      "canonical": "{}",
+      "sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "input": {
+        "note": [
+          -793
+        ],
+        "PENSION_SAVINGS": {
+          "$bigint": "14787"
+        },
+        "priority": null
+      },
+      "canonical": "{\"PENSION_SAVINGS\":\"14787\",\"note\":[-793],\"priority\":null}",
+      "sha256": "ef8b138dea05bcefec43f33cbbe7ba1c456caefb09affbe2b4921986fea284d1"
+    },
+    {
+      "input": {
+        "accountId": 46
+      },
+      "canonical": "{\"accountId\":46}",
+      "sha256": "f692b676874dadeb83e98d4d84a4c36f6656c51247d7cf3a438c43ace0d64a91"
+    },
+    {
+      "input": {
+        "_leading": null
+      },
+      "canonical": "{\"_leading\":null}",
+      "sha256": "3fc156b135ca16adc94a4bb3d408364d2dee923481aa13d06e21947af4485b7e"
+    },
+    {
+      "input": {
+        "unitKrw": 29,
+        "taxYear": {
+          "$bigint": "7654103"
+        },
+        "priority": [
+          620
+        ]
+      },
+      "canonical": "{\"priority\":[620],\"taxYear\":\"7654103\",\"unitKrw\":29}",
+      "sha256": "90aceb2d73d4d3511528dbf2f0b5e227db6f1ca0074dc4acd9de3df3bef472c3"
+    }
+  ]
+}

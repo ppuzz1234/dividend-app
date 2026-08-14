@@ -1,0 +1,11 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": { "rootDir": ".", "outDir": "dist", "resolveJsonModule": true },
+  "include": ["src/**/*.ts", "scripts/**/*.ts", "test/**/*.ts"],
+  "references": [
+    { "path": "../numeric" },
+    { "path": "../corpus" },
+    { "path": "../policy" },
+    { "path": "../factindex" }
+  ]
+}

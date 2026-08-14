@@ -1,0 +1,16 @@
+{
+    "authority": "ORACLE",
+  "reviewer": "Seohyun Park",
+  "reviewedAt": "2026-08-11",
+  "$comment": "넓은 질문(비교·종합) 전용 벤치마크. 규칙 0 의 [비교]·[전반] 유형이다. 좁은 질문과 달리 답이 길어 생성 시간이 크고, 한 조문의 여러 항을 동시에 다루므로 조건 누락 위험도 여기서 제일 크다. ★ 정답지가 아니다: expected 는 내가 코퍼스를 보고 적은 것이고 사람 서명을 받지 않았다.",
+  "queries": [
+    { "bucket": "wide", "q": "ISA가 뭐고 어떤 혜택이 있는지 전반적으로 알려줘", "expected": "TAXEX_91_18", "why": "전반 — 제도 소개" },
+    { "bucket": "wide", "q": "ISA, 연금저축, IRP 셋을 전반적으로 비교해줘", "expected": ["TAXEX_91_18", "INCTAX_D_40_2"], "why": "비교 — 표로 나와야 함" },
+    { "bucket": "wide", "q": "연금계좌 세액공제 제도를 처음부터 끝까지 설명해줘", "expected": "INCTAX_59_3", "why": "전반 — 공제율·한도·조건" },
+    { "bucket": "wide", "q": "ISA 가입부터 만기까지 전 과정과 세금 처리를 설명해줘", "expected": "TAXEX_91_18", "why": "전반 — 생애주기" },
+    { "bucket": "wide", "q": "ISA 장단점 알려줘", "expected": "TAXEX_91_18", "why": "전반 — 장단점" },
+    { "bucket": "wide", "q": "연금저축계좌와 IRP의 세액공제 한도가 어떻게 다른가", "expected": "INCTAX_59_3", "why": "비교 — 두 계좌" },
+    { "bucket": "wide", "q": "연금계좌에서 돈을 빼는 방법과 각각의 세금이 어떻게 다른지 설명해줘", "expected": "INCTAX_D_40_2", "why": "비교 — 연금수령 vs 연금외수령" },
+    { "bucket": "wide", "q": "ISA 만기 자금을 연금계좌로 옮길 때 절차와 세제 혜택을 전반적으로 정리해줘", "expected": ["INCTAX_D_40_2", "INCTAX_59_3"], "why": "전반 — 전환금액" }
+  ]
+}

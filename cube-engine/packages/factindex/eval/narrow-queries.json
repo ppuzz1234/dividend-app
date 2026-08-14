@@ -1,0 +1,18 @@
+{
+    "authority": "ORACLE",
+  "reviewer": "Seohyun Park",
+  "reviewedAt": "2026-08-11",
+  "$comment": "좁은 질문(단일 사실) 전용 벤치마크. 실사용 질문의 대부분이 이 형태다 — 값 하나를 묻거나, 되는지 안 되는지를 묻는다. 규칙 0 의 [값 하나]·[된다/안 된다] 유형에 대응한다. ★ 이 파일은 정답지가 아니다: expected 는 내가 코퍼스를 보고 적은 것이고 사람 서명을 받지 않았다. 회귀·편차 감시용이며, ORACLE 로 올리려면 각 항목을 조문 원문과 대조한 뒤 reviewer/reviewedAt 을 채워야 한다.",
+  "queries": [
+    { "bucket": "narrow", "q": "ISA 비과세 한도가 얼마야", "expected": "TAXEX_91_18", "why": "값 하나 — 400/200만원" },
+    { "bucket": "narrow", "q": "IRP 연간 납입한도 얼마야", "expected": "INCTAX_D_40_2", "why": "값 하나 — 1,800만원" },
+    { "bucket": "narrow", "q": "연금저축 세액공제율 몇 퍼센트야", "expected": "INCTAX_59_3", "why": "값 하나 — 12%/15%" },
+    { "bucket": "narrow", "q": "ISA 의무 가입기간 몇 년이야", "expected": "TAXEX_91_18", "why": "값 하나 — 3년" },
+    { "bucket": "narrow", "q": "ISA 총납입한도가 얼마야", "expected": "TAXEX_91_18", "why": "값 하나 — 1억원" },
+    { "bucket": "narrow", "q": "연금계좌 세액공제 대상 한도가 얼마야", "expected": "INCTAX_59_3", "why": "값 하나 — 600/900만원" },
+    { "bucket": "narrow", "q": "연금 받으려면 몇 살부터 가능해", "expected": "INCTAX_D_40_2", "why": "값 하나 — 55세" },
+    { "bucket": "narrow", "q": "연금계좌 가입하고 몇 년 지나야 연금수령이 되나", "expected": "INCTAX_D_40_2", "why": "값 하나 — 5년" },
+    { "bucket": "narrow", "q": "조세특례제한법 제86조의4는 언제까지 적용되나", "expected": "TAXEX_86_4", "why": "값 하나 — 적용기한. 한시 규정" },
+    { "bucket": "narrow", "q": "ISA 만기 자금을 연금계좌로 옮기면 납입한도에 포함되나", "expected": "INCTAX_D_40_2", "why": "된다/안 된다 — 별도 한도" }
+  ]
+}

@@ -1,0 +1,155 @@
+{
+  "$schema_note": "사양 §5.2 반올림 계약의 언어 중립 골든 벡터. TypeScript·Python 양쪽 구현이 이 파일을 읽는다.",
+  "kind": "spec-derived",
+  "authority": "ORACLE",
+  "$authority_note": [
+    "이것이 정답지다. 아래 expected 값은 사람이 사양 §5.2 의 음수 의미 규정을 읽고 손으로 적은 것이며,",
+    "어떤 구현의 출력도 아니다. 구현과 이 파일이 어긋나면 구현이 틀린 것이다.",
+    "값을 고치려면 사양 원문을 근거로 제시해야 한다 — 구현 출력을 복사해 넣는 것은 이 파일의 권위를 파괴한다."
+  ],
+  "specVersion": "v1.4",
+  "specSection": "§5.2 (음수 의미 고정) / §5.2.1 (round API)",
+  "encoding": {
+    "numerator": "IntegerString — ExactKRW.numerator",
+    "denominator": "IntegerString — ExactKRW.denominator (> 0)",
+    "unitKrw": "IntegerString — RoundingSpec.unitKrw (> 0)",
+    "expected": "모드별 round() 반환 value 의 IntegerString"
+  },
+  "semantics": {
+    "FLOOR": "음의 무한대 방향",
+    "CEIL": "양의 무한대 방향",
+    "TRUNCATE": "0 방향",
+    "HALF_UP": "정확히 절반이면 절대값이 커지는 방향"
+  },
+  "cases": [
+    {
+      "label": "15 — 양수, 정확히 절반",
+      "numerator": "15", "denominator": "1", "unitKrw": "10",
+      "expected": { "FLOOR": "10", "CEIL": "20", "TRUNCATE": "10", "HALF_UP": "20" }
+    },
+    {
+      "label": "-15 — 음수, 정확히 절반 (HALF_UP 이 절대값을 키운다)",
+      "numerator": "-15", "denominator": "1", "unitKrw": "10",
+      "expected": { "FLOOR": "-20", "CEIL": "-10", "TRUNCATE": "-10", "HALF_UP": "-20" }
+    },
+    {
+      "label": "14 — 절반 미만",
+      "numerator": "14", "denominator": "1", "unitKrw": "10",
+      "expected": { "FLOOR": "10", "CEIL": "20", "TRUNCATE": "10", "HALF_UP": "10" }
+    },
+    {
+      "label": "-14 — 절반 미만",
+      "numerator": "-14", "denominator": "1", "unitKrw": "10",
+      "expected": { "FLOOR": "-20", "CEIL": "-10", "TRUNCATE": "-10", "HALF_UP": "-10" }
+    },
+    {
+      "label": "16 — 절반 초과",
+      "numerator": "16", "denominator": "1", "unitKrw": "10",
+      "expected": { "FLOOR": "10", "CEIL": "20", "TRUNCATE": "10", "HALF_UP": "20" }
+    },
+    {
+      "label": "-16 — 절반 초과",
+      "numerator": "-16", "denominator": "1", "unitKrw": "10",
+      "expected": { "FLOOR": "-20", "CEIL": "-10", "TRUNCATE": "-10", "HALF_UP": "-20" }
+    },
+    {
+      "label": "20 — 단위 배수 경계, 어떤 모드도 움직이면 안 된다",
+      "numerator": "20", "denominator": "1", "unitKrw": "10",
+      "expected": { "FLOOR": "20", "CEIL": "20", "TRUNCATE": "20", "HALF_UP": "20" }
+    },
+    {
+      "label": "-20 — 단위 배수 경계 (음수)",
+      "numerator": "-20", "denominator": "1", "unitKrw": "10",
+      "expected": { "FLOOR": "-20", "CEIL": "-20", "TRUNCATE": "-20", "HALF_UP": "-20" }
+    },
+    {
+      "label": "0",
+      "numerator": "0", "denominator": "1", "unitKrw": "10",
+      "expected": { "FLOOR": "0", "CEIL": "0", "TRUNCATE": "0", "HALF_UP": "0" }
+    },
+    {
+      "label": "25/2 = 12.5 — 분모가 1이 아닌 정확히 절반",
+      "numerator": "25", "denominator": "2", "unitKrw": "1",
+      "expected": { "FLOOR": "12", "CEIL": "13", "TRUNCATE": "12", "HALF_UP": "13" }
+    },
+    {
+      "label": "-25/2 = -12.5",
+      "numerator": "-25", "denominator": "2", "unitKrw": "1",
+      "expected": { "FLOOR": "-13", "CEIL": "-12", "TRUNCATE": "-12", "HALF_UP": "-13" }
+    },
+    {
+      "label": "1000/3 = 333.33… — 무한소수, 소수부 < 1/2",
+      "numerator": "1000", "denominator": "3", "unitKrw": "1",
+      "expected": { "FLOOR": "333", "CEIL": "334", "TRUNCATE": "333", "HALF_UP": "333" }
+    },
+    {
+      "label": "-1000/3 = -333.33…",
+      "numerator": "-1000", "denominator": "3", "unitKrw": "1",
+      "expected": { "FLOOR": "-334", "CEIL": "-333", "TRUNCATE": "-333", "HALF_UP": "-333" }
+    },
+    {
+      "label": "2000/3 = 666.66… — 소수부 > 1/2",
+      "numerator": "2000", "denominator": "3", "unitKrw": "1",
+      "expected": { "FLOOR": "666", "CEIL": "667", "TRUNCATE": "666", "HALF_UP": "667" }
+    },
+    {
+      "label": "1000/3 에 단위 10 — 분모와 단위가 함께 작용",
+      "numerator": "1000", "denominator": "3", "unitKrw": "10",
+      "expected": { "FLOOR": "330", "CEIL": "340", "TRUNCATE": "330", "HALF_UP": "330" }
+    },
+    {
+      "label": "조 단위 / 단위 1000 — 소수부 < 1/2",
+      "numerator": "1234567890123", "denominator": "1", "unitKrw": "1000",
+      "expected": {
+        "FLOOR": "1234567890000", "CEIL": "1234567891000",
+        "TRUNCATE": "1234567890000", "HALF_UP": "1234567890000"
+      }
+    },
+    {
+      "label": "조 단위 / 단위 1000 — 소수부 > 1/2",
+      "numerator": "1234567890567", "denominator": "1", "unitKrw": "1000",
+      "expected": {
+        "FLOOR": "1234567890000", "CEIL": "1234567891000",
+        "TRUNCATE": "1234567890000", "HALF_UP": "1234567891000"
+      }
+    },
+    {
+      "label": "조 단위 / 단위 1000 — 정확히 절반",
+      "numerator": "1234567890500", "denominator": "1", "unitKrw": "1000",
+      "expected": {
+        "FLOOR": "1234567890000", "CEIL": "1234567891000",
+        "TRUNCATE": "1234567890000", "HALF_UP": "1234567891000"
+      }
+    },
+    {
+      "label": "조 단위 음수 / 정확히 절반",
+      "numerator": "-1234567890500", "denominator": "1", "unitKrw": "1000",
+      "expected": {
+        "FLOOR": "-1234567891000", "CEIL": "-1234567890000",
+        "TRUNCATE": "-1234567890000", "HALF_UP": "-1234567891000"
+      }
+    },
+    {
+      "label": "2^53 초과 — bigint 경로가 아니면 깨지는 지점",
+      "numerator": "9007199254740993", "denominator": "1", "unitKrw": "10",
+      "expected": {
+        "FLOOR": "9007199254740990", "CEIL": "9007199254741000",
+        "TRUNCATE": "9007199254740990", "HALF_UP": "9007199254740990"
+      }
+    }
+  ],
+  "recordShape": [
+    {
+      "$note": "round() 가 반환하는 RoundingRecord 의 정확한 형태. §6.2 differential 의 중간값 비교 단위다.",
+      "input": { "numerator": "1000", "denominator": "3", "unitKrw": "10", "stage": "PER_YEAR", "mode": "HALF_UP" },
+      "record": {
+        "rawNumerator": "1000",
+        "rawDenominator": "3",
+        "roundingStage": "PER_YEAR",
+        "roundingMode": "HALF_UP",
+        "unitKrw": "10",
+        "roundedKrw": "330"
+      }
+    }
+  ]
+}

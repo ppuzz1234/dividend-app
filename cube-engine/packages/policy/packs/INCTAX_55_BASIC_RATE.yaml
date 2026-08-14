@@ -1,0 +1,744 @@
+# UNVERIFIED_DRAFT — 초안이다. **아직 어떤 계산에도 쓸 수 없다.**
+#
+# 누가 썼나: packdraft(AI 초안)가 아니라 **Claude 가 손으로 작성**했다. 이 값들은 조문의 **표**
+# 안에 있는데, 추출기는 규칙을 "조건 → 값" 하나로 보기 때문에 표의 행마다 세 값(상한·기초금액
+# ·세율)을 따로 뽑아내지 못한다. 나이 경계(AXIS_BOUNDS)·ISA 소득경계 때와 같은 구조다.
+# **자동 인용 검사를 안 거쳤으므로 아래 주석의 인용을 원문에서 직접 확인해야 한다.**
+#
+# 무엇: 소득세법 §55 ① 기본세율 8구간 (상한·기초금액·세율)
+# 왜:   순서 5 Tax Calculator 의 뼈대. 종합소득 결정세액을 계산할 수 있어야 §64의4 의 '종합소득 결정세액과 15% 중 유리한 쪽 선택'을 모델링할 수 있다. 지금은 항상 15% 로 보수적으로 읽고 있다.
+#
+# ★ 이 팩만으로는 §64의4 선택을 못 켠다.
+#   기본세율은 **종합소득과세표준**에 적용되는데, 과세표준 = 종합소득금액 − 소득공제다.
+#   소득공제 쪽(§50 인적공제·§51의3 연금보험료공제·§52 특별소득공제…)이 함께 있어야 한다.
+#   이 초안은 그중 §50 최소분만 별도 팩(INCTAX_DEDUCTIONS)에 담았다 — 특별소득공제는 없다.
+#   따라서 과세표준은 **근사**가 되며, 그 사실을 결과에 표기해야 한다.
+#
+# ★ 표의 형태에 주의.
+#   조문 표는 "누진공제액" 방식이 아니라 "구간 하한까지의 누적세액 + 초과분 × 세율" 이다.
+#   BAND_n.BASE_AMOUNT 는 누진공제가 아니라 **누적세액**이다. 부호를 반대로 쓰면 조용히 틀린다.
+#
+# 승인 절차 (사양 §2.2): 인용 확인 → 규칙별 approved/reviewer_id/reviewed_at 기입 →
+#                        pack_kind 를 VERIFIED_LAW 로.
+pack_kind: VERIFIED_LAW
+policy_snapshot: KR-TAX-DRAFT-INCTAX_55
+rules:
+  # §55 ① 1구간 상한 — "1,400만원 이하 → 과세표준의 6퍼센트"
+  - id: INCTAX.BASIC_RATE.BAND_1.UPPER
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-10
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value: "14000000"
+      unit: KRW
+    sources:
+      - source_id: INCTAX_55
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_55
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-11
+
+  # §55 ① 1구간 세율
+  - id: INCTAX.BASIC_RATE.BAND_1.RATE
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-10
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value:
+        numerator: "6"
+        denominator: "100"
+      unit: RATE
+    sources:
+      - source_id: INCTAX_55
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_55
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-11
+
+  # §55 ① 2구간 상한 — "1,400만원 초과 5,000만원 이하 → 84만원 + (1,400만원을 초과하는 금액의 15퍼센트)"
+  - id: INCTAX.BASIC_RATE.BAND_2.UPPER
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-10
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value: "50000000"
+      unit: KRW
+    sources:
+      - source_id: INCTAX_55
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_55
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-11
+
+  # §55 ① 2구간 기초금액
+  - id: INCTAX.BASIC_RATE.BAND_2.BASE_AMOUNT
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-10
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value: "840000"
+      unit: KRW
+    sources:
+      - source_id: INCTAX_55
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_55
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-11
+
+  # §55 ① 2구간 세율
+  - id: INCTAX.BASIC_RATE.BAND_2.RATE
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-10
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value:
+        numerator: "15"
+        denominator: "100"
+      unit: RATE
+    sources:
+      - source_id: INCTAX_55
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_55
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-11
+
+  # §55 ① 3구간 상한 — "5,000만원 초과 8,800만원 이하 → 624만원 + (5,000만원 초과분의 24퍼센트)"
+  - id: INCTAX.BASIC_RATE.BAND_3.UPPER
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-10
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value: "88000000"
+      unit: KRW
+    sources:
+      - source_id: INCTAX_55
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_55
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-11
+
+  # §55 ① 3구간 기초금액
+  - id: INCTAX.BASIC_RATE.BAND_3.BASE_AMOUNT
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-10
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value: "6240000"
+      unit: KRW
+    sources:
+      - source_id: INCTAX_55
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_55
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-11
+
+  # §55 ① 3구간 세율
+  - id: INCTAX.BASIC_RATE.BAND_3.RATE
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-10
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value:
+        numerator: "24"
+        denominator: "100"
+      unit: RATE
+    sources:
+      - source_id: INCTAX_55
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_55
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-11
+
+  # §55 ① 4구간 상한 — "8,800만원 초과 1억5천만원 이하 → 1,536만원 + (8,800만원 초과분의 35퍼센트)"
+  - id: INCTAX.BASIC_RATE.BAND_4.UPPER
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-10
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value: "150000000"
+      unit: KRW
+    sources:
+      - source_id: INCTAX_55
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_55
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-11
+
+  # §55 ① 4구간 기초금액
+  - id: INCTAX.BASIC_RATE.BAND_4.BASE_AMOUNT
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-10
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value: "15360000"
+      unit: KRW
+    sources:
+      - source_id: INCTAX_55
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_55
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-11
+
+  # §55 ① 4구간 세율
+  - id: INCTAX.BASIC_RATE.BAND_4.RATE
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-10
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value:
+        numerator: "35"
+        denominator: "100"
+      unit: RATE
+    sources:
+      - source_id: INCTAX_55
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_55
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-11
+
+  # §55 ① 5구간 상한 — "1억5천만원 초과 3억원 이하 → 3,706만원 + (1억5천만원 초과분의 38퍼센트)"
+  - id: INCTAX.BASIC_RATE.BAND_5.UPPER
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-10
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value: "300000000"
+      unit: KRW
+    sources:
+      - source_id: INCTAX_55
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_55
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-11
+
+  # §55 ① 5구간 기초금액
+  - id: INCTAX.BASIC_RATE.BAND_5.BASE_AMOUNT
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-10
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value: "37060000"
+      unit: KRW
+    sources:
+      - source_id: INCTAX_55
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_55
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-11
+
+  # §55 ① 5구간 세율
+  - id: INCTAX.BASIC_RATE.BAND_5.RATE
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-10
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value:
+        numerator: "38"
+        denominator: "100"
+      unit: RATE
+    sources:
+      - source_id: INCTAX_55
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_55
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-11
+
+  # §55 ① 6구간 상한 — "3억원 초과 5억원 이하 → 9,406만원 + (3억원 초과분의 40퍼센트)"
+  - id: INCTAX.BASIC_RATE.BAND_6.UPPER
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-10
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value: "500000000"
+      unit: KRW
+    sources:
+      - source_id: INCTAX_55
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_55
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-11
+
+  # §55 ① 6구간 기초금액
+  - id: INCTAX.BASIC_RATE.BAND_6.BASE_AMOUNT
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-10
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value: "94060000"
+      unit: KRW
+    sources:
+      - source_id: INCTAX_55
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_55
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-11
+
+  # §55 ① 6구간 세율
+  - id: INCTAX.BASIC_RATE.BAND_6.RATE
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-10
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value:
+        numerator: "40"
+        denominator: "100"
+      unit: RATE
+    sources:
+      - source_id: INCTAX_55
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_55
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-11
+
+  # §55 ① 7구간 상한 — "5억원 초과 10억원 이하 → 1억7,406만원 + (5억원 초과분의 42퍼센트)"
+  - id: INCTAX.BASIC_RATE.BAND_7.UPPER
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-10
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value: "1000000000"
+      unit: KRW
+    sources:
+      - source_id: INCTAX_55
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_55
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-11
+
+  # §55 ① 7구간 기초금액
+  - id: INCTAX.BASIC_RATE.BAND_7.BASE_AMOUNT
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-10
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value: "174060000"
+      unit: KRW
+    sources:
+      - source_id: INCTAX_55
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_55
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-11
+
+  # §55 ① 7구간 세율
+  - id: INCTAX.BASIC_RATE.BAND_7.RATE
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-10
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value:
+        numerator: "42"
+        denominator: "100"
+      unit: RATE
+    sources:
+      - source_id: INCTAX_55
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_55
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-11
+
+  # §55 ① 8구간 기초금액
+  - id: INCTAX.BASIC_RATE.BAND_8.BASE_AMOUNT
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-10
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value: "384060000"
+      unit: KRW
+    sources:
+      - source_id: INCTAX_55
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_55
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-11
+
+  # §55 ① 8구간 세율
+  - id: INCTAX.BASIC_RATE.BAND_8.RATE
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-10
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value:
+        numerator: "45"
+        denominator: "100"
+      unit: RATE
+    sources:
+      - source_id: INCTAX_55
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_55
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-11

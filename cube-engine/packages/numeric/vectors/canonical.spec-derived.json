@@ -1,0 +1,160 @@
+{
+  "$schema_note": "사양 §5.2 절차 1~4 / §5.2.1 canonical JSON 규약의 언어 중립 골든 벡터.",
+  "kind": "spec-derived",
+  "authority": "ORACLE",
+  "$authority_note": [
+    "이것이 정답지다. canonical 값은 사람이 §5.2.1 규약(정렬·이스케이프·타입 매핑)을 읽고 손으로 적었으며",
+    "어떤 구현의 출력도 아니다. 구현과 어긋나면 구현이 틀린 것이다.",
+    "SHA-256 은 판단이 아니라 표준 함수이므로 케이스마다 기대 해시를 적지 않는다 — 그렇게 하면 내 구현의",
+    "출력을 베껴 정답지로 위장하는 꼴이 된다. 대신 sha256KnownAnswers 에 FIPS 180-4 공표 벡터를 둔다.",
+    "각 구현은 canonical 문자열까지를 이 파일과 대조하고, 해시는 자기 표준 라이브러리로 계산한다."
+  ],
+  "specVersion": "v1.4",
+  "specSection": "§5.2 / §5.2.1",
+  "inputEncoding": {
+    "$note": "JSON 으로 직접 표현할 수 없는 입력은 태그 객체로 적는다. 디코더가 이를 네이티브 값으로 되돌린다.",
+    "$bigint": "임의 정밀도 정수. TS 는 BigInt(s), Python 은 int(s).",
+    "$undefined": "JS 의 undefined. Python 등 undefined 가 없는 언어는 '키 없음'/센티넬로 매핑한다.",
+    "$note_excluded": "Date·함수·Symbol·Map·Set 거부 케이스는 언어별 타입이라 이 파일에 없다. 각 구현의 로컬 테스트 소관."
+  },
+  "cases": [
+    {
+      "label": "key 사전순 정렬 + 중첩 객체에 재귀 적용",
+      "input": { "b": 1, "a": 2, "nested": { "z": "z", "y": "y" } },
+      "canonical": "{\"a\":2,\"b\":1,\"nested\":{\"y\":\"y\",\"z\":\"z\"}}"
+    },
+    {
+      "label": "key 순서만 다른 같은 문서 — 위와 같은 canonical 이어야 한다",
+      "input": { "nested": { "y": "y", "z": "z" }, "a": 2, "b": 1 },
+      "canonical": "{\"a\":2,\"b\":1,\"nested\":{\"y\":\"y\",\"z\":\"z\"}}"
+    },
+    {
+      "label": "bigint 는 JSON number 가 아니라 문자열 (절차 1)",
+      "input": { "v": { "$bigint": "10" } },
+      "canonical": "{\"v\":\"10\"}"
+    },
+    {
+      "label": "음수 bigint",
+      "input": { "v": { "$bigint": "-10" } },
+      "canonical": "{\"v\":\"-10\"}"
+    },
+    {
+      "label": "2^53 초과 bigint — number 였다면 정밀도가 깨지는 지점",
+      "input": { "v": { "$bigint": "9007199254740993" } },
+      "canonical": "{\"v\":\"9007199254740993\"}"
+    },
+    {
+      "label": "정수 number 는 JSON 정수 리터럴 (나이·priority 등)",
+      "input": { "priority": 3, "age": -1 },
+      "canonical": "{\"age\":-1,\"priority\":3}"
+    },
+    {
+      "label": "undefined 인 객체 값은 키까지 제거",
+      "input": { "a": 1, "b": { "$undefined": true } },
+      "canonical": "{\"a\":1}"
+    },
+    {
+      "label": "전부 undefined 면 빈 객체",
+      "input": { "b": { "$undefined": true } },
+      "canonical": "{}"
+    },
+    {
+      "label": "명시적 null 은 키와 함께 보존",
+      "input": { "a": null, "b": 1 },
+      "canonical": "{\"a\":null,\"b\":1}"
+    },
+    {
+      "label": "배열 순서는 의미이므로 정렬하지 않는다",
+      "input": { "xs": [3, 1, 2] },
+      "canonical": "{\"xs\":[3,1,2]}"
+    },
+    {
+      "label": "배열 안 객체의 key 는 정렬한다",
+      "input": { "b": [{ "y": 2, "x": 1 }], "a": "s" },
+      "canonical": "{\"a\":\"s\",\"b\":[{\"x\":1,\"y\":2}]}"
+    },
+    {
+      "label": "언더스코어 key 허용 — 정책 팩 snake_case 스냅샷이 해싱을 통과해야 한다",
+      "input": { "valid_from": "2026-01-01", "conflict_group": "PENSION_TAX_CREDIT" },
+      "canonical": "{\"conflict_group\":\"PENSION_TAX_CREDIT\",\"valid_from\":\"2026-01-01\"}"
+    },
+    {
+      "label": "이스케이프: 따옴표",
+      "input": "he said \"hi\"",
+      "canonical": "\"he said \\\"hi\\\"\""
+    },
+    {
+      "label": "이스케이프: 역슬래시",
+      "input": "back\\slash",
+      "canonical": "\"back\\\\slash\""
+    },
+    {
+      "label": "이스케이프: 짧은 형식이 있는 제어문자",
+      "input": "a\nb\tc",
+      "canonical": "\"a\\nb\\tc\""
+    },
+    {
+      "label": "이스케이프: 짧은 형식이 없는 제어문자는 \\u00xx 소문자 hex",
+      "input": "\u0001",
+      "canonical": "\"\\u0001\""
+    },
+    {
+      "label": "이스케이프: 제어문자 상한 (0x1f)",
+      "input": "\u001f",
+      "canonical": "\"\\u001f\""
+    },
+    {
+      "label": "비ASCII 문자열 값은 이스케이프하지 않고 UTF-8 그대로",
+      "input": { "displayName": "연금저축" },
+      "canonical": "{\"displayName\":\"연금저축\"}"
+    },
+    {
+      "label": "최상위 스칼라",
+      "input": 42,
+      "canonical": "42"
+    },
+    {
+      "label": "토큰 간 공백 없음 + 깊은 중첩",
+      "input": { "z": { "y": { "x": [1, { "b": true, "a": false }] } } },
+      "canonical": "{\"z\":{\"y\":{\"x\":[1,{\"a\":false,\"b\":true}]}}}"
+    }
+  ],
+  "errorCases": [
+    {
+      "label": "비ASCII key — 언어 간 정렬 불일치를 원천 차단",
+      "input": { "금액": 1 },
+      "throws": "NON_ASCII_KEY"
+    },
+    {
+      "label": "하이픈 key",
+      "input": { "a-b": 1 },
+      "throws": "NON_ASCII_KEY"
+    },
+    {
+      "label": "공백 포함 key (중첩)",
+      "input": { "nested": { "a b": 1 } },
+      "throws": "NON_ASCII_KEY"
+    },
+    {
+      "label": "배열 원소의 undefined — 제거하면 인덱스가 밀려 의미가 변한다",
+      "input": { "xs": [1, { "$undefined": true }, 3] },
+      "throws": "UNDEFINED_IN_ARRAY"
+    },
+    {
+      "label": "비정수 number",
+      "input": { "v": 3.5 },
+      "throws": "NON_INTEGER_NUMBER"
+    }
+  ],
+  "sha256KnownAnswers": {
+    "$note": "FIPS 180-4 / NIST 공표 벡터. 내 구현 출력이 아니라 외부 권위다. 해시 배선이 UTF-8 바이트열 기준인지 확인용.",
+    "vectors": [
+      { "input": "", "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855" },
+      { "input": "abc", "sha256": "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad" },
+      {
+        "input": "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq",
+        "sha256": "248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1"
+      }
+    ]
+  }
+}

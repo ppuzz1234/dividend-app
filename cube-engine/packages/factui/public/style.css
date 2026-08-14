@@ -1,0 +1,266 @@
+:root {
+  --bg: #1a1a1a;
+  --panel: #232323;
+  --line: #383838;
+  --fg: #ededed;
+  --dim: #9a9a9a;
+  --accent: #f37321;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: "Pretendard", "Malgun Gothic", system-ui, sans-serif;
+  line-height: 1.7;
+}
+
+/* ─── 레이아웃: 사이드바(대화 목록) + 본문 ─── */
+.layout { display: flex; min-height: 100vh; }
+#side {
+  width: 232px; flex: 0 0 232px; background: #141414;
+  border-right: 1px solid var(--line); padding: 18px 14px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.main-col { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }
+.new-chat { width: 100%; background: transparent; color: var(--fg); border: 1px solid var(--line); font-weight: 600; padding: 10px; }
+.new-chat:hover { border-color: var(--accent); color: var(--accent); filter: none; }
+.side-label { color: var(--dim); font-size: 11.5px; text-transform: uppercase; letter-spacing: .08em; margin: 8px 0 0; }
+.conv-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; flex: 1 1 auto; }
+.conv-list button {
+  width: 100%; text-align: left; background: transparent; color: var(--dim);
+  border: 0; border-radius: 5px; padding: 8px 10px; font-size: 13px; font-weight: 400;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.conv-list button:hover { background: #202020; color: var(--fg); filter: none; }
+.conv-list button.on { background: #2a2118; color: var(--accent); }
+.side-note { color: #6b6b6b; font-size: 11px; line-height: 1.5; margin: 0; }
+
+header, main, footer, form#ask { max-width: 860px; width: 100%; margin: 0 auto; padding: 0 20px; }
+header { padding-top: 32px; }
+h1 { font-size: 30px; letter-spacing: .04em; margin: 0; }
+.accent { color: var(--accent); }
+.sub { color: var(--dim); margin: 6px 0 24px; font-size: 14px; }
+
+form#ask { display: flex; gap: 8px; flex-wrap: wrap; padding-bottom: 8px; position: sticky; bottom: 0; background: var(--bg); padding-top: 12px; }
+#q { flex: 1 1 320px; }
+input {
+  background: var(--panel); color: var(--fg);
+  border: 1px solid var(--line); border-radius: 6px;
+  padding: 11px 13px; font: inherit; font-size: 15px;
+}
+input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+.asof { color: var(--dim); font-size: 13px; display: flex; align-items: center; gap: 6px; }
+.asof input { padding: 8px 10px; font-size: 13px; }
+button {
+  background: var(--accent); color: #111; border: 0; border-radius: 6px;
+  padding: 11px 22px; font: inherit; font-weight: 700; cursor: pointer;
+}
+button:hover { filter: brightness(1.1); }
+
+.chips { list-style: none; display: flex; flex-wrap: wrap; gap: 7px; padding: 0; margin: 14px 0 0; }
+.chips button {
+  background: transparent; color: var(--dim);
+  border: 1px solid var(--line); font-weight: 400; font-size: 13px; padding: 6px 12px;
+}
+.chips button:hover { color: var(--accent); border-color: var(--accent); filter: none; }
+
+#status { color: var(--dim); font-size: 14px; }
+#out { margin: 28px 0 60px; }
+
+/* ─── 클래스 라벨: 이 답이 무엇인지가 가장 먼저 보여야 한다 (§1.2) ─── */
+.class-label {
+  display: inline-block; margin: 0 0 14px;
+  padding: 6px 13px; border-radius: 4px;
+  font-size: 13px; font-weight: 700; letter-spacing: .02em;
+}
+.class-label.resolved { background: #1f4020; color: #9be89f; border: 1px solid #2f6b32; }
+.class-label.unmodeled { background: #3a2f16; color: #f0c67a; border: 1px solid #6b5424; }
+.class-label.plan { background: #16303a; color: #7ac9e8; border: 1px solid #24596b; }
+.class-label.reject { background: #3a1a1a; color: #e88a8a; border: 1px solid #6b2a2a; }
+
+/* ─── 합성 값 스탬프: 놓칠 수 없게 (CLAUDE.md 규칙 0) ─── */
+.stamp {
+  background: #6b1d1d; color: #fff; border: 2px solid #ff5a5a;
+  padding: 12px 16px; border-radius: 6px; font-weight: 800;
+  margin: 0 0 14px; letter-spacing: .02em;
+}
+
+.answer-body { font-size: 16px; white-space: pre-wrap; }
+.answer-body a.ref { color: var(--accent); text-decoration: none; font-weight: 700; }
+.answer-body a.ref:hover { text-decoration: underline; }
+
+.notice {
+  color: var(--dim); font-size: 14px; border-left: 3px solid var(--line);
+  padding-left: 13px; margin: 20px 0;
+}
+/* 비포함 고지의 제목줄 — 본문과 같은 밝기면 고지가 눈에 안 들어온다 */
+.notice b { color: var(--fg); }
+.notice-strong {
+  color: #f0c67a; font-size: 14px; font-weight: 700;
+  border-left: 3px solid #6b5424; padding-left: 13px; margin: 14px 0;
+}
+
+h3 { font-size: 15px; color: var(--dim); border-bottom: 1px solid var(--line); padding-bottom: 8px; margin-top: 34px; }
+
+.src { border: 1px solid var(--line); border-radius: 7px; padding: 14px 17px; margin: 12px 0; background: var(--panel); }
+.src h4 { margin: 0 0 5px; font-size: 15px; }
+.src .refno { color: var(--accent); }
+.src-title { color: var(--dim); font-weight: 400; }
+.src .meta { margin: 0; color: var(--dim); font-size: 12.5px; }
+.src code { color: #b9d7ff; font-size: 12px; }
+.src pre { white-space: pre-wrap; font-size: 13.5px; color: #d2d2d2; background: #1b1b1b; padding: 13px; border-radius: 5px; margin: 10px 0 0; }
+.caveat { color: #f0c67a; font-size: 13px; margin: 8px 0 0; }
+
+summary { cursor: pointer; color: var(--dim); font-size: 13px; margin-top: 9px; }
+summary:hover { color: var(--accent); }
+
+.verify { color: var(--dim); font-size: 13px; margin-top: 18px; }
+
+.manifest { margin-top: 12px; }
+.manifest table { border-collapse: collapse; width: 100%; margin-top: 10px; font-size: 12.5px; }
+.manifest th { text-align: left; color: var(--dim); font-weight: 400; padding: 5px 12px 5px 0; vertical-align: top; white-space: nowrap; }
+.manifest td { padding: 5px 0; word-break: break-all; }
+.manifest code { color: #b9d7ff; }
+
+footer { color: var(--dim); font-size: 12.5px; border-top: 1px solid var(--line); padding-top: 16px; padding-bottom: 40px; }
+
+
+/* ─── 대화 스레드 ─── */
+#thread { margin: 22px 0 0; }
+.turn { margin-bottom: 34px; }
+.turn-q {
+  background: #262626; border-left: 3px solid var(--accent);
+  border-radius: 0 7px 7px 0; padding: 10px 15px; margin-bottom: 16px;
+}
+.turn-q p { margin: 0; font-weight: 600; font-size: 15px; }
+.turn + .turn { border-top: 1px solid var(--line); padding-top: 26px; }
+
+/* ─── 말투 토글 ─── */
+.mode-bar { display: flex; align-items: center; gap: 11px; flex-wrap: wrap; margin: 0 0 14px; }
+.mode-btns { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.mode-btn {
+  background: transparent; color: var(--dim); border: 0; border-radius: 0;
+  padding: 6px 14px; font-size: 12.5px; font-weight: 500;
+}
+.mode-btn + .mode-btn { border-left: 1px solid var(--line); }
+.mode-btn:hover { background: #202020; color: var(--fg); filter: none; }
+.mode-btn.on { background: var(--accent); color: #111; font-weight: 700; }
+.mode-hint { color: var(--dim); font-size: 12px; }
+
+.resolved-from { color: var(--dim); font-size: 12.5px; margin: 0 0 12px; }
+.resolved-from b { color: var(--fg); font-weight: 600; }
+.resolved-from .dim { color: #6b6b6b; }
+
+@media (max-width: 760px) {
+  #side { display: none; }
+}
+
+/* 답변 안의 소제목 — Sonnet 이 긴 답을 `## 1. …` 로 나눠 쓴다 */
+.ans-h {
+  display: inline-block; margin-top: 8px;
+  color: var(--fg); font-size: 15.5px; font-weight: 700;
+  border-bottom: 2px solid var(--accent); padding-bottom: 2px;
+}
+
+/* 적용기한이 지난 조문 — 「각 목」 caveat 보다 강하게 */
+.caveat.sunset { color: #ff8a8a; font-weight: 600; }
+
+/* ─── 스트리밍 ─── */
+#q { resize: none; overflow-y: auto; line-height: 1.6; font-family: inherit; max-height: 200px; }
+#stop { background: #3a2f16; color: #f0c67a; border: 1px solid #6b5424; }
+#stop:hover { filter: none; background: #4a3c1c; }
+.stage { color: var(--dim); font-size: 13.5px; margin: 0 0 10px; }
+.stage:not(:empty)::after { content: ""; display: inline-block; width: 7px; height: 7px; margin-left: 7px; border-radius: 50%; background: var(--accent); animation: pulse 1s ease-in-out infinite; }
+@keyframes pulse { 0%,100% { opacity: .25 } 50% { opacity: 1 } }
+.answer-body.live::after { content: "▍"; color: var(--accent); animation: pulse .9s steps(2) infinite; }
+.turn.streaming .turn-a { opacity: .96; }
+
+/* ─── 답변 안의 표 (비교형 답) ─── */
+.tbl { overflow-x: auto; margin: 14px 0; border: 1px solid var(--line); border-radius: 7px; }
+.answer-body table { border-collapse: collapse; width: 100%; font-size: 14px; white-space: normal; }
+.answer-body th, .answer-body td { padding: 9px 13px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.answer-body th { background: #2a2a2a; color: var(--fg); font-weight: 700; white-space: nowrap; }
+.answer-body tbody tr:last-child td { border-bottom: 0; }
+.answer-body tbody tr:nth-child(even) { background: #1f1f1f; }
+
+/* ─── 이어서 물어볼 것 (답에 안 쓰인 묶음 조문) ─── */
+.suggests { margin-top: 20px; border-top: 1px solid var(--line); padding-top: 14px; }
+.suggests-label { color: var(--dim); font-size: 12.5px; margin: 0 0 9px; }
+.suggests-row { display: flex; flex-wrap: wrap; gap: 7px; }
+.suggest {
+  background: transparent; color: var(--dim); border: 1px solid var(--line);
+  font-weight: 400; font-size: 13px; padding: 7px 13px; text-align: left;
+}
+.suggest:hover { color: var(--accent); border-color: var(--accent); filter: none; }
+
+/* ─── 근거 없는 문장 펼치기 ─── */
+.issues { margin-top: 8px; }
+.issues ul { margin: 6px 0 12px; padding-left: 20px; }
+.issues li { color: #d8c08a; font-size: 13px; margin: 4px 0; }
+.issues-label { color: var(--dim); font-size: 12.5px; margin: 8px 0 0; }
+.issues-note { color: var(--dim); font-size: 12px; margin: 6px 0 0; }
+
+/* ─── 계산 결과 (PLAN) ─── */
+.class-label.plan-calc { background: #1f3a40; color: #7ae8d0; border: 1px solid #2f6b63; }
+.plan-read { color: var(--dim); font-size: 13px; margin: 0 0 12px; }
+.plan-read b { color: var(--fg); }
+.plan-headline { font-size: 19px; font-weight: 700; color: var(--accent); margin: 4px 0 14px; }
+.plan-gap { margin: 8px 0 12px; padding-left: 22px; }
+.plan-gap li { color: #f0c67a; font-size: 13.5px; margin: 4px 0; }
+.plan-gap code { color: #b9d7ff; font-size: 12px; }
+.plan-skipped { color: #ff8a8a; font-size: 13.5px; font-weight: 600; margin: 18px 0 0; }
+
+/* ─── 되묻기 카드 ─── */
+.ask { border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; margin: 12px 0; background: var(--panel); }
+.ask-q { margin: 0 0 10px; font-size: 15px; font-weight: 600; }
+.ask-note { color: var(--dim); font-size: 12.5px; margin: 0 0 10px; }
+.ask-form { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+.ask-input { flex: 0 1 150px; padding: 8px 11px; font-size: 14px; }
+.ask-unit { color: var(--dim); font-size: 13px; }
+.ask-go { padding: 8px 16px; font-size: 13px; }
+.ask-opt { border-color: var(--accent); color: var(--accent); }
+
+/* ─── 조문 답변 아래 계산 제안 ─── */
+.plan-offer { margin-top: 22px; border-top: 1px solid var(--line); padding-top: 14px; }
+.plan-offer-label { color: var(--dim); font-size: 13px; margin: 0 0 8px; }
+.plan-offer-label b { color: var(--fg); }
+
+/* ─── 되묻기 슬라이더 ─── */
+.ask-slider { margin-top: 12px; }
+.ask-range { width: 100%; accent-color: var(--accent); }
+.ask-range-meta { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-top: 4px; }
+.ask-range-val { color: var(--accent); font-weight: 700; font-size: 15px; }
+.ask-range-meta .dim { color: var(--dim); font-size: 11.5px; text-align: right; }
+
+/* ① 공식 팩트 패널 — LLM 을 거치지 않은 값. 답변 본문과 **시각적으로 다른 층**이어야
+   "이건 승인된 값, 저건 LLM 이 쓴 글"이 한눈에 갈린다. 그래서 테두리로 묶는다. */
+.approved { border: 1px solid #2f6b32; border-radius: 8px; padding: 12px 15px; margin: 0 0 18px; background: #17211a; }
+.approved.none { border-color: var(--line); background: var(--panel); }
+.approved .class-label { margin-top: 0; }
+.approved .dim { color: var(--dim); font-size: 13px; margin: 6px 0 10px; }
+.approved table { font-size: 13px; }
+.approved .approved-meta { color: var(--dim); font-size: 12px; margin: 8px 0 0; }
+
+/* 접히는 근거·검증 칸. 요약줄이 곧 목차라서, 펼치지 않고도 뭐가 들었는지 읽힌다. */
+.ev { border-top: 1px solid var(--line); margin-top: 20px; padding-top: 6px; }
+.ev > summary { font-size: 13px; color: var(--dim); padding: 6px 0; list-style: none; }
+.ev > summary::before { content: "▸ "; color: var(--accent); }
+.ev[open] > summary::before { content: "▾ "; }
+.ev > summary:hover { color: var(--fg); }
+.ev.meta > summary { font-weight: 600; }
+.ev h3 { margin-top: 12px; }
+
+/* 답변과 근거를 눈으로 가른다 — 답변은 본문 크기로, 근거는 접힌 줄 하나로.
+   예전엔 조문 카드가 답변 바로 밑에 펼쳐져 있어 어디까지가 답인지 안 보였다(사용자 피드백). */
+.answer-body { font-size: 15.5px; line-height: 1.78; }
+.answer-body > .ans-h { display: block; margin: 20px 0 6px; font-size: 15.5px; }
+.src-fold > summary { color: var(--accent); }
+.src-fold[open] > summary { color: var(--dim); margin-bottom: 4px; }
+/* [n] 을 눌러 도착한 조문을 잠깐 표시해 준다 — 어디로 왔는지 모르면 이동이 무의미하다. */
+.src.flash { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (prefers-reduced-motion: no-preference) {
+  .src { transition: outline-color 200ms ease; }
+}

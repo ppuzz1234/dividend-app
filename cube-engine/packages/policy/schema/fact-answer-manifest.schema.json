@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "cube:fact-answer-manifest",
+  "title": "FactAnswerManifest (사양 §5.6 · §1.2)",
+  "$comment": "answerClass 와 resolvedRuleIds 의 상호 제약(REGISTRY_RESOLVED_FACT 면 필수 / UNMODELED 면 빈 배열)은 스키마로 표현하지 않고 validateFactAnswerManifest 가 각각 고유 code 로 판정한다. packKind/syntheticStamp 는 사양 §5.6 원문에 없는 확장이다(OPEN-Q2') — RunManifest 와 같은 방식으로 추가만 했고 기존 필드는 개명·삭제하지 않았다. 규칙 0(합성 값 결과에 스탬프 강제)을 FACT 경로에서도 만족시키기 위함이다.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "queryAsOf",
+    "policySnapshotVersion",
+    "factResolverVersion",
+    "answerClass",
+    "resolvedRuleIds",
+    "sourceSnapshotIds",
+    "sourceHashes",
+    "rendererTemplateVersion",
+    "answerPayloadHash"
+  ],
+  "properties": {
+    "queryAsOf": {
+      "type": "string"
+    },
+    "confirmedInputHash": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "policySnapshotVersion": {
+      "type": "string",
+      "minLength": 1
+    },
+    "factResolverVersion": {
+      "type": "string",
+      "minLength": 1
+    },
+    "answerClass": {
+      "enum": [
+        "REGISTRY_RESOLVED_FACT",
+        "UNMODELED_OFFICIAL_SOURCE"
+      ]
+    },
+    "resolvedRuleIds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "sourceSnapshotIds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "sourceHashes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "ragIndexVersion": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "rendererTemplateVersion": {
+      "type": "string",
+      "minLength": 1
+    },
+    "rendererModelVersion": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "answerPayloadHash": {
+      "type": "string"
+    },
+    "packKind": {
+      "enum": [
+        "VERIFIED_LAW",
+        "SYNTHETIC_DEMO",
+        "UNVERIFIED_DRAFT"
+      ]
+    },
+    "syntheticStamp": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}

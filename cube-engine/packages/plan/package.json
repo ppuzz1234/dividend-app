@@ -1,0 +1,17 @@
+{
+  "name": "@cube/plan",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/src/index.js",
+  "types": "./dist/src/index.d.ts",
+  "scripts": {
+    "build": "tsc -b tsconfig.json",
+    "test": "tsc -b tsconfig.json && node --test \"dist/test/**/*.test.js\"",
+    "check:approved": "node --env-file=../../.env scripts/check-approved.mjs"
+  },
+  "dependencies": {
+    "@cube/numeric": "*",
+    "@cube/policy": "*"
+  }
+}

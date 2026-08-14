@@ -1,0 +1,143 @@
+# UNVERIFIED_DRAFT — 아직 승인될 수 없는 규칙만 남았다.
+#
+# ⚠️ 아래 두 규칙은 한때 **`approved: true` 인데 값이 `<원문 대조 후 기재>`** 였다 —
+#    즉 **모르는 값을 승인한 상태**다. 그대로 두면 "사람이 확인했다"는 기록이 거짓이 된다.
+#      · CONTRIBUTION_LIMIT_COMPONENT.HOUSING_SALE
+#      · CONTRIBUTION_LIMIT_COMPONENT.REAL_ESTATE_SALE
+#    2026-08-03: **approved 를 false 로 되돌렸다.** 값을 지어낼 수는 없고,
+#    모르는 값에 붙은 승인은 "사람이 확인했다"는 **거짓 기록**이기 때문이다.
+#    원문(§17의2 → 소득세법 시행령 §40의2)에서 금액을 확인한 뒤 다시 승인하면 된다.
+#
+# 나머지 둘은 approved:false 라 정상이다 (ISA_TRANSFER · TOTAL_CUMULATIVE_CAP).
+#
+# 승인·값이 모두 확정된 규칙은 ../INCTAX_D_40_2.yaml 로 옮겼다.
+#
+# ⚠️ 2026-08-04 — 이 초안의 규칙 id 접두어(RETIRE_D_17_2)는 **씨앗 조문 이름일 뿐**이고,
+#    값은 전부 「소득세법 시행령」 제40조의2 에 있다. 근퇴법 시행령 제17조의2 는 그 조문을
+#    가리키기만 하는 위임 조문이라 숫자가 하나도 없다. 남은 둘을 승인할 때
+#    **id 접두어와 sources 를 INCTAX_D_40_2 로 바꿔서** 옮겨야 한다.
+#    (생성기는 고쳤다 — 이제 규칙마다 값이 실제로 적힌 조문을 받아 적는다.)
+pack_kind: UNVERIFIED_DRAFT
+policy_snapshot: KR-TAX-DRAFT-RETIRE_D_17_2
+rules:
+  - id: RETIRE_D_17_2.CONTRIBUTION_LIMIT_COMPONENT.ISA_TRANSFER
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: DECREE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: RETIRE_D_17_2
+    temporal:
+      promulgated_at: 2026-03-24
+      valid_from: 2026-03-24
+      valid_to: null
+      recorded_at: 2026-07-31
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value: <원문 대조 후 기재>
+      unit: KRW
+    sources:
+      - source_id: RETIRE_D_17_2
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - RETIRE_D_17_2
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-07
+  - id: RETIRE_D_17_2.CONTRIBUTION_LIMIT_COMPONENT.HOUSING_SALE
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: DECREE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: RETIRE_D_17_2
+    temporal:
+      promulgated_at: 2026-03-24
+      valid_from: 2026-03-24
+      valid_to: null
+      recorded_at: 2026-07-31
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value: <원문 대조 후 기재>
+      unit: KRW
+    sources:
+      - source_id: RETIRE_D_17_2
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - RETIRE_D_17_2
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-07
+  - id: RETIRE_D_17_2.CONTRIBUTION_LIMIT_COMPONENT.REAL_ESTATE_SALE
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: DECREE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: RETIRE_D_17_2
+    temporal:
+      promulgated_at: 2026-03-24
+      valid_from: 2026-03-24
+      valid_to: null
+      recorded_at: 2026-07-31
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value: <원문 대조 후 기재>
+      unit: KRW
+    sources:
+      - source_id: RETIRE_D_17_2
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - RETIRE_D_17_2
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-07
+  - id: RETIRE_D_17_2.CONTRIBUTION_LIMIT_COMPONENT.HOUSING_REAL_ESTATE_TOTAL_CUMULATIVE_CAP
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: DECREE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: RETIRE_D_17_2
+    temporal:
+      promulgated_at: 2026-03-24
+      valid_from: 2026-03-24
+      valid_to: null
+      recorded_at: 2026-07-31
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value: "100000000"
+      unit: KRW
+    sources:
+      - source_id: RETIRE_D_17_2
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - RETIRE_D_17_2
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-07
+
