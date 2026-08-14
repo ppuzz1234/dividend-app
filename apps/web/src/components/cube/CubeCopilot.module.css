@@ -177,6 +177,22 @@
 .emptyLead b {
   color: var(--text);
 }
+.emptyNote {
+  margin: 0 0 10px;
+  font-size: 12.5px;
+  line-height: 1.65;
+  color: var(--sub);
+  word-break: keep-all;
+}
+.emptyNote code {
+  padding: 1px 5px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: var(--bg);
+  color: var(--jade);
+  font-size: 11.5px;
+  word-break: break-all;
+}
 .chips {
   display: flex;
   flex-direction: column;

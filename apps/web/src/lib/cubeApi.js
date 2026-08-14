@@ -6,20 +6,24 @@
  *  · quotes.js / strategyApi.js 와 달리 /api 프록시(:4000)를 쓰지 않는다.
  *    엔진은 별도 포트라 절대 URL 로 부른다.
  *
- *  ## 개발 서버는 켜진 채로 온다
- *  브랜치를 받아 `npm run dev` 만 하면 설정 없이 버튼이 보여야 리뷰가 된다.
- *  꺼진 채로 올리고 "환경변수를 넣으면 켜집니다" 라고 하면 리뷰어는 아무것도 못 본다.
- *
- *  ## 프로덕션 빌드는 여전히 명시 설정이 필요하다
- *  세법 엔진은 이 저장소 밖에서 도는 사이드카다. 배포본에서 기본으로 켜면
- *  **눌러도 안 되는 버튼**이 실사용자에게 남는다. 그래서 배포 빌드는 env 가 있을 때만 켠다.
+ *  ## 개발 서버는 주소를 기본값으로 안다
+ *  브랜치를 받아 `npm run dev` 만 하면 설정 없이 동작해야 리뷰가 된다.
+ *  배포 빌드에는 기본값을 두지 않는다 — 엔진은 저장소 밖에서 도는 사이드카라
+ *  배포본이 로컬 주소를 때려봐야 소용이 없다. 그때는 `VITE_CUBE_API_BASE` 로 알려준다.
  *  (`import.meta.env.DEV` 는 dev 서버에서만 true — 빌드 시 상수로 접힌다)
+ *
+ *  ## 주소가 없어도 버튼은 뜬다
+ *  한때 주소가 없으면 버튼 자체를 숨겼는데, 그건 **기능이 없는 것처럼 보이게** 만든다.
+ *  없는 걸 숨기지 말고 왜 못 쓰는지 말하는 편이 낫다 — 이 엔진이 답을 못 할 때
+ *  "모른다"고 말하는 것과 같은 이유다. 대신 주소가 없으면 요청을 보내지도 않는다
+ *  (실패할 걸 아는 요청을 굳이 던져서 콘솔에 오류를 남길 이유가 없다).
  * ------------------------------------------------------------------ */
 const DEV_DEFAULT = "http://127.0.0.1:8787";
 const CONFIGURED = (import.meta.env.VITE_CUBE_API_BASE || "").trim();
 const BASE = (CONFIGURED !== "" ? CONFIGURED : import.meta.env.DEV ? DEV_DEFAULT : "").replace(/\/+$/, "");
 
-export const cubeEnabled = BASE !== "";
+/** 엔진 주소를 아는가. false 면 패널이 "설정이 필요합니다" 안내를 보여준다. */
+export const cubeConfigured = BASE !== "";
 
 /** 새 대화 — 서버가 convId 를 만든다. 실패하면 null(호출부가 기존 convId 유지). */
 export async function cubeNewConversation() {

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Scale, X, Plus, ArrowUp, Square } from "lucide-react";
-import { cubeEnabled, cubeNewConversation, cubeStream } from "../../lib/cubeApi.js";
+import { cubeConfigured, cubeNewConversation, cubeStream } from "../../lib/cubeApi.js";
 import { CubeThread } from "./CubeThread.jsx";
 import styles from "./CubeCopilot.module.css";
 
@@ -49,7 +49,7 @@ export function CubeCopilot({ step, framed = false }) {
 
   const ask = useCallback(async (query) => {
     const text = query.trim();
-    if (busy || text === "") return;
+    if (busy || text === "" || !cubeConfigured) return;
     setBusy(true);
     setQ("");
 
@@ -107,7 +107,7 @@ export function CubeCopilot({ step, framed = false }) {
     return () => window.removeEventListener("keydown", onEsc);
   }, [open]);
 
-  if (!cubeEnabled || HIDDEN_STEPS.has(step)) return null;
+  if (HIDDEN_STEPS.has(step)) return null;
 
   const pos = framed ? styles.framed : styles.floating;
 
@@ -132,23 +132,45 @@ export function CubeCopilot({ step, framed = false }) {
             </header>
 
             <div className={styles.scroll} ref={scrollRef}>
-              {turns.length === 0 && (
+              {/* 주소를 모르면 숨기지 말고 왜 못 쓰는지 말한다. 실패할 요청을 던지지도 않는다. */}
+              {!cubeConfigured ? (
                 <div className={styles.empty}>
                   <p className={styles.emptyLead}>
-                    세법은 <b>조문 원문</b>으로만 답합니다. 근거가 없으면 답하지 않습니다.
+                    <b>세법 엔진이 연결되어 있지 않습니다.</b>
                   </p>
-                  <ul className={styles.chips}>
-                    {STARTERS.map((s) => (
-                      <li key={s}>
-                        <button type="button" onClick={() => ask(s)}>{s}</button>
-                      </li>
-                    ))}
-                  </ul>
+                  <p className={styles.emptyNote}>
+                    이 기능은 법령 원문을 들고 있는 별도 엔진이 있어야 답할 수 있습니다.
+                    엔진 소스는 이 저장소의 <code>cube-engine/</code> 에 있습니다.
+                  </p>
+                  <p className={styles.emptyNote}>
+                    로컬에서는 저장소 루트에서 <code>npm run dev:cube</code> 로 함께 띄웁니다.
+                    다른 곳에 띄운 엔진을 쓰려면 <code>VITE_CUBE_API_BASE</code> 에 그 주소를 넣으세요.
+                    준비 과정은 <code>cube-engine/README.md</code> 에 있습니다.
+                  </p>
                 </div>
+              ) : (
+                <>
+                  {turns.length === 0 && (
+                    <div className={styles.empty}>
+                      <p className={styles.emptyLead}>
+                        세법은 <b>조문 원문</b>으로만 답합니다. 근거가 없으면 답하지 않습니다.
+                      </p>
+                      <ul className={styles.chips}>
+                        {STARTERS.map((s) => (
+                          <li key={s}>
+                            <button type="button" onClick={() => ask(s)}>{s}</button>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  <CubeThread turns={turns} busy={busy} convIdRef={convId} onAsk={ask} onBusy={setBusy} />
+                </>
               )}
-              <CubeThread turns={turns} busy={busy} convIdRef={convId} onAsk={ask} onBusy={setBusy} />
             </div>
 
+            {/* 엔진이 없으면 입력창도 내린다 — 쳐 봐야 갈 데가 없는 칸은 없느니만 못하다 */}
+            {cubeConfigured && (
             <form
               className={styles.composer}
               onSubmit={(e) => { e.preventDefault(); ask(q); }}
@@ -182,6 +204,7 @@ export function CubeCopilot({ step, framed = false }) {
                 </button>
               )}
             </form>
+            )}
           </section>
         </>
       )}
