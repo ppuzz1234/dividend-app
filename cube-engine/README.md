@@ -17,7 +17,7 @@ Node 20 이상. 처음 한 번만 준비하면 그다음부터는 명령 하나�
 # 준비 (한 번)
 cd cube-engine
 npm install
-cp .env.example .env                     # LLM_API_KEY 를 채운다
+cp .env.example .env                     # 키 두 개를 채운다 (아래 참고)
 npm run build
 npm run build:index -w @cube/factindex   # 조문 → 벡터 색인 (수 분 · 임베딩 API 사용)
 
@@ -28,9 +28,20 @@ npm run dev:cube
 
 엔진만 따로 띄우려면 `npm run serve -w @cube/factui` (→ http://127.0.0.1:8787).
 
-**`LLM_API_KEY` 는 각자 채웁니다.** 저장소에 키를 넣지 않습니다. 키가 없으면 색인도 못
-만들고 답변도 못 합니다 — 조문 검색은 임베딩 API 를, 답변은 생성 API 를 쓰기 때문입니다.
-`npm run dev:cube` 는 준비가 안 됐으면 **무엇을 해야 하는지 알려주고 멈춥니다.**
+**키는 두 종류입니다. 저장소에 넣지 않으니 각자 채웁니다.**
+
+| | 무엇에 쓰나 |
+|---|---|
+| `LLM_API_KEY` (Gemini) | 조문을 벡터로 만드는 **색인 생성** |
+| `ANSWER_API_KEY` (Anthropic) | **답변 생성** — 비우면 `ATTACK_API_KEY` 를 대신 씀 |
+
+`docs/ANSWER-QUALITY-*.md` 의 측정치는 전부 **claude-sonnet-5 · effort=medium** 으로 잰
+것이고, `.env.example` 에 그 조합이 박혀 있습니다. Anthropic 키를 안 채우면 코드가
+gemini 로 떨어지는데 — 그건 우리가 측정한 품질이 아닙니다. 그래서 `.env.example` 이
+`ANSWER_PROVIDER=claude` 를 명시하고, 이 경우 엔진이 **뜨지 않고 그 자리에서 알려줍니다.**
+조용히 다른 모델로 답하는 것보다 낫습니다.
+
+`npm run dev:cube` 도 준비가 안 됐으면 **무엇을 해야 하는지 알려주고 멈춥니다.**
 
 색인(`packages/factindex/index/`)은 저장소에 없습니다. 조문 스냅샷에서 **결정론적으로
 재생성**되기 때문입니다 — 같은 스냅샷이면 같은 색인이 나오는 것을 콜드 재빌드로 확인했고
