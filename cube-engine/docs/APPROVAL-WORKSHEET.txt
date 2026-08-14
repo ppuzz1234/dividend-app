@@ -2,7 +2,7 @@
 > @cube/packdraft@0.0.0 review
 > tsc -b tsconfig.json && node dist/scripts/review.js packages/policy/packs/drafts/RETIRE_D_17_2.draft.yaml
 
-[검토] C:\Users\spbra\OneDrive\Shared\College\1C - CoOp_Hanwha\Hanwha\MyWork\A4\packages\policy\packs\drafts\RETIRE_D_17_2.draft.yaml
+[검토] packages\policy\packs\drafts\RETIRE_D_17_2.draft.yaml
 [검토] pack_kind=UNVERIFIED_DRAFT · 규칙 11개
 
 ☐ RETIRE_D_17_2.CONTRIBUTION_LIMIT_COMPONENT.GENERAL
