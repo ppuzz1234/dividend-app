@@ -1,0 +1,28 @@
+{
+  "name": "@cube/factindex",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/src/index.js",
+  "types": "./dist/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "default": "./dist/src/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -b tsconfig.json",
+    "test": "tsc -b tsconfig.json && node --test \"dist/test/**/*.test.js\"",
+    "measure:tokens": "tsc -b tsconfig.json && node --env-file-if-exists=../../.env dist/scripts/measure-tokens.js",
+    "build:index": "tsc -b tsconfig.json && node --env-file-if-exists=../../.env dist/scripts/build-index.js",
+    "ask": "tsc -b tsconfig.json && node --env-file-if-exists=../../.env dist/scripts/ask.js",
+    "check:retrieval": "tsc -b tsconfig.json && node --env-file-if-exists=../../.env dist/scripts/check-retrieval.js",
+    "ablate:rerank": "tsc -b tsconfig.json && node --env-file-if-exists=../../.env dist/scripts/ablate-rerank.js",
+    "measure:bareref": "tsc -b tsconfig.json && node dist/scripts/measure-bare-ref.js"
+  },
+  "dependencies": {
+    "@cube/corpus": "*",
+    "@cube/numeric": "*"
+  }
+}

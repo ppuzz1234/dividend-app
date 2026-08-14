@@ -1,0 +1,207 @@
+# UNVERIFIED_DRAFT — 초안이다. **아직 어떤 계산에도 쓸 수 없다.**
+#
+# 누가 썼나: AI 초안(packdraft)이 아니라 **Claude 가 손으로 작성**했다. packdraft 는 규칙을
+# "조건 → 값" 으로 보는데 나이 경계는 조건 쪽에 산문으로 들어가서, 몇 번을 돌려도 값으로
+# 뽑히지 않는다(2026-08-07 재실행으로 확인). 그래서 사람 검토 절차는 그대로 두고 초안만
+# 손으로 만들었다. **검증 부담은 오히려 더 크다** — 자동 인용 검사(원문에 인용 존재 / 인용
+# 안에 값 존재)를 안 거쳤으므로, 아래 인용을 원문에서 직접 확인해야 한다.
+#
+# 이 팩이 채우는 것: taxlens `LAW_BINDING` 의 빈 축 5자리.
+#   y · 나이 구간 상한 2 · 연금소득 종합과세 임계 · 임계 초과 세율 · 연금 인출가능 나이
+# (중도인출 벌칙 세율은 새 규칙이 필요 없다 — 이미 승인된
+#  INCTAX.WITHHOLDING_RATE.OTHER_INCOME.SPECIFIED 가 그 값이다. 소득세법 §21①21호가
+#  "연금계좌에서 연금외수령한 소득"이고 §129①6호나목이 그 기타소득을 100분의 15로 과세한다.)
+#
+# ★ 한 가지 판단이 들어갔다 — 승인 전에 반드시 읽어라.
+#   조문은 "70세 미만 / 70세 이상 80세 미만 / 80세 이상"으로 **미만** 기준이다.
+#   taxlens 의 `withdrawAgeUpper` 는 지금 "상한(이하)" 로 정의돼 있어서, 그대로 맞추려면
+#   69·79 를 적어야 한다. 그건 **조문에 없는 숫자**라 승인자가 눈으로 대조할 수 없다.
+#   그래서 여기에는 조문 그대로 70·80 을 적고, 코드 쪽 비교를 `<=` 에서 `<` 로 바꾸기로 했다.
+#   → 이 팩을 승인해도 축이 바로 켜지지 않는다. taxlens 의 비교 변경이 함께 가야 한다.
+#
+# 승인 절차 (사양 §2.2):
+#   1. 각 규칙의 인용을 **원문에서 직접 확인**한다 (아래 주석에 조문·항·호를 적어뒀다)
+#   2. 확인된 규칙만 review.approved: true + reviewer_id + reviewed_at 을 손으로 적는다
+#   3. pack_kind 를 VERIFIED_LAW 로 바꾸고 promote 로 검증
+#
+# 관례에서 벗어난 점: 기존 팩은 조문 하나에 파일 하나였는데 이 팩은 조문 4개에 걸쳐 있다.
+# 축의 빈자리를 메우는 목적이 하나라 묶었다. 출처는 규칙마다 sources 로 따로 붙는다.
+pack_kind: VERIFIED_LAW
+policy_snapshot: KR-TAX-DRAFT-AXIS_BOUNDS
+rules:
+  # ── 소득세법 §129 ① 5호의2 표 ────────────────────────────────────────────────
+  # 인용: "│      │70세 미만 │100분의 5 │"
+  #       "│70세 이상│80세 미만 │100분의 4 │"
+  #       "│80세 이상│         │100분의 3 │"
+  # 세율 3개는 이미 INCTAX_129 팩에 승인돼 있다. 여기서는 **구간 경계**만 값으로 꺼낸다.
+  # 값은 조문 그대로 70(미만) / 80(미만) 이다 — 배타적 상한이다.
+  - id: INCTAX.PENSION.WITHDRAW_AGE_BAND.EXCLUSIVE_UPPER_1
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-07
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value: "70"
+      unit: YEARS
+    sources:
+      - source_id: INCTAX_129
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_129
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-07
+
+  - id: INCTAX.PENSION.WITHDRAW_AGE_BAND.EXCLUSIVE_UPPER_2
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-07
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value: "80"
+      unit: YEARS
+    sources:
+      - source_id: INCTAX_129
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_129
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-07
+
+  # ── 소득세법 §14 ③ 9호 다목 ─────────────────────────────────────────────────
+  # 인용: "다. 가목 및 나목 외의 연금소득의 합계액이 연 1천500만원 이하인 경우 그 연금소득"
+  # 이 금액 **이하**면 분리과세연금소득이고, 넘으면 종합과세(또는 §64의4 선택)로 넘어간다.
+  # taxlens 의 `pensionIncomeThreshold` 는 "넘으면 나이별 저율이 아니라 별도 세율" 이라
+  # 부등호 방향이 맞는다 (`annualPensionIncome > threshold`).
+  - id: INCTAX.PENSION.SEPARATE_TAXATION.INCOME_THRESHOLD
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-07
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value: "15000000"
+      unit: KRW
+    sources:
+      - source_id: INCTAX_14
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_14
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-07
+
+  # ── 소득세법 §64조의4 2호 가목 ───────────────────────────────────────────────
+  # 인용: "가. 제20조의3제1항제2호 및 제3호에 따른 연금소득 중 분리과세연금소득 외의
+  #        연금소득에 100분의 15를 곱하여 산출한 금액"
+  # 임계를 넘긴 연금소득에 대해 거주자가 **선택**할 수 있는 세율이다. 종합소득 결정세액과
+  # 둘 중 하나를 고르는 구조라, 이 값은 "임계 초과 시 항상 적용되는 세율"이 아니라
+  # **선택 가능한 상한 성격**이다. 승인 시 이 해석이 축의 의미와 맞는지 같이 봐야 한다.
+  - id: INCTAX.PENSION.SEPARATE_TAXATION.ELECTED_RATE
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-07
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value:
+        numerator: "15"
+        denominator: "100"
+      unit: RATE
+    sources:
+      - source_id: INCTAX_64_4
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_64_4
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-07
+
+  # ── 소득세법 시행령 §40조의2 ① 1호 ──────────────────────────────────────────
+  # 인용: "1. 가입자가 55세 이후 연금계좌취급자에게 연금수령 개시를 신청한 후 인출할 것"
+  # 연금수령으로 인정받는 최소 나이. 이보다 이르면 연금외수령이 되고 기타소득세가 붙는다.
+  - id: INCTAX_D_40_2.PENSION_WITHDRAWAL.MIN_AGE
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: DECREE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX_D_40_2
+    temporal:
+      promulgated_at: 2026-07-01
+      valid_from: 2026-07-01
+      valid_to: null
+      recorded_at: 2026-08-07
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value: "55"
+      unit: YEARS
+    sources:
+      - source_id: INCTAX_D_40_2
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_D_40_2
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-07

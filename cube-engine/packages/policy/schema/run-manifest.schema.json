@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "cube:run-manifest",
+  "title": "RunManifest (사양 §5.6 + §5.7 추가 필드 + 순서 2 스탬프 확장)",
+  "$comment": "packKind·syntheticStamp 는 사양 §5.6 정의에 없는 확장이다 — docs/ORDER2-OPEN-QUESTIONS.md Q7 참조. §5.7 이 이미 'RunManifest 추가 필드' 선례를 만들었으므로 같은 방식을 따랐다. assumptionSetVersion 필수 여부와 스탬프 필수 여부는 스키마로 표현할 수 없어 validateRunManifest 가 판정한다.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "runId",
+    "queryAsOf",
+    "taxYear",
+    "confirmedInputHash",
+    "packKind",
+    "policySnapshotVersion",
+    "accountSpecVersion",
+    "mechanismSchemaVersion",
+    "instrumentDataVersion",
+    "strategyCoverageVersion",
+    "strategyTemplateVersion",
+    "optimizerVersion",
+    "engineBuildVersion",
+    "createdAt"
+  ],
+  "properties": {
+    "runId": { "type": "string", "minLength": 1 },
+    "queryAsOf": { "type": "string" },
+    "taxYear": { "type": "number" },
+    "confirmedInputHash": { "type": "string" },
+
+    "packKind": { "enum": ["VERIFIED_LAW", "SYNTHETIC_DEMO", "UNVERIFIED_DRAFT"] },
+    "syntheticStamp": { "type": ["string", "null"] },
+
+    "policySnapshotVersion": { "type": "string", "minLength": 1 },
+    "accountSpecVersion": { "type": "string", "minLength": 1 },
+    "mechanismSchemaVersion": { "type": "string", "minLength": 1 },
+    "instrumentDataVersion": { "type": "string", "minLength": 1 },
+    "providerRuleVersion": { "type": ["string", "null"] },
+
+    "strategyCoverageVersion": { "type": "string", "minLength": 1 },
+    "strategyTemplateVersion": { "type": "string", "minLength": 1 },
+    "optimizerVersion": { "type": "string", "minLength": 1 },
+    "engineBuildVersion": { "type": "string", "minLength": 1 },
+    "assumptionSetVersion": { "type": ["string", "null"] },
+
+    "parserModelVersion": { "type": ["string", "null"] },
+    "parserPromptVersion": { "type": ["string", "null"] },
+    "rendererTemplateVersion": { "type": ["string", "null"] },
+    "rendererPromptVersion": { "type": ["string", "null"] },
+    "rendererModelVersion": { "type": ["string", "null"] },
+
+    "mydataSpecVersion": { "type": ["string", "null"] },
+    "mydataRetrievedAt": { "type": ["string", "null"] },
+    "mydataConsentScope": { "type": ["array", "null"], "items": { "type": "string" } },
+
+    "createdAt": { "type": "string" }
+  }
+}

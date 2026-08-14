@@ -3,14 +3,27 @@
  *
  *  · BASE 는 **URL 하나뿐**이다. LLM 키는 사이드카 쪽 .env 에만 있고
  *    브라우저로 내려오지 않는다 (VITE_ 변수는 번들에 그대로 노출된다).
- *  · BASE 가 비면 cubeEnabled=false → 호출부가 버튼 자체를 렌더하지 않는다.
- *    배포본(Netlify)은 기존 앱과 동일하게 동작한다.
  *  · quotes.js / strategyApi.js 와 달리 /api 프록시(:4000)를 쓰지 않는다.
  *    엔진은 별도 포트라 절대 URL 로 부른다.
+ *
+ *  ## 개발 서버는 주소를 기본값으로 안다
+ *  브랜치를 받아 `npm run dev` 만 하면 설정 없이 동작해야 리뷰가 된다.
+ *  배포 빌드에는 기본값을 두지 않는다 — 엔진은 저장소 밖에서 도는 사이드카라
+ *  배포본이 로컬 주소를 때려봐야 소용이 없다. 그때는 `VITE_CUBE_API_BASE` 로 알려준다.
+ *  (`import.meta.env.DEV` 는 dev 서버에서만 true — 빌드 시 상수로 접힌다)
+ *
+ *  ## 주소가 없어도 버튼은 뜬다
+ *  한때 주소가 없으면 버튼 자체를 숨겼는데, 그건 **기능이 없는 것처럼 보이게** 만든다.
+ *  없는 걸 숨기지 말고 왜 못 쓰는지 말하는 편이 낫다 — 이 엔진이 답을 못 할 때
+ *  "모른다"고 말하는 것과 같은 이유다. 대신 주소가 없으면 요청을 보내지도 않는다
+ *  (실패할 걸 아는 요청을 굳이 던져서 콘솔에 오류를 남길 이유가 없다).
  * ------------------------------------------------------------------ */
-const BASE = (import.meta.env.VITE_CUBE_API_BASE || "").replace(/\/+$/, "");
+const DEV_DEFAULT = "http://127.0.0.1:8787";
+const CONFIGURED = (import.meta.env.VITE_CUBE_API_BASE || "").trim();
+const BASE = (CONFIGURED !== "" ? CONFIGURED : import.meta.env.DEV ? DEV_DEFAULT : "").replace(/\/+$/, "");
 
-export const cubeEnabled = BASE !== "";
+/** 엔진 주소를 아는가. false 면 패널이 "설정이 필요합니다" 안내를 보여준다. */
+export const cubeConfigured = BASE !== "";
 
 /** 새 대화 — 서버가 convId 를 만든다. 실패하면 null(호출부가 기존 convId 유지). */
 export async function cubeNewConversation() {
@@ -68,6 +81,8 @@ export async function cubeStream(path, body, { onStart, onStage, onDelta, onFina
   } catch (e) {
     // 실패를 그럴듯한 답으로 덮지 않는다. 중간까지 흘러온 글도 남긴다.
     if (e.name === "AbortError") return { ok: false, error: "중지했습니다." };
-    return { ok: false, error: "세법 엔진에 연결되지 않았어요." };
+    // 엔진은 별도 프로세스라 안 떠 있을 수 있다. raw fetch 오류를 그대로 보이지 않고,
+    // 무엇을 해야 하는지까지 말해 준다 — 리뷰어가 여기서 막히면 기능을 못 본다.
+    return { ok: false, error: `세법 엔진(${BASE})에 연결되지 않았어요. 엔진을 먼저 실행하세요 — components/cube/README.md` };
   }
 }

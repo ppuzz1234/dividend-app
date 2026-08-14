@@ -583,7 +583,8 @@ export default function App() {
   );
 
   // 세법 팩트 코파일럿 — 셸의 자식으로 넣는다. PhoneShell 이 transform: scale() 을 쓰므로
-  // body 로 포탈하면 ?frame=1 에서 베젤 밖으로 튀어나온다. (VITE_CUBE_API_BASE 비면 렌더 안 됨)
+  // body 로 포탈하면 ?frame=1 에서 베젤 밖으로 튀어나온다.
+  // 로그인 이후 화면에서만, 그리고 배포 빌드에서는 VITE_CUBE_API_BASE 가 있을 때만 뜬다.
   const cube = <CubeCopilot step={step} framed={framed} />;
 
   return framed

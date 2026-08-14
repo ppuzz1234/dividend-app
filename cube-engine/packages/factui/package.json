@@ -1,0 +1,19 @@
+{
+  "name": "@cube/factui",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/src/index.js",
+  "types": "./dist/src/index.d.ts",
+  "scripts": {
+    "build": "tsc -b tsconfig.json",
+    "test": "tsc -b tsconfig.json && node --test \"dist/test/**/*.test.js\"",
+    "serve": "tsc -b tsconfig.json && node --env-file-if-exists=../../.env dist/scripts/serve.js"
+  },
+  "dependencies": {
+    "@cube/fact": "*",
+    "@cube/factindex": "*",
+    "@cube/policy": "*",
+    "@cube/plan": "*"
+  }
+}

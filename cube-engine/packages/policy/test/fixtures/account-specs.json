@@ -1,0 +1,73 @@
+{
+  "$comment": "AccountSpec fixture — TS 계층이므로 camelCase (사양 §5.2.1). 참조하는 rule id 는 전부 synthetic-demo.pack.yaml 에 실재한다. 일반계좌도 AccountSpec 을 갖는다는 §5.3.1 규정을 반영해 두 번째 spec 을 뒀다.",
+  "accountSpecVersion": "DEMO-SPECS-0001",
+  "specs": [
+    {
+      "accountId": "DEMO_PENSION_SAVINGS",
+      "displayName": "합성 연금저축 (데모)",
+      "schemaVersion": "1.0.0",
+      "effectiveFrom": "2026-01-01",
+      "eligibilityRuleIds": ["DEMO.ELIGIBILITY.RESIDENT"],
+      "mechanismInstances": [
+        {
+          "mechanismInstanceId": "DEMO_PENSION_LIMIT",
+          "mechanismType": "CONTRIBUTION_LIMIT",
+          "parameterRuleIds": ["DEMO.LIMIT.ANNUAL"],
+          "priority": 10
+        },
+        {
+          "mechanismInstanceId": "DEMO_PENSION_CREDIT",
+          "mechanismType": "TAX_CREDIT",
+          "parameterRuleIds": ["DEMO.CREDIT.RATE"],
+          "priority": 20
+        },
+        {
+          "mechanismInstanceId": "DEMO_PENSION_DEFERRAL",
+          "mechanismType": "TAX_DEFERRAL",
+          "parameterRuleIds": ["DEMO.DEFERRAL.FLAG"],
+          "priority": 30
+        }
+      ],
+      "instrumentEligibilityRuleIds": ["DEMO.INSTRUMENT.WHITELIST"],
+      "supportedEvents": ["CONTRIBUTION", "WITHDRAWAL", "YEAR_END"],
+      "requiredEngineCapabilities": ["CONTRIBUTION_LIMIT", "TAX_CREDIT", "TAX_DEFERRAL"],
+      "sourceIds": ["DEMO_SRC_PRIMARY"]
+    },
+    {
+      "accountId": "DEMO_TAXABLE",
+      "displayName": "합성 일반계좌 (데모)",
+      "schemaVersion": "1.0.0",
+      "effectiveFrom": "2026-01-01",
+      "effectiveTo": "2030-01-01",
+      "eligibilityRuleIds": [],
+      "mechanismInstances": [
+        {
+          "mechanismInstanceId": "DEMO_TAXABLE_DIVIDEND",
+          "mechanismType": "DIVIDEND_DISTRIBUTION_TAX",
+          "parameterRuleIds": ["DEMO.CREDIT.RATE"],
+          "priority": 10
+        },
+        {
+          "mechanismInstanceId": "DEMO_TAXABLE_SALE",
+          "mechanismType": "TAXABLE_SALE_TAX",
+          "parameterRuleIds": ["DEMO.CREDIT.RATE"],
+          "priority": 20
+        },
+        {
+          "mechanismInstanceId": "DEMO_TAXABLE_AGGREGATION",
+          "mechanismType": "FINANCIAL_INCOME_AGGREGATION",
+          "parameterRuleIds": ["DEMO.LIMIT.ANNUAL"],
+          "priority": 30
+        }
+      ],
+      "instrumentEligibilityRuleIds": [],
+      "supportedEvents": ["DISTRIBUTION", "SALE", "YEAR_END"],
+      "requiredEngineCapabilities": [
+        "DIVIDEND_DISTRIBUTION_TAX",
+        "TAXABLE_SALE_TAX",
+        "FINANCIAL_INCOME_AGGREGATION"
+      ],
+      "sourceIds": ["DEMO_SRC_PRIMARY"]
+    }
+  ]
+}

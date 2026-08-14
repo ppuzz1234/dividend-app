@@ -1,0 +1,29 @@
+﻿{
+    "name":  "@cube/fact",
+    "version":  "0.0.0",
+    "private":  true,
+    "type":  "module",
+    "main":  "./dist/src/index.js",
+    "types":  "./dist/src/index.d.ts",
+    "exports":  {
+                    ".":  {
+                              "types":  "./dist/src/index.d.ts",
+                              "default":  "./dist/src/index.js"
+                          }
+                },
+    "scripts":  {
+                    "build":  "tsc -b tsconfig.json",
+                    "test":  "tsc -b tsconfig.json \u0026\u0026 node --test \"dist/test/**/*.test.js\"",
+                    "answer":  "tsc -b tsconfig.json \u0026\u0026 node --env-file-if-exists=../../.env dist/scripts/answer.js",
+                    "check:bundle":  "tsc -b tsconfig.json \u0026\u0026 node --env-file-if-exists=../../.env dist/scripts/check-bundle.js",
+                    "check:answers":  "tsc -b tsconfig.json \u0026\u0026 node --env-file-if-exists=../../.env dist/scripts/check-answers.js",
+                    "check:cross":  "tsc -b tsconfig.json \u0026\u0026 node --env-file-if-exists=../../.env dist/scripts/check-crosscheck.js",
+                    "rescore":  "tsc -b tsconfig.json \u0026\u0026 node dist/scripts/rescore-coverage.js"
+                },
+    "dependencies":  {
+                         "@cube/corpus":  "*",
+                         "@cube/factindex":  "*",
+                         "@cube/numeric":  "*",
+                         "@cube/policy":  "*"
+                     }
+}

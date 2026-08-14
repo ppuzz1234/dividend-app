@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CUBE FACT — 절세계좌 법령 팩트 엔진</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="layout">
+
+  <aside id="side">
+    <button type="button" id="new-chat" class="new-chat">+ 새 대화</button>
+    <p class="side-label">대화</p>
+    <ul id="conv-list" class="conv-list"></ul>
+    <p class="side-note">대화는 서버 메모리에만 있습니다. 서버를 끄면 사라집니다.</p>
+  </aside>
+
+  <div class="main-col">
+    <header>
+      <h1>CUBE <span class="accent">FACT</span></h1>
+      <p class="sub">국가법령정보 원문에 근거해서만 답합니다. 근거가 없으면 답하지 않습니다.</p>
+    </header>
+
+    <main>
+      <section id="thread"></section>
+
+      <ul class="chips" id="chips">
+        <li><button type="button" data-q="ISA 비과세 한도와 서민형 요건">ISA 비과세 한도와 서민형 요건</button></li>
+        <li><button type="button" data-q="IRP 연간 납입한도가 얼마인가">IRP 납입한도</button></li>
+        <li><button type="button" data-q="연금계좌 중도인출 사유">연금계좌 중도인출</button></li>
+        <li><button type="button" data-q="퇴직소득세 이연 요건">퇴직소득세 이연</button></li>
+        <li><button type="button" data-q="나는 연봉 6000만원인데 얼마 넣어야 돼?">(PLAN 으로 걷어내지는 질문)</button></li>
+      </ul>
+
+      <p id="status" hidden></p>
+    </main>
+
+    <form id="ask">
+      <textarea id="q" rows="1" autocomplete="off" placeholder="질문하세요. 답을 받은 뒤 “예시를 줘”처럼 이어서 물어도 됩니다. (Enter 전송 · Shift+Enter 줄바꿈)"></textarea>
+      <label class="asof">조회일 <input id="asof" type="date"></label>
+      <button type="submit" id="send">묻기</button>
+      <button type="button" id="stop" hidden>■ 중지</button>
+    </form>
+
+    <footer>
+      <p>이 화면은 계산을 하지 않습니다. 표시되는 모든 값은 조문 원문에서 온 것이며, 개인별 적용은 PLAN 엔진(미션 2)의 몫입니다.</p>
+    </footer>
+  </div>
+</div>
+
+<script src="/app.js"></script>
+</body>
+</html>

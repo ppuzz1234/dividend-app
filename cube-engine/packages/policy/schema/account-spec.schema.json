@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "cube:account-spec",
+  "title": "AccountSpec (사양 §5.3.2)",
+  "$comment": "TS 계층 인터페이스의 직렬화 표현이므로 camelCase 다 (사양 §5.2.1 네이밍 계약). 정책 팩 YAML 의 snake_case 와 섞지 않는다. 커버리지 검사·dangling 참조·의존성 그래프는 loadAccountSpecs 의 의미 검사가 담당한다.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "accountId",
+    "displayName",
+    "schemaVersion",
+    "effectiveFrom",
+    "eligibilityRuleIds",
+    "mechanismInstances",
+    "instrumentEligibilityRuleIds",
+    "supportedEvents",
+    "requiredEngineCapabilities",
+    "sourceIds"
+  ],
+  "properties": {
+    "accountId": { "type": "string", "minLength": 1 },
+    "displayName": { "type": "string", "minLength": 1 },
+    "schemaVersion": { "type": "string", "minLength": 1 },
+    "effectiveFrom": { "type": "string" },
+    "effectiveTo": { "type": ["string", "null"] },
+    "eligibilityRuleIds": { "type": "array", "items": { "type": "string" } },
+    "mechanismInstances": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/mechanismInstance" }
+    },
+    "instrumentEligibilityRuleIds": { "type": "array", "items": { "type": "string" } },
+    "supportedEvents": { "type": "array", "items": { "type": "string" } },
+    "requiredEngineCapabilities": { "type": "array", "items": { "type": "string" } },
+    "sourceIds": { "type": "array", "items": { "type": "string" } }
+  },
+  "$defs": {
+    "mechanismInstance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mechanismInstanceId", "mechanismType", "parameterRuleIds", "priority"],
+      "properties": {
+        "mechanismInstanceId": { "type": "string", "minLength": 1 },
+        "mechanismType": { "type": "string", "minLength": 1 },
+        "parameterRuleIds": { "type": "array", "items": { "type": "string" } },
+        "priority": { "type": "number" }
+      }
+    }
+  }
+}

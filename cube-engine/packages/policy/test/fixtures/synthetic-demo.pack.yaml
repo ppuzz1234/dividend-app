@@ -1,0 +1,285 @@
+# SYNTHETIC_DEMO 정책 팩 — 로더 테스트용 합성 값이다. 실제 세법 값이 아니며 어떤 조문도 대조하지 않았다.
+# 모든 수치는 424242 패턴으로 명백히 합성임을 표시했다. 이 팩으로 계산한 결과에는
+# "합성 세법 값 · 실제 세법이 아님" 스탬프가 강제 부착된다 (CLAUDE.md 규칙 0).
+#
+# 표기법: 정책 팩 계층이므로 snake_case 다 (사양 §5.2.1 네이밍 계약).
+# 이 파일은 canonical ASCII key 검사(R31)를 통과해야 한다 — 언더스코어는 허용된다.
+
+pack_kind: SYNTHETIC_DEMO
+policy_snapshot: DEMO-SYNTHETIC-0001
+
+rules:
+  # ── 값이 있는 규칙 ────────────────────────────────────────────────────────
+  - id: DEMO.LIMIT.ANNUAL
+    lifecycle: { status: ENACTED }
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: CONTRIBUTION_LIMIT
+      conflict_group: DEMO_LIMIT
+    temporal:
+      promulgated_at: "2025-12-01"
+      valid_from: "2026-01-01"
+      valid_to: null
+      recorded_at: "2025-12-15"
+    scope:
+      jurisdiction: KR
+      tax_years: [2026]
+    effect:
+      value: "424242000"
+      unit: KRW
+      rounding:
+        stage: PER_YEAR
+        mode: FLOOR
+        unit_krw: "10"
+    sources:
+      - { source_id: DEMO_SRC_PRIMARY, role: PRIMARY }
+      - { source_id: DEMO_SRC_DETAIL, role: IMPLEMENTING_DETAIL }
+    # 사양 §5.1 예시는 `effect.value:` 처럼 점 포함 key 를 쓰지만, §5.2.1 canonical key 규칙이
+    # 점을 금지해 그 팩은 해싱 불가가 된다 (OPEN-Q11). 언더스코어 표기로 적는다.
+    field_bindings:
+      effect_value: [DEMO_SRC_PRIMARY]
+      effect_rounding: [DEMO_SRC_DETAIL]
+    review:
+      approved: false
+      reviewer_id: null
+      reviewed_at: null
+
+  - id: DEMO.CREDIT.RATE
+    lifecycle: { status: ENACTED }
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: DEMO_CREDIT
+    temporal:
+      promulgated_at: "2025-12-01"
+      valid_from: "2026-01-01"
+      valid_to: null
+      recorded_at: "2025-12-15"
+    scope:
+      jurisdiction: KR
+      tax_years: [2026]
+    effect:
+      value: { numerator: "424242", denominator: "1000000" }
+      unit: RATE
+      rounding:
+        stage: FINAL_RESULT
+        mode: HALF_UP
+        unit_krw: "1"
+    sources:
+      - { source_id: DEMO_SRC_PRIMARY, role: PRIMARY }
+    review:
+      approved: false
+      reviewer_id: null
+      reviewed_at: null
+
+  - id: DEMO.DEFERRAL.FLAG
+    lifecycle: { status: ENACTED }
+    authority:
+      type: DECREE
+      delegated_by: DEMO.CREDIT.RATE
+      applies_to: TAX_TREATMENT
+      conflict_group: DEMO_DEFERRAL
+    temporal:
+      promulgated_at: "2025-12-01"
+      valid_from: "2026-01-01"
+      valid_to: null
+      recorded_at: "2025-12-15"
+    scope:
+      jurisdiction: KR
+      tax_years: [2026]
+    effect:
+      value: "1"
+      unit: COUNT
+    sources:
+      - { source_id: DEMO_SRC_PRIMARY, role: PRIMARY }
+    review:
+      approved: false
+      reviewer_id: null
+      reviewed_at: null
+
+  # ── 효과 없는 참조 규칙 (자격·편입 게이트) ────────────────────────────────
+  - id: DEMO.ELIGIBILITY.RESIDENT
+    lifecycle: { status: ENACTED }
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: AVAILABILITY
+      conflict_group: DEMO_ELIGIBILITY
+    temporal:
+      valid_from: "2026-01-01"
+      valid_to: null
+    scope:
+      jurisdiction: KR
+      tax_years: [2026]
+    conditions:
+      branches:
+        - { resident: true }
+    sources:
+      - { source_id: DEMO_SRC_PRIMARY, role: PRIMARY }
+    review:
+      approved: false
+      reviewer_id: null
+      reviewed_at: null
+
+  - id: DEMO.INSTRUMENT.WHITELIST
+    lifecycle: { status: ENACTED }
+    authority:
+      type: PROVIDER_POLICY
+      delegated_by: null
+      applies_to: AVAILABILITY
+      conflict_group: DEMO_INSTRUMENT
+    temporal:
+      valid_from: "2026-01-01"
+      valid_to: null
+    scope:
+      jurisdiction: KR
+      tax_years: [2026]
+    sources:
+      - { source_id: DEMO_SRC_PROVIDER, role: ADMIN_INTERPRETATION }
+    review:
+      approved: false
+      reviewer_id: null
+      reviewed_at: null
+
+  # ── 서열 해소 대상: 같은 applies_to + conflict_group, 다른 서열 (P05) ─────
+  - id: DEMO.RANKED.STATUTE
+    lifecycle: { status: ENACTED }
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: DEMO_RANKED
+    temporal:
+      valid_from: "2026-01-01"
+      valid_to: null
+    scope:
+      jurisdiction: KR
+      tax_years: [2026]
+    effect:
+      value: "424242001"
+      unit: KRW
+    sources:
+      - { source_id: DEMO_SRC_PRIMARY, role: PRIMARY }
+    review:
+      approved: false
+      reviewer_id: null
+      reviewed_at: null
+
+  - id: DEMO.RANKED.GUIDANCE
+    lifecycle: { status: ENACTED }
+    authority:
+      type: ADMIN_GUIDANCE
+      delegated_by: DEMO.RANKED.STATUTE
+      applies_to: TAX_TREATMENT
+      conflict_group: DEMO_RANKED
+    temporal:
+      valid_from: "2026-01-01"
+      valid_to: null
+    scope:
+      jurisdiction: KR
+      tax_years: [2026]
+    effect:
+      value: "424242002"
+      unit: KRW
+    sources:
+      - { source_id: DEMO_SRC_GUIDE, role: ADMIN_INTERPRETATION }
+      - { source_id: DEMO_SRC_PRIMARY, role: PRIMARY }
+    review:
+      approved: false
+      reviewer_id: null
+      reviewed_at: null
+
+  # ── 생애주기·유효구간 경계 케이스 ─────────────────────────────────────────
+  - id: DEMO.PROPOSED.DRAFT
+    lifecycle: { status: PROPOSED }
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: DEMO_PROPOSED
+    temporal:
+      valid_from: "2026-01-01"
+      valid_to: null
+    scope:
+      jurisdiction: KR
+      tax_years: [2027]
+    effect:
+      value: "424242003"
+      unit: KRW
+    sources:
+      - { source_id: DEMO_SRC_PRIMARY, role: PRIMARY }
+    review:
+      approved: false
+      reviewer_id: null
+      reviewed_at: null
+
+  - id: DEMO.REPEALED.OLD
+    lifecycle: { status: REPEALED }
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: DEMO_REPEALED
+    temporal:
+      valid_from: "2020-01-01"
+      valid_to: "2024-01-01"
+    scope:
+      jurisdiction: KR
+      tax_years: [2020]
+    effect:
+      value: "424242004"
+      unit: KRW
+    sources:
+      - { source_id: DEMO_SRC_PRIMARY, role: PRIMARY }
+    review:
+      approved: false
+      reviewer_id: null
+      reviewed_at: null
+
+  - id: DEMO.FUTURE.NOTYET
+    lifecycle: { status: ENACTED }
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: DEMO_FUTURE
+    temporal:
+      valid_from: "2030-01-01"
+      valid_to: null
+    scope:
+      jurisdiction: KR
+      tax_years: [2030]
+    effect:
+      value: "424242005"
+      unit: KRW
+    sources:
+      - { source_id: DEMO_SRC_PRIMARY, role: PRIMARY }
+    review:
+      approved: false
+      reviewer_id: null
+      reviewed_at: null
+
+  - id: DEMO.SUNSET.BOUNDED
+    lifecycle: { status: ENACTED }
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: DEMO_SUNSET
+    temporal:
+      valid_from: "2026-01-01"
+      valid_to: "2027-01-01"
+    scope:
+      jurisdiction: KR
+      tax_years: [2026]
+    effect:
+      value: "424242006"
+      unit: KRW
+    sources:
+      - { source_id: DEMO_SRC_PRIMARY, role: PRIMARY }
+    review:
+      approved: false
+      reviewer_id: null
+      reviewed_at: null

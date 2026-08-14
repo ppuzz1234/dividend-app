@@ -1,0 +1,720 @@
+# UNVERIFIED_DRAFT — AI 초안이다. **아직 어떤 계산에도 쓸 수 없다.**
+# 이 팩으로 resolveEffect 를 호출하면 UnverifiedPolicyError 가 난다 (registry.ts).
+#
+# 승인 절차 (사양 §2.2 5단계):
+#   1. `npm run review -w @cube/packdraft -- <이 파일>` 로 대조표를 본다
+#   2. 각 규칙의 인용을 **원문에서 직접 확인**한다
+#   3. 확인된 규칙만 review.approved: true + reviewer_id + reviewed_at 을 손으로 적는다
+#   4. <원문 대조 후 기재> 를 실제 값으로 바꾼다 (남아 있으면 승격이 거절된다)
+#   4-1. ★ effect.rounding 을 **직접 추가**한다 — 초안에는 아예 없다.
+#        AI 가 반올림 사양을 지어내면 절대 규칙 1 위반이라 비워 보낸다.
+#        stage/mode/unit_krw 셋 다 적어야 한다 (일부만 있으면 ROUNDING_SPEC_INCOMPLETE).
+#   5. pack_kind 를 VERIFIED_LAW 로 바꾸고 `npm run promote` 로 검증
+#   6. 다른 사람이 git diff 로 확인 (Checker)
+#
+# 승인 버튼이 없는 이유: 버튼이 있으면 원문을 안 보게 된다.
+pack_kind: VERIFIED_LAW
+policy_snapshot: KR-TAX-DRAFT-INCTAX_129
+rules:
+  - id: INCTAX.WITHHOLDING_RATE.INTEREST.NON_BUSINESS_LOAN
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-05
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value:
+        numerator: "25"
+        denominator: "100"
+      unit: RATE
+    sources:
+      - source_id: INCTAX_129
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_129
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-07
+  - id: INCTAX.WITHHOLDING_RATE.INTEREST.ONLINE_P2P_LOAN
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-05
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value:
+        numerator: "14"
+        denominator: "100"
+      unit: RATE
+    sources:
+      - source_id: INCTAX_129
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_129
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-07
+  - id: INCTAX.WITHHOLDING_RATE.INTEREST.OTHER
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-05
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value:
+        numerator: "14"
+        denominator: "100"
+      unit: RATE
+    sources:
+      - source_id: INCTAX_129
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_129
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-07
+  - id: INCTAX.WITHHOLDING_RATE.DIVIDEND.PARTNER
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-05
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value:
+        numerator: "25"
+        denominator: "100"
+      unit: RATE
+    sources:
+      - source_id: INCTAX_129
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_129
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-07
+  - id: INCTAX.WITHHOLDING_RATE.DIVIDEND.OTHER
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-05
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value:
+        numerator: "14"
+        denominator: "100"
+      unit: RATE
+    sources:
+      - source_id: INCTAX_129
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_129
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-07
+  - id: INCTAX.WITHHOLDING_RATE.BUSINESS.GENERAL
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-05
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value:
+        numerator: "3"
+        denominator: "100"
+      unit: RATE
+    sources:
+      - source_id: INCTAX_129
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_129
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-07
+  - id: INCTAX.WITHHOLDING_RATE.BUSINESS.FOREIGN_SPORTS_PLAYER
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-05
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value:
+        numerator: "20"
+        denominator: "100"
+      unit: RATE
+    sources:
+      - source_id: INCTAX_129
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_129
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-07
+  - id: INCTAX.WITHHOLDING_RATE.LABOR.DAILY_WORKER
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-05
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value:
+        numerator: "6"
+        denominator: "100"
+      unit: RATE
+    sources:
+      - source_id: INCTAX_129
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_129
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-07
+  - id: INCTAX.WITHHOLDING_RATE.PENSION.ACCOUNT.AGE_70_LT
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-05
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value:
+        numerator: "5"
+        denominator: "100"
+      unit: RATE
+    sources:
+      - source_id: INCTAX_129
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_129
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-07
+  - id: INCTAX.WITHHOLDING_RATE.PENSION.ACCOUNT.AGE_70_TO_80
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-05
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value:
+        numerator: "4"
+        denominator: "100"
+      unit: RATE
+    sources:
+      - source_id: INCTAX_129
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_129
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-07
+  - id: INCTAX.WITHHOLDING_RATE.PENSION.ACCOUNT.AGE_80_GE
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-05
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value:
+        numerator: "3"
+        denominator: "100"
+      unit: RATE
+    sources:
+      - source_id: INCTAX_129
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_129
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-07
+  - id: INCTAX.WITHHOLDING_RATE.PENSION.ACCOUNT.LIFELONG_CONTRACT
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-05
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value:
+        numerator: "3"
+        denominator: "100"
+      unit: RATE
+    sources:
+      - source_id: INCTAX_129
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_129
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-07
+  - id: INCTAX.WITHHOLDING_RATE.PENSION.RETIREMENT.YEARS_10_LE
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-05
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value:
+        numerator: "70"
+        denominator: "100"
+      unit: RATE
+    sources:
+      - source_id: INCTAX_129
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_129
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-07
+  - id: INCTAX.WITHHOLDING_RATE.PENSION.RETIREMENT.YEARS_10_TO_20
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-05
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value:
+        numerator: "60"
+        denominator: "100"
+      unit: RATE
+    sources:
+      - source_id: INCTAX_129
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_129
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-07
+  - id: INCTAX.WITHHOLDING_RATE.PENSION.RETIREMENT.YEARS_20_GT
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-05
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value:
+        numerator: "50"
+        denominator: "100"
+      unit: RATE
+    sources:
+      - source_id: INCTAX_129
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_129
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-07
+  - id: INCTAX.WITHHOLDING_RATE.OTHER_INCOME.OVER_300M
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-05
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value:
+        numerator: "30"
+        denominator: "100"
+      unit: RATE
+    sources:
+      - source_id: INCTAX_129
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_129
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-07
+  - id: INCTAX.OTHER_INCOME.THRESHOLD.OVER_300M
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-05
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value: "300000000"
+      unit: KRW
+    sources:
+      - source_id: INCTAX_129
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_129
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-07
+  - id: INCTAX.WITHHOLDING_RATE.OTHER_INCOME.SPECIFIED
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-05
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value:
+        numerator: "15"
+        denominator: "100"
+      unit: RATE
+    sources:
+      - source_id: INCTAX_129
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_129
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-07
+  - id: INCTAX.WITHHOLDING_RATE.OTHER_INCOME.OTHER
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-05
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value:
+        numerator: "20"
+        denominator: "100"
+      unit: RATE
+    sources:
+      - source_id: INCTAX_129
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_129
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-07
+  - id: INCTAX.WITHHOLDING_RATE.TIPS
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-05
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value:
+        numerator: "5"
+        denominator: "100"
+      unit: RATE
+    sources:
+      - source_id: INCTAX_129
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_129
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-07
+  - id: INCTAX.WITHHOLDING_RATE.INTEREST.LEGAL_DEPOSIT
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-05
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value:
+        numerator: "14"
+        denominator: "100"
+      unit: RATE
+    sources:
+      - source_id: INCTAX_129
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_129
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-07
+  - id: INCTAX.WITHHOLDING_RATE.UNIDENTIFIED_INCOME
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-05
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value:
+        numerator: "45"
+        denominator: "100"
+      unit: RATE
+    sources:
+      - source_id: INCTAX_129
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_129
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-07

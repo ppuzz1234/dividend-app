@@ -1,0 +1,99 @@
+# UNVERIFIED_DRAFT — 초안이다. **아직 어떤 계산에도 쓸 수 없다.**
+#
+# 누가 썼나: `AXIS_BOUNDS.draft.yaml` 과 같은 이유로 **Claude 가 손으로 작성**했다.
+# 값(400만원·200만원)은 이미 TAXEX_91_18 팩에 승인돼 있는데, 둘을 **가르는 소득 경계**가
+# 조문에서는 "다음 각 목의 어느 하나에 해당하는 경우" 라는 조건 문장 안에 들어 있어서
+# packdraft 가 값으로 뽑지 못한다. 나이 경계 때와 같은 구조다.
+#
+# 이 팩이 채우는 것: ISA 비과세 한도 구간표의 **경계** 2개.
+#   지금 taxlens 는 `isaTaxFreeEarnings` 를 일반형 200만원으로 **고정**해 쓴다. 즉 서민형
+#   400만원을 받을 수 있는 사람도 200만원으로 계산된다 — 불리한 쪽으로 틀린다.
+#
+# ★ 승인 전에 읽을 것 — 이 초안이 다루지 않는 것
+#   조문 ② 1호는 가·나·다 세 갈래다. 여기 담은 것은 **가(총급여)·나(종합소득금액)** 뿐이다.
+#   다목(농어민)은 "대통령령으로 정하는 농어민" 이라 시행령을 더 봐야 하고, 우리 모델에
+#   농어민 여부를 담는 사실(fact)도 없다. 농어민은 서민형인데 일반형으로 계산된다 —
+#   **불리한 쪽으로 틀리는 미포함**이므로 결과에 표기해야 한다(NOT_INCLUDED).
+#
+#   또 조문은 "**직전 과세기간**의 총급여액/종합소득금액" 을 기준으로 한다. 우리 모델은
+#   사용자가 입력한 **현재 연소득** 하나만 안다. 둘을 같다고 보는 것은 단순화다.
+#   승인하면 그 단순화를 받아들이는 것이다.
+#
+# 승인 절차 (사양 §2.2):
+#   1. 아래 인용을 원문에서 직접 확인한다
+#   2. 확인된 규칙만 review.approved: true + reviewer_id + reviewed_at 을 손으로 적는다
+#   3. pack_kind 를 VERIFIED_LAW 로 바꾼다
+pack_kind: VERIFIED_LAW
+policy_snapshot: KR-TAX-DRAFT-ISA_NONTAX_BOUNDS
+rules:
+  # ── 조세특례제한법 §91의18 ② 1호 가목 ────────────────────────────────────────
+  # 인용: "가. 직전 과세기간의 총급여액이 5천만원 이하인 거주자(직전 과세기간에 근로소득만
+  #        있거나 근로소득 및 종합소득과세표준에 합산되지 아니하는 종합소득이 있는 자로 한정한다)"
+  # 이 금액 **이하**면 1호(400만원), 초과면 2호(200만원).
+  - id: ISA.NONTAX_LIMIT.THRESHOLD.SALARY
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: TAXEX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-10
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value: "50000000"
+      unit: KRW
+    sources:
+      - source_id: TAXEX_91_18
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - TAXEX_91_18
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-11
+
+  # ── 조세특례제한법 §91의18 ② 1호 나목 ────────────────────────────────────────
+  # 인용: "나. 직전 과세기간의 종합소득과세표준에 합산되는 종합소득금액이 3천8백만원 이하인
+  #        거주자(직전 과세기간의 총급여액이 5천만원을 초과하지 아니하는 자로 한정한다)"
+  # 괄호의 단서(총급여 5천만 초과 제외)는 두 경계를 **동시에** 봐야 한다는 뜻이지만,
+  # 우리 구간표는 사실 하나(총급여 또는 종합소득금액)로만 판정한다.
+  # KNOWN-LIMITATION 으로 남기고 승인 여부는 사람이 정한다.
+  - id: ISA.NONTAX_LIMIT.THRESHOLD.COMPREHENSIVE_INCOME
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: TAXEX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-10
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value: "38000000"
+      unit: KRW
+    sources:
+      - source_id: TAXEX_91_18
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - TAXEX_91_18
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-11

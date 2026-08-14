@@ -1,0 +1,345 @@
+# UNVERIFIED_DRAFT — 초안이다. **아직 어떤 계산에도 쓸 수 없다.**
+#
+# 누가 썼나: packdraft(AI 초안)가 아니라 **Claude 가 손으로 작성**했다. 이 값들은 조문의 **표**
+# 안에 있는데, 추출기는 규칙을 "조건 → 값" 하나로 보기 때문에 표의 행마다 세 값(상한·기초금액
+# ·세율)을 따로 뽑아내지 못한다. 나이 경계(AXIS_BOUNDS)·ISA 소득경계 때와 같은 구조다.
+# **자동 인용 검사를 안 거쳤으므로 아래 주석의 인용을 원문에서 직접 확인해야 한다.**
+#
+# 무엇: 소득세법 §47의2 ① 연금소득공제 4구간 + 900만원 한도
+# 왜:   연금을 종합과세로 받을 때 총연금액에서 빼는 공제. 이게 없으면 종합과세 경로의 세액이 과대평가되고, §64의4 비교가 15% 쪽으로 기운다.
+#
+# ★ 분리과세연금소득은 제외다.
+#   조문이 "총연금액(분리과세연금소득은 제외하며)" 이라고 못 박는다. 즉 연 1,500만원 이하로
+#   분리과세되는 연금에는 이 공제가 붙지 않는다 — 그 경로는 §129 원천징수(5/4/3%)로 끝난다.
+#   두 경로를 섞으면 공제를 두 번 주게 된다.
+#
+# 승인 절차 (사양 §2.2): 인용 확인 → 규칙별 approved/reviewer_id/reviewed_at 기입 →
+#                        pack_kind 를 VERIFIED_LAW 로.
+pack_kind: VERIFIED_LAW
+policy_snapshot: KR-TAX-DRAFT-INCTAX_47_2
+rules:
+  # §47의2 ① 1구간 상한 — "350만원 이하 → 총연금액"
+  - id: INCTAX.PENSION_INCOME_DEDUCTION.BAND_1.UPPER
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-10
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value: "3500000"
+      unit: KRW
+    sources:
+      - source_id: INCTAX_47_2
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_47_2
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-11
+
+  # §47의2 ① 2구간 상한 — "350만원 초과 700만원 이하 → 350만원＋(350만원 초과분의 100분의 40)"
+  - id: INCTAX.PENSION_INCOME_DEDUCTION.BAND_2.UPPER
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-10
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value: "7000000"
+      unit: KRW
+    sources:
+      - source_id: INCTAX_47_2
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_47_2
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-11
+
+  # §47의2 ① 2구간 기초금액
+  - id: INCTAX.PENSION_INCOME_DEDUCTION.BAND_2.BASE_AMOUNT
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-10
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value: "3500000"
+      unit: KRW
+    sources:
+      - source_id: INCTAX_47_2
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_47_2
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-11
+
+  # §47의2 ① 2구간 초과분 공제율
+  - id: INCTAX.PENSION_INCOME_DEDUCTION.BAND_2.RATE
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-10
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value:
+        numerator: "40"
+        denominator: "100"
+      unit: RATE
+    sources:
+      - source_id: INCTAX_47_2
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_47_2
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-11
+
+  # §47의2 ① 3구간 상한 — "700만원 초과 1400만원 이하 → 490만원＋(700만원 초과분의 100분의 20)"
+  - id: INCTAX.PENSION_INCOME_DEDUCTION.BAND_3.UPPER
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-10
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value: "14000000"
+      unit: KRW
+    sources:
+      - source_id: INCTAX_47_2
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_47_2
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-11
+
+  # §47의2 ① 3구간 기초금액
+  - id: INCTAX.PENSION_INCOME_DEDUCTION.BAND_3.BASE_AMOUNT
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-10
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value: "4900000"
+      unit: KRW
+    sources:
+      - source_id: INCTAX_47_2
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_47_2
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-11
+
+  # §47의2 ① 3구간 초과분 공제율
+  - id: INCTAX.PENSION_INCOME_DEDUCTION.BAND_3.RATE
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-10
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value:
+        numerator: "20"
+        denominator: "100"
+      unit: RATE
+    sources:
+      - source_id: INCTAX_47_2
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_47_2
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-11
+
+  # §47의2 ① 4구간 기초금액
+  - id: INCTAX.PENSION_INCOME_DEDUCTION.BAND_4.BASE_AMOUNT
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-10
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value: "6300000"
+      unit: KRW
+    sources:
+      - source_id: INCTAX_47_2
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_47_2
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-11
+
+  # §47의2 ① 4구간 초과분 공제율
+  - id: INCTAX.PENSION_INCOME_DEDUCTION.BAND_4.RATE
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-10
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value:
+        numerator: "10"
+        denominator: "100"
+      unit: RATE
+    sources:
+      - source_id: INCTAX_47_2
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_47_2
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-11
+
+  # §47의2 ① 단서 — "공제액이 900만원을 초과하는 경우에는 900만원을 공제한다"
+  - id: INCTAX.PENSION_INCOME_DEDUCTION.CAP
+    lifecycle:
+      status: ENACTED
+    authority:
+      type: STATUTE
+      delegated_by: null
+      applies_to: TAX_TREATMENT
+      conflict_group: INCTAX
+    temporal:
+      promulgated_at: 2026-01-01
+      valid_from: 2026-01-01
+      valid_to: null
+      recorded_at: 2026-08-10
+    scope:
+      jurisdiction: KR
+      tax_years:
+        - 2026
+    effect:
+      value: "9000000"
+      unit: KRW
+    sources:
+      - source_id: INCTAX_47_2
+        role: PRIMARY
+    field_bindings:
+      effect_value:
+        - INCTAX_47_2
+    review:
+      approved: true
+      reviewer_id: Seohyun Park
+      reviewed_at: 2026-08-11

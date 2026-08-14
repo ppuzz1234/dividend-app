@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "cube:policy-pack",
+  "title": "정책 팩 (사양 §5.1 + CLAUDE.md 규칙 0)",
+  "$comment": "구조 검증만 담당한다. 교차 필드 불변식(dangling 참조·중복 id·유효구간·pack_kind 별 승인 규칙)은 loadPolicyPack 의 의미 검사가 담당하며, 각각 매트릭스의 고유 code 를 던진다. 표기법은 정책 팩 계층 규약대로 snake_case 다 (사양 §5.2.1 네이밍 계약).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["pack_kind", "policy_snapshot", "rules"],
+  "properties": {
+    "pack_kind": {
+      "enum": ["VERIFIED_LAW", "SYNTHETIC_DEMO", "UNVERIFIED_DRAFT"]
+    },
+    "policy_snapshot": { "type": "string", "minLength": 1 },
+    "rules": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/rule" }
+    }
+  },
+  "$defs": {
+    "rule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "lifecycle", "authority", "temporal", "scope", "sources", "review"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "lifecycle": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status"],
+          "properties": {
+            "status": { "enum": ["PROPOSED", "ENACTED", "REPEALED"] }
+          }
+        },
+        "authority": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "applies_to", "conflict_group"],
+          "properties": {
+            "type": { "enum": ["STATUTE", "DECREE", "RULE", "ADMIN_GUIDANCE", "PROVIDER_POLICY"] },
+            "delegated_by": { "type": ["string", "null"] },
+            "applies_to": { "type": "string", "minLength": 1 },
+            "conflict_group": { "type": "string", "minLength": 1 }
+          }
+        },
+        "temporal": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["valid_from"],
+          "properties": {
+            "promulgated_at": { "type": ["string", "null"] },
+            "valid_from": { "type": "string" },
+            "valid_to": { "type": ["string", "null"] },
+            "recorded_at": { "type": ["string", "null"] }
+          }
+        },
+        "scope": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["jurisdiction", "tax_years"],
+          "properties": {
+            "jurisdiction": { "type": "string", "minLength": 1 },
+            "tax_years": { "type": "array", "items": { "type": "number" } }
+          }
+        },
+        "conditions": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "branches": { "type": "array", "items": { "type": "object" } }
+          }
+        },
+        "effect": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["value", "unit"],
+          "properties": {
+            "value": true,
+            "unit": { "enum": ["RATE", "KRW", "COUNT", "YEARS", "MONTHS"] },
+            "rounding": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "stage": { "enum": ["PER_TRANSACTION", "PER_YEAR", "PER_ACCOUNT", "FINAL_RESULT"] },
+                "mode": { "enum": ["FLOOR", "CEIL", "HALF_UP", "TRUNCATE"] },
+                "unit_krw": { "type": "string" }
+              }
+            }
+          }
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["source_id", "role"],
+            "properties": {
+              "source_id": { "type": "string", "minLength": 1 },
+              "role": { "enum": ["PRIMARY", "IMPLEMENTING_DETAIL", "ADMIN_INTERPRETATION"] }
+            }
+          }
+        },
+        "field_bindings": {
+          "type": "object",
+          "additionalProperties": { "type": "array", "items": { "type": "string" } }
+        },
+        "review": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["approved"],
+          "properties": {
+            "approved": { "type": "boolean" },
+            "reviewer_id": { "type": ["string", "null"] },
+            "reviewed_at": { "type": ["string", "null"] }
+          }
+        }
+      }
+    }
+  }
+}
