@@ -13,6 +13,7 @@
     "preview": "npm run preview --workspace apps/web",
     "lint": "npm run lint --workspace apps/web",
     "dev:api": "npm run dev --workspace apps/api",
+    "dev:cube": "node cube-engine/scripts/dev-all.mjs",
     "db:setup": "node --env-file-if-exists=.env supabase/setup.mjs"
   },
   "devDependencies": {

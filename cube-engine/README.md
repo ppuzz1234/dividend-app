@@ -11,23 +11,31 @@ ISA·연금저축·IRP 질문에 **법령 원문을 인용해서** 답하는 엔
 
 ## 실행
 
-Node 20 이상이 필요합니다.
+Node 20 이상. 처음 한 번만 준비하면 그다음부터는 명령 하나입니다.
 
 ```bash
+# 준비 (한 번)
+cd cube-engine
 npm install
-cp .env.example .env      # LLM_API_KEY 를 채운다
+cp .env.example .env                     # LLM_API_KEY 를 채운다
 npm run build
+npm run build:index -w @cube/factindex   # 조문 → 벡터 색인 (수 분 · 임베딩 API 사용)
 
-npm run build:index -w @cube/factindex   # 조문 스냅샷 → 벡터 색인 (수 분, 1회)
-npm run serve -w @cube/factui            # http://127.0.0.1:8787
+# 이후: 저장소 루트에서 프런트 + 엔진을 함께
+cd ..
+npm run dev:cube
 ```
+
+엔진만 따로 띄우려면 `npm run serve -w @cube/factui` (→ http://127.0.0.1:8787).
+
+**`LLM_API_KEY` 는 각자 채웁니다.** 저장소에 키를 넣지 않습니다. 키가 없으면 색인도 못
+만들고 답변도 못 합니다 — 조문 검색은 임베딩 API 를, 답변은 생성 API 를 쓰기 때문입니다.
+`npm run dev:cube` 는 준비가 안 됐으면 **무엇을 해야 하는지 알려주고 멈춥니다.**
 
 색인(`packages/factindex/index/`)은 저장소에 없습니다. 조문 스냅샷에서 **결정론적으로
 재생성**되기 때문입니다 — 같은 스냅샷이면 같은 색인이 나오는 것을 콜드 재빌드로 확인했고
 (`docs/MISSION2-SEAM.md` §4), 그래서 32MB 파생물을 커밋하지 않습니다. 조문 스냅샷은
 반대로 **증거물**이라 커밋합니다.
-
-`.env` 는 커밋되지 않습니다. 키는 각자 채웁니다.
 
 ## 무엇이 어디에 있나
 
